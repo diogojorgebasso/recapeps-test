@@ -56,8 +56,8 @@ export const createStripeCheckoutSession = onCall<CheckoutSessionRequest>(
 
       // Create a Stripe Checkout Session for a subscription
       const session = await stripe.checkout.sessions.create({
-        customer, // Link to the Stripe customer
-        payment_method_types: ["card"],
+        customer, 
+        ui_mode: "embedded",
         line_items: [
           {
             price: priceId,
@@ -65,8 +65,7 @@ export const createStripeCheckoutSession = onCall<CheckoutSessionRequest>(
           },
         ],
         mode: "subscription",
-        success_url: "https://recapeps.fr/success?session_id={CHECKOUT_SESSION_ID}",
-        cancel_url: "https://recapeps.fr/cancel",
+        return_url: "https://recapeps.fr/success?session_id={CHECKOUT_SESSION_ID}",
         metadata: { firebaseUID: userId },
       });
 
