@@ -17,7 +17,7 @@ function useUserSession(initialUser) {
     // The service worker is built with npm run build-service-worker
     useEffect(() => {
         if ("serviceWorker" in navigator) {
-            navigator.serviceWorker.register('/auth-service-worker.js', { type: 'module' })
+            navigator.serviceWorker.register('/auth-service-worker.js')
                 .then((registration) => console.log("scope is: ", registration.scope))
                 .catch((error) => console.log("SW registration failed: ", error));
         }
