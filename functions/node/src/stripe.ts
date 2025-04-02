@@ -15,7 +15,7 @@ interface CheckoutSessionRequest {
   priceId: string;
 }
 
-export const createStripeCheckoutSession = onCall<CheckoutSessionRequest>(
+export const createstripecheckoutsession = onCall<CheckoutSessionRequest>(
   { 
     cors: "https://recapeps.fr", 
     enforceAppCheck: true 
@@ -81,7 +81,7 @@ export const createStripeCheckoutSession = onCall<CheckoutSessionRequest>(
   }
 );
 
-export const stripeWebhookTest = onRequest( async (req, res) => {
+export const stripewebhooktest = onRequest( async (req, res) => {
   try {
     const sig = req.headers["stripe-signature"] as string;
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -138,7 +138,7 @@ export const stripeWebhookTest = onRequest( async (req, res) => {
   }
 });
 
-export const createPortalSession = onCall(
+export const createportalsession = onCall(
   { cors: "https://recapeps.fr", enforceAppCheck: true },
   async (request) => {
 

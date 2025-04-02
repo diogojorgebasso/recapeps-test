@@ -10,7 +10,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
 }
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-export const saveRoleToFirestore = functions.auth.user().onCreate(async (user) => {
+export const saveroletofirestore = functions.auth.user().onCreate(async (user) => {
     try {
         const { uid, email, displayName, photoURL } = user;
         const role = email && email.endsWith("@recapeps.com") ? "admin" : "user";
@@ -35,7 +35,7 @@ export const saveRoleToFirestore = functions.auth.user().onCreate(async (user) =
     }
 });
 
-export const deleteUserDocument = functions.auth.user().onDelete(async (user) => {
+export const deleteuserdocument = functions.auth.user().onDelete(async (user) => {
     console.log("Deleting user data:", user.uid);
     const userUid = user.uid;
     const userDocRef = db.collection("users").doc(userUid);

@@ -8,7 +8,10 @@ import * as functions from 'firebase-functions/v1';
 const db = getFirestore();
 MailService.setApiKey(process.env.SENDGRID_API_KEY || "");
 
-export const sendContactEmail = onDocumentCreated("contact/{contactID}",
+export const sendcontactemail = onDocumentCreated({
+    document:"contact/{contactID}",
+    serviceAccount: "sendcontactemail@recapeps-test.iam.gserviceaccount.com"
+},
     async (event) => {
         const snapshot = event.data;
 
@@ -25,8 +28,8 @@ export const sendContactEmail = onDocumentCreated("contact/{contactID}",
             to: userEmail,
             from: "no-reply@recapeps.fr",
             cc: "support@recapeps.fr",
-            subject: `Confirmation de réception de votre message`,
-            text: `Bonjour ${userName},\n\nNous avons bien reçu votre message, nous y répondrons dans les meilleurs délais.\n\nMerci pour votre confiance,\nL'équipe Recapeps.`
+            subject: "Confirmation de réception de votre messages",
+            text: `Bonjour ${userName},\n\nNous avons bien reçu votre message et vous remercions de nous avoir contactés.\nNotre équipe vous répondra dans les plus brefs délais.\n\nEn attendant, n'hésitez pas à consulter notre FAQ ou à nous recontacter si nécessaire.\n\nBien cordialement,\nL'équipe RecapEPS.`
         };
 
         try {
@@ -37,11 +40,9 @@ export const sendContactEmail = onDocumentCreated("contact/{contactID}",
         } catch (error) {
             logger.error("Erro ao enviar emails via SendGrid:", error);
         }
-    });
+});
 
-interface ExportUserDataRequest {}
-
-export const exportUserData = onCall<ExportUserDataRequest>(
+export const exportuserdata = onCall(
     { cors: ["https://recapeps.fr"] },
     async (request) => {
         const userId = request.auth?.uid;
@@ -118,7 +119,7 @@ export const exportUserData = onCall<ExportUserDataRequest>(
     }
 );
 
-export const sendWelcomeEmail = functions.auth.user().onCreate(async (user) => {
+export const sendwelcomeemail = functions.auth.user().onCreate(async (user) => {
     try {
       const { email } = user;
       

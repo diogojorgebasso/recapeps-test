@@ -7,7 +7,7 @@ import { getFirestore } from "firebase-admin/firestore";
 const db = getFirestore();
 
 // TODO : Essa função é local, ou seja, não precisa de acesso à internet!
-export const transcribeUploadedDocument = onObjectFinalized(async (event) => {
+export const transcribeuploadeddocument = onObjectFinalized(async (event) => {
     const filePath = event.data.name;
     const pathMatch = filePath.match(/^user\/(.*?)\/transcripts\/(.*?)$/);
     const speechClient = new speech.SpeechClient();
