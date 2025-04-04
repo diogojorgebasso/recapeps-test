@@ -18,7 +18,8 @@ interface CheckoutSessionRequest {
 export const createstripecheckoutsession = onCall<CheckoutSessionRequest>(
   { 
     cors: "https://recapeps.fr", 
-    enforceAppCheck: true 
+    enforceAppCheck: true,
+    serviceAccount:"stripe-checkout-session-run@recapeps-test.iam.gserviceaccount.com" 
 },
   async (request) => {
     const { priceId } = request.data;
@@ -81,7 +82,9 @@ export const createstripecheckoutsession = onCall<CheckoutSessionRequest>(
   }
 );
 
-export const stripewebhooktest = onRequest( async (req, res) => {
+export const stripewebhooktest = onRequest({
+  serviceAccount:"stripe-webhook-test-run@recapeps-test.iam.gserviceaccount.com"
+}, async (req, res) => {
   try {
     const sig = req.headers["stripe-signature"] as string;
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -139,7 +142,9 @@ export const stripewebhooktest = onRequest( async (req, res) => {
 });
 
 export const createportalsession = onCall(
-  { cors: "https://recapeps.fr", enforceAppCheck: true },
+  { cors: "https://recapeps.fr", 
+    serviceAccount:"create-portal-session-run@recapeps-test.iam.gserviceaccount.com",
+    enforceAppCheck: true },
   async (request) => {
 
     const userId = request.auth?.uid;

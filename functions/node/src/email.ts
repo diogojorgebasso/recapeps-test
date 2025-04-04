@@ -8,9 +8,10 @@ import * as functions from 'firebase-functions/v1';
 const db = getFirestore();
 MailService.setApiKey(process.env.SENDGRID_API_KEY || "");
 
+// Activate the retrie option automatically.
 export const sendcontactemail = onDocumentCreated({
     document:"contact/{contactID}",
-    serviceAccount: "sendcontactemail@recapeps-test.iam.gserviceaccount.com"
+    serviceAccount: "send-contact-email-run@recapeps-test.iam.gserviceaccount.com"
 },
     async (event) => {
         const snapshot = event.data;
@@ -28,8 +29,8 @@ export const sendcontactemail = onDocumentCreated({
             to: userEmail,
             from: "no-reply@recapeps.fr",
             cc: "support@recapeps.fr",
-            subject: "Confirmation de réception de votre messages",
-            text: `Bonjour ${userName},\n\nNous avons bien reçu votre message et vous remercions de nous avoir contactés.\nNotre équipe vous répondra dans les plus brefs délais.\n\nEn attendant, n'hésitez pas à consulter notre FAQ ou à nous recontacter si nécessaire.\n\nBien cordialement,\nL'équipe RecapEPS.`
+            subject: "Confirmation de réception de votre message",
+            text: `Bonjour ${userName},\n\nNous avons bien reçu votre message et vous remercions de nous avoir contactés.\nNotre équipe vous répondra dans les plus brefs délais.\n\nEn attendant, n'hésitez pas à consulter notre FAQ ou à nous recontacter si nécessaire.\n\nBien cordialement,\nL'équipe Recap'eps.`
         };
 
         try {
@@ -43,7 +44,10 @@ export const sendcontactemail = onDocumentCreated({
 });
 
 export const exportuserdata = onCall(
-    { cors: ["https://recapeps.fr"] },
+    { cors: ["https://recapeps.fr"],
+      serviceAccount: "export-user-data-run@recapeps-test.iam.gserviceaccount.com",
+      enforceAppCheck: true
+     },
     async (request) => {
         const userId = request.auth?.uid;
         
@@ -119,12 +123,14 @@ export const exportuserdata = onCall(
     }
 );
 
-export const sendwelcomeemail = functions.auth.user().onCreate(async (user) => {
+export const sendwelcomeemail = functions.runWith({
+    serviceAccount:"send-welcome-email-run@recapeps-test.iam.gserviceaccount.com"
+}).auth.user().onCreate(async (user) => {
     try {
       const { email } = user;
       
       if (!email) {
-        throw new functions.https.HttpsError('invalid-argument', 'Email is required');
+        throw new HttpsError('invalid-argument', 'Email is required');
       }
       
       const msg = {

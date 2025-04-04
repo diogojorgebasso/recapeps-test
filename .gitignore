@@ -18,7 +18,9 @@
 /out/
 
 # firebase
-/firebase-debug.log
+firebase-debug.log
+firestore-debug.log
+pubsub-debug.log
 /firebase.json
 /.firebase/
 
@@ -50,6 +52,8 @@ apphosting.local.yaml
 *storybook.log
 
 #terraform
-terraform.tfstate
-terraform.tfstate.backup
 .terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars.secret
+*.tfvars.local
