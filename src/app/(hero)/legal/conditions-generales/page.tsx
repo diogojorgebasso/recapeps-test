@@ -1,6 +1,6 @@
 import { Box, VStack, Heading, Text, Link, List } from "@chakra-ui/react";
 
-export default function MentionsLegales() {
+export default function Page() {
     return (
         <Box p={8} mx="auto" borderRadius="xl">
             <VStack align="start" gap={6}>
