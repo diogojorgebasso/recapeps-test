@@ -4,47 +4,30 @@ import Link from "next/link";
 import {
     signInWithGoogle,
     signOut,
-    onAuthStateChanged
+    onIdTokenChanged
 } from "@/lib/firebase/auth";
 import { useRouter } from "next/navigation";
+import { useBreakpointValue } from "@chakra-ui/react";
+import { setCookie, deleteCookie } from "cookies-next";
 
 function useUserSession(initialUser) {
-    // The initialUser comes from the server via a server component
-    const [user, setUser] = useState(initialUser);
-    const router = useRouter();
-
-    // Register the service worker that sends auth state back to server
-    // The service worker is built with npm run build-service-worker
     useEffect(() => {
-        if ("serviceWorker" in navigator) {
-            navigator.serviceWorker.register('/auth-service-worker.js')
-                .then((registration) => console.log("scope is: ", registration.scope))
-                .catch((error) => console.log("SW registration failed: ", error));
-        }
-    }, []);
-
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged((authUser) => {
-            setUser(authUser)
-        })
-
-        return () => unsubscribe()
-    }, []);
-
-    useEffect(() => {
-        onAuthStateChanged((authUser) => {
-            if (user === undefined) return
-
-            // refresh when user changed to ease testing
-            if (user?.email !== authUser?.email) {
-                router.refresh()
+        return onIdTokenChanged(async (user) => {
+            if (user) {
+                const idToken = await user.getIdToken();
+                await setCookie("__session", idToken);
+            } else {
+                await deleteCookie("__session");
             }
-        })
-    }, [user])
+            if (initialUser?.uid === user?.uid) {
+                return;
+            }
+            window.location.reload();
+        });
+    }, [initialUser]);
 
-    return user;
+    return initialUser;
 }
-
 interface User {
     displayName?: string;
     email?: string;
@@ -52,7 +35,7 @@ interface User {
 }
 
 export default function Header({ initialUser }: { initialUser?: User }) {
-
+    const isMobile = useBreakpointValue({ base: true, md: false }, { fallback: "base" });
     const user = useUserSession(initialUser);
 
     const handleSignOut: React.MouseEventHandler<HTMLAnchorElement> = event => {
@@ -67,10 +50,6 @@ export default function Header({ initialUser }: { initialUser?: User }) {
 
     return (
         <header>
-            <Link href="/" className="logo">
-                <img src="/friendly-eats.svg" alt="FriendlyEats" />
-                Friendly Eats
-            </Link>
             {user ? (
                 <>
                     <div className="profile">
@@ -95,7 +74,6 @@ export default function Header({ initialUser }: { initialUser?: User }) {
                 </>
             ) : (
                 <div className="profile"><a href="#" onClick={handleSignIn}>
-                    <img src="/profile.svg" alt="A placeholder user image" />
                     Sign In with Google
                 </a></div>
             )}
