@@ -5,11 +5,14 @@ import {
   ColorModeProvider,
   type ColorModeProviderProps,
 } from "./color-mode"
+import { SubscriptionProvider } from "@/hooks/useSubscription"
 
 export function Provider(props: ColorModeProviderProps) {
   return (
     <ChakraProvider value={defaultSystem}>
-      <ColorModeProvider {...props} />
+      <SubscriptionProvider>
+        <ColorModeProvider {...props} />
+      </SubscriptionProvider>
     </ChakraProvider>
   )
 }

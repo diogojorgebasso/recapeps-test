@@ -1,3 +1,4 @@
+// load the Auth. Does not impose any styles.
 import type { Metadata } from "next";
 import { Provider } from "@/components/ui/provider"
 import Header from "@/components/Header";

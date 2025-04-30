@@ -1,128 +1,250 @@
-import { Box, Heading, List, Button, Card, Text, Center } from "@chakra-ui/react";
-import { LuCircleCheck } from "react-icons/lu";
+'use client';
+
+import { useState, useEffect } from 'react';
+import { Box, Heading, List, Button, Card, Text, Center, Flex, Icon, Spinner, useToast } from '@chakra-ui/react';
+import { LuCircleCheck } from 'react-icons/lu';
 import { httpsCallable } from 'firebase/functions';
-import { functions } from "@/utils/firebase";
-import { useAuth } from "@/hooks/useAuth";
-import { useState, useEffect } from "react";
-import { useSubscription } from "@/hooks/useSubscription";
-import { Link } from "@chakra-ui/react";
-import { loadStripe } from "@stripe/stripe-js";
+import { functions } from '@/lib/firebase/clientApp';
+import { useAuth } from '@/hooks/useAuth';
+import { useSubscription } from '@/hooks/useSubscription';
+import { useRouter } from 'next/navigation';
+import { loadStripe } from '@stripe/stripe-js';
 
 interface Plan {
     id: string;
+    name: string;
     price: string;
-    amount: number;
-    description: string;
     priceId: string;
+    features: string[];
+    buttonText: string;
+    period: string;
+    recommended?: boolean;
 }
 
 interface StripeResponse {
-    data: {
-        id: string;
-    };
+    id: string;
+    clientSecret?: string;
 }
 
-const stripePromise = loadStripe("pk_live_51QqK3jEfLSFXfvk1Ysx877RxVyMoWj4NMoFUWGvyvVKbI7Zw9bT4FzuJ4TKf0ne3LxO7FjKCaTGdwJZ1VTRgBkpv00eNrzjryZ");
+// Replace with your actual publishable key from Stripe
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "");
+
+const plans: Plan[] = [
+    {
+        id: 'monthly',
+        name: 'Abonnement Mensuel',
+        price: '14,99 €',
+        priceId: 'price_1OYSQGEfLSFXfvk1YmzR1IC8',
+        period: 'par mois',
+        features: [
+            'Accès à tous les cours',
+            'Flashcards illimitées',
+            'Quiz illimités',
+            'Notes illimitées',
+            'Préparation à l\'oral'
+        ],
+        buttonText: 'Commencer'
+    },
+    {
+        id: 'yearly',
+        name: 'Abonnement Annuel',
+        price: '149,99 €',
+        priceId: 'price_1OYSQnEfLSFXfvk1jcfRgO6C',
+        period: 'par an',
+        features: [
+            'Tout dans l\'abonnement mensuel',
+            'Économisez 30 € par an',
+            'Accès aux nouveautés en priorité',
+            'Support premium'
+        ],
+        buttonText: 'Commencer',
+        recommended: true
+    }
+];
 
 export default function CheckoutPage() {
-    const { isAuthenticated } = useAuth();
-    const [loading, setLoading] = useState(false);
-    let navigate = useNavigate();
+    const { currentUser, isAuthenticated } = useAuth();
     const { isSubscribed } = useSubscription();
+    const [selectedPlanId, setSelectedPlanId] = useState<string>('yearly');
+    const [loading, setLoading] = useState<boolean>(false);
+    const [checkoutUrl, setCheckoutUrl] = useState<string | null>(null);
+    const [clientSecret, setClientSecret] = useState<string | null>(null);
+    const toast = useToast();
+    const router = useRouter();
 
     useEffect(() => {
         if (isSubscribed) {
-            navigate("/profil");
+            // If user is already subscribed, redirect to manage subscription
+            router.push('/dashboard');
         }
-    }, [isSubscribed, navigate]);
+    }, [isSubscribed, router]);
 
-    useEffect(() => {
-        if (isAuthenticated === false) {
-            navigate("/login?redirect=/checkout");
+    const handlePlanSelect = (planId: string) => {
+        setSelectedPlanId(planId);
+    };
+
+    const handleCheckout = async () => {
+        if (!currentUser) {
+            toast({
+                title: 'Connexion requise',
+                description: 'Vous devez être connecté pour vous abonner.',
+                status: 'error',
+                duration: 5000,
+                isClosable: true,
+            });
+            router.push('/login?from=/checkout');
+            return;
         }
-    }, [isAuthenticated, navigate]);
 
+        const selectedPlan = plans.find(plan => plan.id === selectedPlanId);
+        if (!selectedPlan) return;
 
-    const handleCheckout = async (plan: Plan) => {
         setLoading(true);
+
         try {
-            const createStripeCheckoutSession = httpsCallable(functions, 'createStripeCheckoutSession');
-            const response = await createStripeCheckoutSession({ priceId: plan.priceId }) as StripeResponse;
+            // Call Firebase Function to create checkout session
+            const createCheckoutSession = httpsCallable(
+                functions,
+                'createcheckoutsession'
+            );
 
-            const { id: sessionId } = response.data;
+            const { data } = await createCheckoutSession({
+                priceId: selectedPlan.priceId,
+            }) as { data: StripeResponse };
 
-            const stripe = await stripePromise;
+            // Redirect to Stripe Checkout
+            if (data && data.id) {
+                const stripe = await stripePromise;
+                const { error } = await stripe!.redirectToCheckout({
+                    sessionId: data.id
+                });
 
-            if (stripe) {
-                await stripe.redirectToCheckout({ sessionId });
-            } else {
-                console.error("Stripe failed to load.");
-                navigate("/error");
+                if (error) {
+                    toast({
+                        title: 'Erreur',
+                        description: error.message,
+                        status: 'error',
+                        duration: 5000,
+                        isClosable: true,
+                    });
+                }
             }
-
         } catch (error: any) {
-            console.error("Error calling function:", error);
-            navigate("/error");
+            toast({
+                title: 'Erreur',
+                description: error.message || 'Une erreur s\'est produite',
+                status: 'error',
+                duration: 5000,
+                isClosable: true,
+            });
         } finally {
             setLoading(false);
         }
     };
 
-    const plans = [
-        { id: "basic", price: "4.99€", amount: 499, description: "Basic Plan", priceId: 'price_1QrIBREfLSFXfvk1pguf3yl6' },
-    ];
+    if (isSubscribed) {
+        return (
+            <Center h="80vh">
+                <Spinner />
+            </Center>
+        );
+    }
 
     return (
-        <Box p={8} rounded="md" maxW="2xl" mx="auto" textAlign="center">
-            <Heading as="h1" size="xl" mb={6}>Choisissez votre plan</Heading>
-            {plans.map((plan) => (
-                <Card.Root border="1px solid orange" key={plan.id} variant="elevated" mb={4} textAlign="center">
-                    <Card.Header fontWeight="bold"> Offre de dernière minute ⏰<br />4,99€ par mois seulement 🔥🔥</Card.Header>
-                    <Card.Body>
-                        Débloque l’accès à tout le contenu du site:
-                        <Center>
-                            <List.Root mt={3} variant="plain" textAlign="center">
-                                <List.Item>
-                                    <List.Indicator asChild color="green.500">
-                                        <LuCircleCheck />
-                                    </List.Indicator>
-                                    Fiches de révision
-                                </List.Item>
-                                <List.Item>
-                                    <List.Indicator asChild color="green.500">
-                                        <LuCircleCheck />
-                                    </List.Indicator>
-                                    Quiz ascociés
-                                </List.Item>
-                                <List.Item>
-                                    <List.Indicator asChild color="green.500">
-                                        <LuCircleCheck />
-                                    </List.Indicator>
-                                    Flashcards
-                                </List.Item>
-                            </List.Root>
-                        </Center>
-                    </Card.Body>
-                    <Text>Résiliable à tout moment !</Text>
-                    <Text mt={2}>
-                        En appuyant sur le bouton ci-dessous, l’Utilisateur <Link href="/legal/conditions-generales">accepte nos CGV</Link>.
-                    </Text>
-                    <Card.Footer justifyContent={"center"}>
+        <Box py={10} px={4}>
+            <Heading as="h1" textAlign="center" mb={10}>
+                Choisissez votre formule
+            </Heading>
+
+            <Flex
+                direction={{ base: 'column', md: 'row' }}
+                justify="center"
+                align="stretch"
+                gap={6}
+                maxW="1200px"
+                mx="auto"
+            >
+                {plans.map((plan) => (
+                    <Card.Root
+                        key={plan.id}
+                        p={6}
+                        borderWidth="1px"
+                        borderRadius="lg"
+                        flex="1"
+                        maxW={{ base: '100%', md: '400px' }}
+                        bg={plan.recommended ? 'blue.50' : 'white'}
+                        borderColor={selectedPlanId === plan.id ? 'blue.400' : plan.recommended ? 'blue.200' : 'gray.200'}
+                        boxShadow={selectedPlanId === plan.id ? 'md' : 'none'}
+                        transition="all 0.3s"
+                        position="relative"
+                        onClick={() => handlePlanSelect(plan.id)}
+                        cursor="pointer"
+                        _hover={{
+                            borderColor: 'blue.400',
+                            transform: 'translateY(-4px)',
+                            boxShadow: 'md'
+                        }}
+                    >
+                        {plan.recommended && (
+                            <Box
+                                position="absolute"
+                                top="-2"
+                                right="5"
+                                bg="green.500"
+                                color="white"
+                                px={3}
+                                py={1}
+                                borderRadius="full"
+                                fontSize="xs"
+                                fontWeight="bold"
+                            >
+                                Recommandé
+                            </Box>
+                        )}
+
+                        <Heading as="h2" size="lg" mb={2}>
+                            {plan.name}
+                        </Heading>
+
+                        <Flex align="baseline" mb={6}>
+                            <Text fontSize="3xl" fontWeight="bold">
+                                {plan.price}
+                            </Text>
+                            <Text ml={2} color="gray.600">
+                                {plan.period}
+                            </Text>
+                        </Flex>
+
+                        <List spacing={3} mb={6}>
+                            {plan.features.map((feature, index) => (
+                                <Flex key={index} align="center">
+                                    <Icon as={LuCircleCheck} color="green.500" mr={2} />
+                                    <Text>{feature}</Text>
+                                </Flex>
+                            ))}
+                        </List>
+
                         <Button
-                            onClick={() => handleCheckout(plan)}
-                            loading={loading}
-                            rounded="full"
-                            mt={3}
-                            size="2xl"
-                            bg="orange.500"
-                            color="white"
-                            _hover={{ bg: "orange.600", transform: "scale(1.1)" }}
+                            colorScheme={selectedPlanId === plan.id ? 'blue' : 'gray'}
+                            variant={selectedPlanId === plan.id ? 'solid' : 'outline'}
+                            w="full"
+                            size="lg"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handlePlanSelect(plan.id);
+                                handleCheckout();
+                            }}
+                            isLoading={loading && selectedPlanId === plan.id}
                         >
-                            Confirmer et payer
+                            {plan.buttonText}
                         </Button>
-                    </Card.Footer>
-                </Card.Root>
-            ))}
+                    </Card.Root>
+                ))}
+            </Flex>
+
+            <Text textAlign="center" mt={8} fontSize="sm" color="gray.600">
+                Paiement sécurisé via Stripe. Vous pouvez annuler à tout moment.
+            </Text>
         </Box>
     );
-};
+}

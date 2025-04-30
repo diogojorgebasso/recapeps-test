@@ -1,88 +1,69 @@
 'use client';
 
-import { Box, Flex, Text } from '@chakra-ui/react';
-import { Quiz } from '../../types';
-import QuizCircle from './QuizCircle';
-import { useMemo } from 'react';
+import { Box, Flex, Circle, Text, useBreakpointValue } from '@chakra-ui/react';
 
-interface PathProgressProps {
-    quizzes: Quiz[];
-    onQuizSelect: (quizId: string) => void;
+interface PathStep {
+    id: string;
+    name: string;
+    path: string;
 }
 
-export default function PathProgress({ quizzes, onQuizSelect }: PathProgressProps) {
-    // Sort quizzes by position
-    const sortedQuizzes = useMemo(() => {
-        return [...quizzes].sort((a, b) => a.position - b.position);
-    }, [quizzes]);
+// Define the learning path steps
+const learningPath: PathStep[] = [
+    { id: 'flashcards', name: 'Flashcards', path: '/flashcards' },
+    { id: 'quiz', name: 'Quiz', path: '/quiz' },
+    { id: 'notes', name: 'Notes', path: '/notes' },
+    { id: 'oral', name: 'Oral', path: '/oral-3' },
+];
 
-    // Group quizzes into rows (5 per row)
-    const quizRows = useMemo(() => {
-        const rows: Quiz[][] = [];
-        let currentRow: Quiz[] = [];
+interface PathProgressProps {
+    currentPath: string;
+}
 
-        sortedQuizzes.forEach((quiz, index) => {
-            currentRow.push(quiz);
-            if ((index + 1) % 5 === 0 || index === sortedQuizzes.length - 1) {
-                rows.push(currentRow);
-                currentRow = [];
-            }
-        });
+export function PathProgress({ currentPath }: PathProgressProps) {
+    // Responsive line width
+    const lineWidth = useBreakpointValue({ base: '40px', sm: '60px', md: '100px' });
 
-        return rows;
-    }, [sortedQuizzes]);
-
-    // Determine if a quiz should be locked
-    // A quiz is unlocked if all previous quizzes are completed or it's the first uncompleted quiz
-    const isQuizLocked = (quiz: Quiz, index: number): boolean => {
-        // First quiz is always unlocked
-        if (index === 0) return false;
-
-        // If this quiz is already completed, it's not locked
-        if (quiz.completed) return false;
-
-        // Find the previous quiz
-        const prevQuiz = sortedQuizzes[index - 1];
-
-        // If the previous quiz is completed, this one is unlocked
-        if (prevQuiz && prevQuiz.completed) return false;
-
-        // Otherwise, it's locked
-        return true;
-    };
+    // Determine the active step
+    const currentStepIndex = learningPath.findIndex(step =>
+        currentPath.includes(step.path)
+    );
 
     return (
-        <Box maxW="800px" mx="auto" my={6}>
-            {quizRows.map((row, rowIndex) => (
-                <Box key={rowIndex} mb={10} position="relative">
-                    {/* Path line */}
-                    <Box
-                        position="absolute"
-                        height="2px"
-                        bg="gray.200"
-                        top="30px"
-                        left="30px"
-                        right="30px"
-                        zIndex={0}
-                    />
-
-                    <Flex justify="space-between" position="relative" zIndex={1}>
-                        {row.map((quiz, index) => {
-                            const globalIndex = rowIndex * 5 + index;
-                            const locked = isQuizLocked(quiz, globalIndex);
-
-                            return (
-                                <QuizCircle
-                                    key={quiz.id}
-                                    quiz={quiz}
-                                    isLocked={locked}
-                                    onClick={onQuizSelect}
-                                />
-                            );
-                        })}
+        <Flex justify="center" align="center">
+            {learningPath.map((step, index) => (
+                <Flex key={step.id} align="center">
+                    {/* Step circle */}
+                    <Flex direction="column" align="center">
+                        <Circle
+                            size="40px"
+                            bg={index <= currentStepIndex ? 'blue.500' : 'gray.200'}
+                            color="white"
+                            fontWeight="bold"
+                        >
+                            {index + 1}
+                        </Circle>
+                        <Text
+                            mt={2}
+                            fontSize="sm"
+                            fontWeight={index <= currentStepIndex ? 'semibold' : 'normal'}
+                            color={index <= currentStepIndex ? 'gray.800' : 'gray.500'}
+                        >
+                            {step.name}
+                        </Text>
                     </Flex>
-                </Box>
+
+                    {/* Connecting line (except after last item) */}
+                    {index < learningPath.length - 1 && (
+                        <Box
+                            height="2px"
+                            width={lineWidth}
+                            bg={index < currentStepIndex ? 'blue.500' : 'gray.200'}
+                            mx={2}
+                        />
+                    )}
+                </Flex>
             ))}
-        </Box>
+        </Flex>
     );
 }

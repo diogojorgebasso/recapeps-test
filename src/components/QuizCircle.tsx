@@ -2,7 +2,7 @@
 
 import { Box, Text, Circle, Tooltip, VStack, useToken } from '@chakra-ui/react';
 import { FaCheck, FaLock } from 'react-icons/fa';
-import { Quiz } from '../../types';
+import { Quiz } from '../types';
 
 interface QuizCircleProps {
     quiz: Quiz;
