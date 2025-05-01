@@ -1,7 +1,7 @@
 import { onCall, onRequest, HttpsError } from "firebase-functions/v2/https";
 import { error, info, debug } from "firebase-functions/logger";
 import Stripe from "stripe";
-import { getFirestore } from "firebase-admin/firestore";
+import { FieldValue, getFirestore } from "firebase-admin/firestore"; // Import FieldValue
 import * as admin from "firebase-admin"; // TODO : Remove this to auth library.
 
 const db = getFirestore();
@@ -87,6 +87,7 @@ export const stripewebhooktest = onRequest({
   serviceAccount: "stripe-webhook-test-run@recapeps-test.iam.gserviceaccount.com"
 }, async (req, res) => {
   try {
+
     const sig = req.headers["stripe-signature"] as string;
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
@@ -94,7 +95,6 @@ export const stripewebhooktest = onRequest({
       throw new Error("Webhook secret not configured");
     }
 
-    // Construct the Stripe event using the raw body
     const event = stripe.webhooks.constructEvent(
       req.rawBody,
       sig,
@@ -102,6 +102,76 @@ export const stripewebhooktest = onRequest({
     );
 
     debug(`Received event: ${event.type}`);
+
+    if (event.type === "invoice.payment_failed") {
+      const customerId = event.data.object.customer;
+      const userSnap = await db
+        .collection('users')
+        .where('stripeCustomerId', '==', customerId)
+        .limit(1)
+        .get();
+
+      if (userSnap.empty) {
+        error(`Webhook: No user found for customer ${customerId}`);
+        res.status(404).send('No user found');
+      }
+      const uid = userSnap.docs[0].id;
+      const userRef = db.collection('users').doc(uid);
+
+      // 1️⃣ Send FCM push & Handle Results
+      const userDoc = await userRef.get();
+      const userData = userDoc.data();
+      const tokens = userData?.fcmTokens;
+
+      if (Array.isArray(tokens) && tokens.length > 0) {
+        info(`Sending payment failed notification to ${tokens.length} tokens for user ${uid}.`);
+        const response = await admin.messaging().sendEachForMulticast({
+          tokens,
+          notification: {
+            title: 'Payment Failed',
+            body: 'We couldn’t process your subscription payment. Please update your card info.',
+          }
+        });
+
+        const tokensToRemove: string[] = [];
+        response.responses.forEach((result, index) => {
+          if (!result.success) {
+            const errorCode = result.error?.code;
+            // Check for errors indicating an invalid or unregistered token
+            if (
+              errorCode === 'messaging/invalid-registration-token' ||
+              errorCode === 'messaging/registration-token-not-registered'
+            ) {
+              const invalidToken = tokens[index];
+              error(`Invalid token found for user ${uid}: ${invalidToken}. Scheduling removal.`);
+              tokensToRemove.push(invalidToken);
+            } else {
+              error(`Failed to send to token for user ${uid}: ${tokens[index]}`, result.error);
+            }
+          }
+        });
+
+        if (tokensToRemove.length > 0) {
+          await userRef.update({
+            fcmTokens: FieldValue.arrayRemove(...tokensToRemove)
+          });
+          info(`Removed ${tokensToRemove.length} invalid tokens for user ${uid}.`);
+        }
+
+      } else {
+        info(`No valid FCM tokens found for user ${uid} to send payment failed notification.`);
+      }
+
+      // 2️⃣ Persist in-app notification
+      await userRef.collection('notifications').add({
+        type: 'payment_failed',
+        title: 'Payment Failed',
+        body: 'We couldn’t process your subscription payment. Please update your card info.',
+        isRead: false,
+        createdAt: FieldValue.serverTimestamp()
+      });
+      info(`In-app notification created for user ${uid}.`);
+    }
 
     if (
       event.type === 'customer.subscription.deleted') {
@@ -148,6 +218,7 @@ export const stripewebhooktest = onRequest({
       // Acknowledge unhandled event types
       res.status(200).send("Event type not handled");
     }
+
   } catch (err) {
     const e = err as Error;
     error("Webhook error:", e.message);

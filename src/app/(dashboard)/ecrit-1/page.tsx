@@ -33,20 +33,19 @@ export default function Ecrit1Page() {
                 </Tabs.List>
                 <Tabs.Content value="apprendre">
                     <Box>
-
                         <Box mb="12">
                             <Heading size="xl" mb="4" color="blue.600">
                                 Écrit 1
                             </Heading>
                             <SimpleGrid columns={[1, 2, 3]} gap="6">
-                                {subjects.map(({ id, name, image, premium, link }) => (
+                                {subjects.map(({ id, name, image, premium }) => (
                                     <ExamCard
                                         key={id}
                                         name={name}
                                         image={image}
                                         premium={premium}
                                         isUserPremium={isPro}
-                                        vers={link}
+                                        vers={id}
                                     />
                                 ))}
                             </SimpleGrid>
