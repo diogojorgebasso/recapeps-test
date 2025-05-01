@@ -22,10 +22,9 @@ export async function getAuthenticatedAppForUser() {
     };
 
     const firebaseServerApp = initializeServerApp(
-        initializeApp(firebaseConfig),
+        initializeApp(),
         {
             authIdToken,
-
         }
     );
 
