@@ -103,7 +103,16 @@ export const stripewebhooktest = onRequest({
 
     debug(`Received event: ${event.type}`);
 
-    // Handle customer.subscription.updated event
+    if (
+      event.type === 'customer.subscription.deleted' ||
+      event.type === 'invoice.payment_failed'
+    ) {
+      const customerId = event.data.object.customer;
+      const userSnapshot = await db.collection("users").where("stripeCustomerId", "==", customerId).get();
+      const userId = userSnapshot.docs[0].id;
+      await admin.auth().setCustomUserClaims(userId, { pro: false });
+    }
+
     if (event.type === "customer.subscription.updated") {
 
       const subscription = event.data.object as Stripe.Subscription;
