@@ -46,13 +46,13 @@ export default function QuizPage({ params }: { params: { id: string } }) {
     const [questionStartTime, setQuestionStartTime] = useState<number>(0);
     const [quizResults, setQuizResults] = useState<QuestionResult[]>([]);
 
-    const { currentUser } = useAuth();
+    const { user } = useAuth();
 
     // Fetch quizzes
     useEffect(() => {
         const loadQuiz = async () => {
             setIsLoading(true);
-            if (subjectId && currentUser) {
+            if (subjectId && user) {
                 try {
                     const fetchedQuizzes = await fetchQuizzesBySubject(subjectId, currentUser.uid);
                     setQuizzes(fetchedQuizzes);
