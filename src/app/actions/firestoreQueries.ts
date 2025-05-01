@@ -1,6 +1,6 @@
 'use server';
 
-import { collection, doc, getDoc, getDocs, query, where, orderBy, limit, Timestamp } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, query, orderBy, Timestamp } from 'firebase/firestore';
 import { getAuthenticatedAppForUser } from '@/lib/firebase/serverApp';
 
 interface Subject {
@@ -108,42 +108,6 @@ export async function fetchUserStreak() {
   }
 }
 
-/**
- * Fetch recent activities for the user
- */
-export async function fetchRecentActivities(limit = 5) {
-  try {
-    const { firebaseServerApp, currentUser } = await getAuthenticatedAppForUser();
-
-    if (!currentUser) {
-      return { activities: [], error: 'User not authenticated' };
-    }
-
-    const { getFirestore } = await import('firebase/firestore');
-    const db = getFirestore(firebaseServerApp);
-
-    const activitiesQuery = query(
-      collection(db, 'users', currentUser.uid, 'activities'),
-      orderBy('timestamp', 'desc'),
-      limit(limit)
-    );
-
-    const activitiesSnapshot = await getDocs(activitiesQuery);
-    const activities: any[] = [];
-
-    activitiesSnapshot.forEach((doc) => {
-      activities.push({
-        id: doc.id,
-        ...doc.data()
-      });
-    });
-
-    return { activities };
-  } catch (error) {
-    console.error('Error fetching recent activities:', error);
-    return { activities: [], error: (error as Error).message };
-  }
-}
 
 /**
  * Update user streak
@@ -156,48 +120,72 @@ export async function updateUserStreak() {
       return { success: false, error: 'User not authenticated' };
     }
 
-    const { getFirestore, serverTimestamp } = await import('firebase/firestore');
+    const { getFirestore, serverTimestamp, setDoc } = await import('firebase/firestore');
     const db = getFirestore(firebaseServerApp);
 
     const streakDocRef = doc(db, 'users', currentUser.uid, 'stats', 'streak');
     const streakSnapshot = await getDoc(streakDocRef);
 
     const now = new Date();
-    let currentStreak = 1;
-    let longestStreak = 1;
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()); // Start of today
+
+    let currentStreak = 0;
+    let longestStreak = 0;
+    let updateNeeded = false;
+    let lastLoginDate: Date | null = null;
 
     if (streakSnapshot.exists()) {
       const streakData = streakSnapshot.data() as StreakData;
-      const lastLogin = streakData.lastLoginDate?.toDate();
+      currentStreak = streakData.currentStreak || 0;
       longestStreak = streakData.longestStreak || 0;
+      if (streakData.lastLoginDate) {
+        lastLoginDate = streakData.lastLoginDate.toDate();
+      }
 
-      if (lastLogin) {
-        // Check if last login was yesterday or today
-        const lastLoginDate = lastLogin.getDate();
-        const today = now.getDate();
-        const isConsecutive = (today - lastLoginDate === 1) || (today === lastLoginDate);
+      if (lastLoginDate) {
+        const lastLoginDay = new Date(lastLoginDate.getFullYear(), lastLoginDate.getMonth(), lastLoginDate.getDate());
+        const diffTime = today.getTime() - lastLoginDay.getTime();
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-        if (isConsecutive) {
-          // Continue the streak
-          currentStreak = (streakData.currentStreak || 0) + 1;
-        } else {
-          // Reset the streak
+        if (diffDays === 1) {
+          // Last login was yesterday, increment streak
+          currentStreak++;
+          updateNeeded = true;
+        } else if (diffDays > 1) {
+          // Last login was before yesterday, reset streak
           currentStreak = 1;
+          updateNeeded = true;
         }
-      }
+        // If diffDays === 0 (logged in today already), do nothing to currentStreak, but update lastLoginDate
+        if (diffDays >= 0) {
+          updateNeeded = true; // Always update lastLoginDate if login is today or yesterday
+        }
 
-      // Update longest streak if current is longer
-      if (currentStreak > longestStreak) {
-        longestStreak = currentStreak;
+      } else {
+        // No last login date, start streak
+        currentStreak = 1;
+        updateNeeded = true;
       }
+    } else {
+      // No streak document exists, start streak
+      currentStreak = 1;
+      longestStreak = 1;
+      updateNeeded = true;
     }
 
-    // Update streak document
-    await streakDocRef.set({
-      currentStreak,
-      longestStreak,
-      lastLoginDate: serverTimestamp()
-    });
+    // Update longest streak if current is greater
+    if (currentStreak > longestStreak) {
+      longestStreak = currentStreak;
+    }
+
+    // Update streak document only if needed
+    if (updateNeeded) {
+      await setDoc(streakDocRef, {
+        currentStreak,
+        longestStreak,
+        lastLoginDate: serverTimestamp() // Use serverTimestamp for consistency
+      }, { merge: true }); // Use merge: true to avoid overwriting other potential fields
+    }
 
     return {
       success: true,

@@ -5,19 +5,15 @@ import {
 import { onIdTokenChanged } from "@/lib/firebase/auth";
 import { setCookie, deleteCookie } from "cookies-next";
 import type { User } from "firebase/auth";
-import type { UserProfile } from "@/types/User";
-import { userRepo } from "@/lib/firebase/userRepository";
 
 interface AuthCtx {
     user: User | null;
     isPro: boolean;
-    profile: UserProfile | null;
 }
 
 const Ctx = createContext<AuthCtx>({
     user: null,
     isPro: false,
-    profile: null,
 });
 export const useAuth = () => useContext(Ctx);
 
@@ -32,7 +28,6 @@ export function AuthProvider({
 }) {
     const [user, setUser] = useState(initialUser);
     const [isPro, setIsPro] = useState(initialIsPro);
-    const [profile, setProfile] = useState<UserProfile | null>(null);
 
     /* 1️⃣  Auth / claim listener */
     useEffect(() => {
@@ -49,15 +44,7 @@ export function AuthProvider({
         });
     }, []);
 
-    /* 2️⃣  Profile listener via repository */
-    useEffect(() => {
-        if (!user) { setProfile(null); return; }
-        // repository hides the Firestore details
-        const unsub = userRepo.listenProfile(user.uid, setProfile);
-        return unsub;
-    }, [user?.uid]);
-
     return (
-        <Ctx.Provider value={{ user, isPro, profile }}>{children}</Ctx.Provider>
+        <Ctx.Provider value={{ user, isPro }}>{children}</Ctx.Provider>
     );
 }

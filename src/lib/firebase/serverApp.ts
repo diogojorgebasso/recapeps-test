@@ -34,9 +34,9 @@ export async function getAuthenticatedAppForUser() {
     let isPro = false;
 
     if (auth.currentUser) {
-        // ⬇︎  await the Promise, then destructure `claims`
+        // true  ➟ subscriber,  false ➟ free user
         const { claims }: IdTokenResult = await auth.currentUser.getIdTokenResult();
-        isPro = !!claims.pro;             // true  ➟ subscriber,  false ➟ free user
+        isPro = !!claims.pro;
     }
 
     return { firebaseServerApp, currentUser: auth.currentUser, isPro };

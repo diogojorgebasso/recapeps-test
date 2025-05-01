@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { getNotes } from "@/api/getSubjects";
-import { SubjectNote } from "@/types/Subject";
+import { subjects } from "./subjects";
 import {
     Box,
     Card,
@@ -8,62 +7,62 @@ import {
     SimpleGrid,
     Image,
     Button,
-    Link
+    Link,
+    Dialog,
+    Tabs
 } from "@chakra-ui/react";
 import { Toaster, toaster } from "@/components/ui/toaster"
-import {
-    DialogActionTrigger,
-    DialogBody,
-    DialogCloseTrigger,
-    DialogContent,
-    DialogFooter,
-    DialogHeader,
-    DialogRoot,
-    DialogTitle,
-    DialogTrigger,
-} from "@/components/ui/dialog"
-import { useSubscription } from "@/hooks/useSubscription";
+
+import { useAuth } from "@/components/AuthProvider";
+import SkillTreeClient from "./SkillTreeClient";
 
 export default function Ecrit1Page() {
-    const [subjects, setSubjects] = useState<SubjectNote[]>([]);
-    const { isSubscribed } = useSubscription();
-
-    useEffect(() => {
-        const loadSubjects = async () => {
-            const allSubjects = await getNotes('ecrit-1'); // Pass collection name 'ecrit-1'
-            setSubjects(allSubjects.filter((subject) => subject.evaluation === 1));
-            if (allSubjects.length === 0) {
-                toaster.create({
-                    title: "Erreur inattendue",
-                    description: "Nous rencontrons des difficultés avec notre serveur, veuillez recharger la page",
-                    type: "error"
-                })
-            }
-        }
-        loadSubjects();
-    }, []);
+    const { isPro } = useAuth();
 
     return (
-        <Box>
+        <>
             <Toaster />
-            <Box mb="12">
-                <Heading size="xl" mb="4" color="blue.600">
-                    Écrit 1
-                </Heading>
-                <SimpleGrid columns={[1, 2, 3]} gap="6">
-                    {subjects.map(({ id, name, image, premium, link }) => (
-                        <ExamCard
-                            key={id}
-                            name={name}
-                            image={image}
-                            premium={premium}
-                            isUserPremium={isSubscribed}
-                            vers={link}
-                        />
-                    ))}
-                </SimpleGrid>
-            </Box>
-        </Box>
+            <Tabs.Root>
+                <Tabs.List>
+                    <Tabs.Trigger value="apprendre" colorScheme="blue" fontSize="2xl" fontWeight="bold">
+                        Apprendre
+                    </Tabs.Trigger>
+                    <Tabs.Trigger value="s-entraner" colorScheme="blue" fontSize="2xl" fontWeight="bold">
+                        S'entrâner
+                    </Tabs.Trigger>
+                </Tabs.List>
+                <Tabs.Content value="apprendre">
+                    <Box>
+
+                        <Box mb="12">
+                            <Heading size="xl" mb="4" color="blue.600">
+                                Écrit 1
+                            </Heading>
+                            <SimpleGrid columns={[1, 2, 3]} gap="6">
+                                {subjects.map(({ id, name, image, premium, link }) => (
+                                    <ExamCard
+                                        key={id}
+                                        name={name}
+                                        image={image}
+                                        premium={premium}
+                                        isUserPremium={isPro}
+                                        vers={link}
+                                    />
+                                ))}
+                            </SimpleGrid>
+                        </Box>
+                    </Box >
+                </Tabs.Content>
+                <Tabs.Content value="s-entraner">
+                    <SkillTreeClient quizzes={[
+                        { id: "1", subject: "Travail des élèves", level: 1, state: "doing" },
+                        { id: "2", subject: "Les techniques", level: 2, state: "passed" },
+                        { id: "3", subject: "Sport scolaire", level: 3, state: "retry" },
+                    ]} />
+                </Tabs.Content>
+
+            </Tabs.Root>
+        </>
     );
 }
 
@@ -104,33 +103,33 @@ function ExamCard({
                 </Card.Body>
                 <Card.Footer gap="2" p="4">
                     {premium ?
-                        <DialogRoot>
-                            <DialogTrigger asChild>
+                        <Dialog.Root>
+                            <Dialog.Trigger asChild>
                                 <Button size="sm">
                                     Voir plus
                                 </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                                <DialogHeader>
-                                    <DialogTitle>Passer à Recap'eps pro?
-                                    </DialogTitle>
-                                </DialogHeader>
-                                <DialogBody>
+                            </Dialog.Trigger>
+                            <Dialog.Content>
+                                <Dialog.Header>
+                                    <Dialog.Title>Passer à Recap'eps pro?
+                                    </Dialog.Title>
+                                </Dialog.Header>
+                                <Dialog.Body>
                                     <p>
                                         Tu apprécies le contenu que nous te proposons mais tu restes sur ta faim? Tu aimerai accéder à tout le contenu que nous t'avons concocté? Alors n'hésite plus et passe à Recap'eps pro ! 🎯
                                     </p>
-                                </DialogBody>
-                                <DialogFooter>
-                                    <DialogActionTrigger asChild>
+                                </Dialog.Body>
+                                <Dialog.Footer>
+                                    <Dialog.ActionTrigger asChild>
                                         <Button variant="outline">Non, merci</Button>
-                                    </DialogActionTrigger>
+                                    </Dialog.ActionTrigger>
                                     <Button variant="solid">
                                         <Link href="/checkout">Oui par pitié</Link>
                                     </Button>
-                                </DialogFooter>
-                                <DialogCloseTrigger />
-                            </DialogContent>
-                        </DialogRoot>
+                                </Dialog.Footer>
+                                <Dialog.CloseTrigger />
+                            </Dialog.Content>
+                        </Dialog.Root>
                         :
                         <Button variant="solid" asChild>
                             <a target="_blank" href={vers}>Voir plus</a>
