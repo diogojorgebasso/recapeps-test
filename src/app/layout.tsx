@@ -1,11 +1,10 @@
 // load the Auth. Does not impose any styles.
 import type { Metadata } from "next";
 import { Provider } from "@/components/ui/provider"
-import Header from "@/components/Header";
 import { getAuthenticatedAppForUser } from "@/lib/firebase/serverApp";
+import { AuthProvider } from "@/components/AuthProvider";
 
-
-export const dynamic = "force-dynamic";
+export const dynamic = "force-dynamic"; // server side!
 
 export const metadata: Metadata = {
   title: "Recap'eps",
@@ -17,15 +16,17 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { currentUser } = await getAuthenticatedAppForUser();
+  const { currentUser, isPro } = await getAuthenticatedAppForUser();
 
   return (
-    <html suppressHydrationWarning lang="en">
+    <html suppressHydrationWarning lang="fr">
       <body>
-        <Header initialUser={currentUser?.toJSON()} />
-        <Provider >
-          {children}
-        </Provider>
+        {/* currentUser?.toJSON()*/}
+        <AuthProvider initialUser={currentUser ?? null} initialIsPro={isPro}>
+          <Provider >
+            {children}
+          </Provider>
+        </AuthProvider>
       </body>
     </html>
   );

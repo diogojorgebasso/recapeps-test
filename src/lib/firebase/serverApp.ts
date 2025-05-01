@@ -5,12 +5,12 @@ import "server-only";
 import { cookies } from "next/headers";
 import { initializeServerApp, initializeApp } from "firebase/app";
 
-import { getAuth } from "firebase/auth";
-import { init } from "next/dist/compiled/webpack/webpack";
+import { getAuth, IdTokenResult } from "firebase/auth";
 
 export async function getAuthenticatedAppForUser() {
     const authIdToken = (await cookies()).get("__session")?.value;
 
+    // TODO : remove this bcs of the new initilizeApp.
     const firebaseConfig = {
         apiKey: "AIzaSyCQL9kH3r-y4Q4PtzQ_t9lBJl5J3zuty7k",
         authDomain: "recapeps-test.firebaseapp.com",
@@ -22,7 +22,7 @@ export async function getAuthenticatedAppForUser() {
     };
 
     const firebaseServerApp = initializeServerApp(
-        initializeApp(),
+        initializeApp(firebaseConfig),
         {
             authIdToken,
 
@@ -32,5 +32,13 @@ export async function getAuthenticatedAppForUser() {
     const auth = getAuth(firebaseServerApp);
     await auth.authStateReady();
 
-    return { firebaseServerApp, currentUser: auth.currentUser };
+    let isPro = false;
+
+    if (auth.currentUser) {
+        // ⬇︎  await the Promise, then destructure `claims`
+        const { claims }: IdTokenResult = await auth.currentUser.getIdTokenResult();
+        isPro = !!claims.pro;             // true  ➟ subscriber,  false ➟ free user
+    }
+
+    return { firebaseServerApp, currentUser: auth.currentUser, isPro };
 }
