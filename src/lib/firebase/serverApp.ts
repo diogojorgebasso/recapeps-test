@@ -2,14 +2,15 @@
 // https://nextjs.org/docs/app/building-your-application/rendering/composition-patterns#keeping-server-only-code-out-of-the-client-environment
 import "server-only";
 
-import { headers } from "next/headers";
-import { initializeServerApp } from "firebase/app";
+import { cookies } from "next/headers";
+import { initializeServerApp, initializeApp } from "firebase/app";
 
-import { getAuth } from "firebase/auth";
+import { getAuth, IdTokenResult } from "firebase/auth";
 
 export async function getAuthenticatedAppForUser() {
-    const idToken = (await headers()).get("Authorization")?.split("Bearer ")[1];
+    const authIdToken = (await cookies()).get("__session")?.value;
 
+    // TODO : remove this bcs of the new initilizeApp.
     const firebaseConfig = {
         apiKey: "AIzaSyCQL9kH3r-y4Q4PtzQ_t9lBJl5J3zuty7k",
         authDomain: "recapeps-test.firebaseapp.com",
@@ -18,19 +19,25 @@ export async function getAuthenticatedAppForUser() {
         messagingSenderId: "298375526115",
         appId: "1:298375526115:web:784cb51da316177ad637d6",
         measurementId: "G-9PK8PPVBSE"
-      };
-      
+    };
+
     const firebaseServerApp = initializeServerApp(
-        firebaseConfig,
-        idToken
-            ? {
-                authIdToken: idToken,
-            }
-            : {}
+        initializeApp(firebaseConfig),
+        {
+            authIdToken,
+        }
     );
 
     const auth = getAuth(firebaseServerApp);
     await auth.authStateReady();
 
-    return { firebaseServerApp, currentUser: auth.currentUser };
+    let isPro = false;
+
+    if (auth.currentUser) {
+        // ⬇︎  await the Promise, then destructure `claims`
+        const { claims }: IdTokenResult = await auth.currentUser.getIdTokenResult();
+        isPro = !!claims.pro;             // true  ➟ subscriber,  false ➟ free user
+    }
+
+    return { firebaseServerApp, currentUser: auth.currentUser, isPro };
 }

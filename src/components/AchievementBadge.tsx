@@ -1,57 +1,45 @@
-import { Box, Text, VStack, Icon, Tooltip } from '@chakra-ui/react';
-import { FaTrophy, FaMedal, FaStar, FaFire } from 'react-icons/fa';
+'use client';
 
-type AchievementType = 'trophy' | 'medal' | 'star' | 'streak';
+import { Box, Text, Center, Tooltip } from '@chakra-ui/react';
 
 interface AchievementBadgeProps {
-    type: AchievementType;
-    label: string;
-    description: string;
-    isUnlocked: boolean;
+    title: string;
+    icon: string;
+    achieved: boolean;
+    description?: string;
 }
 
-export default function AchievementBadge({ type, label, description, isUnlocked }: AchievementBadgeProps) {
-    const getIcon = () => {
-        switch (type) {
-            case 'trophy': return FaTrophy;
-            case 'medal': return FaMedal;
-            case 'star': return FaStar;
-            case 'streak': return FaFire;
-        }
-    };
-
-    const getColor = () => {
-        if (!isUnlocked) return 'gray.400';
-
-        switch (type) {
-            case 'trophy': return 'gold';
-            case 'medal': return 'blue.500';
-            case 'star': return 'purple.500';
-            case 'streak': return 'orange.500';
-        }
-    };
-
+export function AchievementBadge({ title, icon, achieved, description }: AchievementBadgeProps) {
     return (
-        <Tooltip label={description}>
-            <VStack
-                gap={1}
-                opacity={isUnlocked ? 1 : 0.6}
-                transition="all 0.2s"
-                cursor="pointer"
-                _hover={{ transform: 'translateY(-2px)' }}
-            >
-                <Box
-                    bg={isUnlocked ? 'white' : 'gray.100'}
-                    borderRadius="full"
-                    p={2}
-                    boxShadow={isUnlocked ? 'md' : 'none'}
+        <Tooltip
+            label={description || (achieved ? `Badge débloqué : ${title}` : `Badge verrouillé : ${title}`)}
+            placement="top"
+        >
+            <Box textAlign="center">
+                <Center
+                    boxSize="60px"
+                    bg={achieved ? 'green.100' : 'gray.100'}
+                    color={achieved ? 'green.500' : 'gray.400'}
+                    borderRadius="md"
+                    mb={2}
+                    border="2px"
+                    borderColor={achieved ? 'green.200' : 'gray.200'}
+                    fontSize="2xl"
+                    opacity={achieved ? 1 : 0.6}
+                    filter={achieved ? 'none' : 'grayscale(1)'}
+                    transition="all 0.2s"
+                    cursor="pointer"
+                    _hover={{
+                        transform: achieved ? 'scale(1.05)' : 'none',
+                        boxShadow: achieved ? 'md' : 'none'
+                    }}
                 >
-                    <Icon as={getIcon()} boxSize="24px" color={getColor()} />
-                </Box>
-                <Text fontSize="xs" fontWeight="medium" textAlign="center">
-                    {label}
+                    {icon}
+                </Center>
+                <Text fontSize="xs" fontWeight={achieved ? 'medium' : 'normal'} isTruncated>
+                    {title}
                 </Text>
-            </VStack>
+            </Box>
         </Tooltip>
     );
 }

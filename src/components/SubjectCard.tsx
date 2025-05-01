@@ -1,84 +1,67 @@
 'use client';
 
-import { Box, Text, Image, Flex, Badge, CircularProgress, CircularProgressLabel } from '@chakra-ui/react';
-import { Subject } from '../../types';
+import { Box, Text, Progress, Flex, Center } from '@chakra-ui/react';
 
 interface SubjectCardProps {
-    subject: Subject;
+    title: string;
+    icon: string;
+    progress: number;
+    onClick?: () => void;
 }
 
-export default function SubjectCard({ subject }: SubjectCardProps) {
-    const progress = Math.round((subject.chaptersRead / subject.totalChapters) * 100);
-    const isComplete = subject.chaptersRead === subject.totalChapters;
-
+export function SubjectCard({ title, icon, progress, onClick }: SubjectCardProps) {
     return (
         <Box
             borderWidth="1px"
             borderRadius="lg"
             overflow="hidden"
-            boxShadow="md"
-            transition="transform 0.3s, box-shadow 0.3s"
-            _hover={{ transform: "translateY(-4px)", boxShadow: "lg" }}
+            p={4}
+            cursor="pointer"
+            onClick={onClick}
+            transition="all 0.2s"
+            _hover={{
+                transform: 'translateY(-4px)',
+                boxShadow: 'md'
+            }}
             bg="white"
             height="100%"
             display="flex"
             flexDirection="column"
         >
-            <Box position="relative" height="150px" overflow="hidden">
-                <Image
-                    src={subject.imageUrl || '/images/default-subject.jpg'}
-                    alt={subject.title}
-                    objectFit="cover"
-                    width="100%"
-                    height="100%"
-                />
-
-                <Flex
-                    position="absolute"
-                    top={2}
-                    right={2}
+            <Flex align="center" mb={3}>
+                <Center
+                    bg="blue.50"
+                    borderRadius="md"
+                    boxSize="40px"
+                    fontSize="xl"
+                    mr={3}
                 >
-                    <Box
-                        bg="white"
-                        borderRadius="full"
-                        p={1}
-                        boxShadow="md"
-                    >
-                        <CircularProgress
-                            value={progress}
-                            color={isComplete ? "green.500" : "blue.500"}
-                            size="40px"
-                        >
-                            <CircularProgressLabel fontSize="xs">
-                                {isComplete ? '✓' : `${progress}%`}
-                            </CircularProgressLabel>
-                        </CircularProgress>
-                    </Box>
-                </Flex>
-            </Box>
-
-            <Box p={4} flexGrow={1} display="flex" flexDirection="column">
-                <Flex justify="space-between" align="start" mb={2}>
-                    <Text fontWeight="semibold" fontSize="lg" noOfLines={1}>
-                        {subject.title}
-                    </Text>
-
-                    {isComplete && (
-                        <Badge colorScheme="green" variant="solid" fontSize="xs" borderRadius="full">
-                            Terminé
-                        </Badge>
-                    )}
-                </Flex>
-
-                <Text fontSize="sm" color="gray.600" mb={3} flexGrow={1} noOfLines={3}>
-                    {subject.description}
+                    {icon}
+                </Center>
+                <Text fontWeight="bold" fontSize="md" noOfLines={2}>
+                    {title}
                 </Text>
+            </Flex>
 
-                <Flex justifyContent="space-between" alignItems="center" pt={1}>
+            <Box mt="auto">
+                <Flex justify="space-between" mb={1}>
                     <Text fontSize="xs" color="gray.500">
-                        {subject.chaptersRead} / {subject.totalChapters} chapitres
+                        Progression
+                    </Text>
+                    <Text fontSize="xs" fontWeight="bold">
+                        {progress}%
                     </Text>
                 </Flex>
+                <Progress
+                    value={progress}
+                    size="sm"
+                    colorScheme={
+                        progress < 30 ? 'red' :
+                            progress < 70 ? 'orange' :
+                                'green'
+                    }
+                    borderRadius="full"
+                />
             </Box>
         </Box>
     );

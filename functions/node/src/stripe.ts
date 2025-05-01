@@ -2,6 +2,7 @@ import { onCall, onRequest, HttpsError } from "firebase-functions/v2/https";
 import { error, info, debug } from "firebase-functions/logger";
 import Stripe from "stripe";
 import { getFirestore } from "firebase-admin/firestore";
+import * as admin from "firebase-admin"; // TODO : Remove this to auth library.
 
 const db = getFirestore();
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
@@ -15,11 +16,12 @@ interface CheckoutSessionRequest {
   priceId: string;
 }
 
-export const createStripeCheckoutSession = onCall<CheckoutSessionRequest>(
-  { 
-    cors: "https://recapeps.fr", 
-    enforceAppCheck: true 
-},
+export const createstripecheckoutsession = onCall<CheckoutSessionRequest>(
+  {
+    cors: "https://recapeps.fr",
+    enforceAppCheck: true,
+    serviceAccount: "stripe-checkout-session-run@recapeps-test.iam.gserviceaccount.com"
+  },
   async (request) => {
     const { priceId } = request.data;
     const userId = request.auth?.uid;
@@ -56,7 +58,7 @@ export const createStripeCheckoutSession = onCall<CheckoutSessionRequest>(
 
       // Create a Stripe Checkout Session for a subscription
       const session = await stripe.checkout.sessions.create({
-        customer, 
+        customer,
         ui_mode: "embedded",
         line_items: [
           {
@@ -81,7 +83,9 @@ export const createStripeCheckoutSession = onCall<CheckoutSessionRequest>(
   }
 );
 
-export const stripeWebhookTest = onRequest( async (req, res) => {
+export const stripewebhooktest = onRequest({
+  serviceAccount: "stripe-webhook-test-run@recapeps-test.iam.gserviceaccount.com"
+}, async (req, res) => {
   try {
     const sig = req.headers["stripe-signature"] as string;
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -101,10 +105,15 @@ export const stripeWebhookTest = onRequest( async (req, res) => {
 
     // Handle customer.subscription.updated event
     if (event.type === "customer.subscription.updated") {
+
       const subscription = event.data.object as Stripe.Subscription;
+      const isPro = subscription.status === "active";
+
       const subscriptionId = subscription.id;
       const stripeCustomerId = subscription.customer as string;
+
       debug(`Subscription ${subscriptionId} updated for user ${stripeCustomerId}`);
+
       const userSnapshot = await db.collection("users").where("stripeCustomerId", "==", stripeCustomerId).get();
 
       if (userSnapshot.empty) {
@@ -124,6 +133,9 @@ export const stripeWebhookTest = onRequest( async (req, res) => {
 
       await subscriptionRef.set(subscription, { merge: true });
       info(`Subscription ${subscriptionId} updated successfully`);
+
+      await admin.auth().setCustomUserClaims(userId, { pro: isPro });
+
       res.status(200).send("Webhook received");
     } else {
       // Acknowledge unhandled event types
@@ -138,8 +150,12 @@ export const stripeWebhookTest = onRequest( async (req, res) => {
   }
 });
 
-export const createPortalSession = onCall(
-  { cors: "https://recapeps.fr", enforceAppCheck: true },
+export const createportalsession = onCall(
+  {
+    cors: "https://recapeps.fr",
+    serviceAccount: "create-portal-session-run@recapeps-test.iam.gserviceaccount.com",
+    enforceAppCheck: true
+  },
   async (request) => {
 
     const userId = request.auth?.uid;

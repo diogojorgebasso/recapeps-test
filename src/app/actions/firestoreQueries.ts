@@ -1,194 +1,210 @@
 'use server';
 
-import { collection, getDocs, doc, getDoc, updateDoc, setDoc, query, where, increment, Timestamp } from 'firebase/firestore';
-import { db } from '../../lib/firebase';
-import { Subject, Quiz, UserStreak } from '../../../types';
+import { collection, doc, getDoc, getDocs, query, where, orderBy, limit, Timestamp } from 'firebase/firestore';
+import { getAuthenticatedAppForUser } from '@/lib/firebase/serverApp';
 
-export async function getSubjects(userId: string): Promise<Subject[]> {
+interface Subject {
+  id: string;
+  title: string;
+  description?: string;
+  icon?: string;
+}
+
+interface UserProgress {
+  subjectId: string;
+  progress: number;
+  lastAccessed?: Timestamp;
+}
+
+interface StreakData {
+  currentStreak: number;
+  lastLoginDate: Timestamp;
+  longestStreak: number;
+}
+
+/**
+ * Fetch subjects with user progress data
+ */
+export async function fetchSubjectsWithProgress() {
   try {
-    const subjectsRef = collection(db, 'subjects');
-    const snapshot = await getDocs(subjectsRef);
+    const { firebaseServerApp, currentUser } = await getAuthenticatedAppForUser();
+
+    if (!currentUser) {
+      return { subjects: [], error: 'User not authenticated' };
+    }
+
+    const { getFirestore } = await import('firebase/firestore');
+    const db = getFirestore(firebaseServerApp);
+
+    // Fetch all subjects
+    const subjectsSnapshot = await getDocs(collection(db, 'subjects'));
     const subjects: Subject[] = [];
 
-    for (const subjectDoc of snapshot.docs) {
-      const subjectData = subjectDoc.data();
-      
-      // Get user progress for this subject
-      const progressRef = doc(db, 'userProgress', `${userId}_${subjectDoc.id}`);
-      const progressSnap = await getDoc(progressRef);
-      const chaptersRead = progressSnap.exists() ? progressSnap.data().chaptersRead : 0;
-      
+    subjectsSnapshot.forEach((doc) => {
       subjects.push({
-        id: subjectDoc.id,
-        title: subjectData.title,
-        description: subjectData.description,
-        imageUrl: subjectData.imageUrl,
-        totalChapters: subjectData.totalChapters,
-        chaptersRead,
+        id: doc.id,
+        ...doc.data() as Subject
       });
-    }
-
-    return subjects;
-  } catch (error) {
-    console.error("Error fetching subjects:", error);
-    return [];
-  }
-}
-
-export async function getQuizzes(userId: string): Promise<Quiz[]> {
-  try {
-    const quizzesRef = collection(db, 'quizzes');
-    const snapshot = await getDocs(quizzesRef);
-    const userProgressRef = collection(db, 'userProgress');
-    
-    const quizzes: Quiz[] = [];
-    
-    for (const quizDoc of snapshot.docs) {
-      const quizData = quizDoc.data();
-      
-      // Check if user completed this quiz
-      const progressQuery = query(
-        userProgressRef, 
-        where('userId', '==', userId), 
-        where('quizId', '==', quizDoc.id)
-      );
-      const progressSnap = await getDocs(progressQuery);
-      const completed = !progressSnap.empty;
-      
-      quizzes.push({
-        id: quizDoc.id,
-        title: quizData.title,
-        subjectId: quizData.subjectId,
-        difficulty: quizData.difficulty,
-        completed,
-        position: quizData.position,
-      });
-    }
-    
-    return quizzes;
-  } catch (error) {
-    console.error("Error fetching quizzes:", error);
-    return [];
-  }
-}
-
-export async function markChapterAsRead(userId: string, subjectId: string, chapterId: string) {
-  try {
-    const progressRef = doc(db, 'userProgress', `${userId}_${subjectId}`);
-    const progressSnap = await getDoc(progressRef);
-    
-    if (progressSnap.exists()) {
-      // Update existing progress
-      await updateDoc(progressRef, {
-        chaptersRead: increment(1),
-        [`readChapters.${chapterId}`]: true,
-        lastUpdated: Timestamp.now()
-      });
-    } else {
-      // Create new progress entry
-      await setDoc(progressRef, {
-        userId,
-        subjectId,
-        chaptersRead: 1,
-        readChapters: { [chapterId]: true },
-        lastUpdated: Timestamp.now()
-      });
-    }
-    
-    // Update user streak
-    await updateUserStreak(userId);
-  } catch (error) {
-    console.error("Error marking chapter as read:", error);
-  }
-}
-
-export async function completeQuiz(userId: string, quizId: string) {
-  try {
-    const progressRef = doc(db, 'userProgress', `${userId}_quiz_${quizId}`);
-    
-    await setDoc(progressRef, {
-      userId,
-      quizId,
-      completed: true,
-      completedAt: Timestamp.now()
     });
-    
-    // Update user streak
-    await updateUserStreak(userId);
+
+    // Fetch user progress for each subject
+    const userProgressSnapshot = await getDocs(
+      collection(db, 'users', currentUser.uid, 'progress')
+    );
+
+    const progressMap: Record<string, number> = {};
+
+    userProgressSnapshot.forEach((doc) => {
+      const progress = doc.data() as UserProgress;
+      progressMap[progress.subjectId] = progress.progress;
+    });
+
+    // Combine subjects with progress
+    const subjectsWithProgress = subjects.map((subject) => ({
+      ...subject,
+      progress: progressMap[subject.id] || 0
+    }));
+
+    return { subjects: subjectsWithProgress };
   } catch (error) {
-    console.error("Error completing quiz:", error);
+    console.error('Error fetching subjects with progress:', error);
+    return { subjects: [], error: (error as Error).message };
   }
 }
 
-export async function getUserStreak(userId: string): Promise<UserStreak> {
+/**
+ * Fetch user streak data
+ */
+export async function fetchUserStreak() {
   try {
-    const streakRef = doc(db, 'userStreaks', userId);
-    const streakSnap = await getDoc(streakRef);
-    
-    if (streakSnap.exists()) {
-      const data = streakSnap.data();
-      return {
-        currentStreak: data.currentStreak || 0,
-        lastCompletionDate: data.lastCompletionDate?.toDate().toISOString() || '',
-        longestStreak: data.longestStreak || 0
-      };
+    const { firebaseServerApp, currentUser } = await getAuthenticatedAppForUser();
+
+    if (!currentUser) {
+      return { streak: { currentStreak: 0, longestStreak: 0 }, error: 'User not authenticated' };
     }
-    
+
+    const { getFirestore } = await import('firebase/firestore');
+    const db = getFirestore(firebaseServerApp);
+
+    const streakDocRef = doc(db, 'users', currentUser.uid, 'stats', 'streak');
+    const streakSnapshot = await getDoc(streakDocRef);
+
+    if (!streakSnapshot.exists()) {
+      return { streak: { currentStreak: 0, longestStreak: 0 } };
+    }
+
+    const streakData = streakSnapshot.data() as StreakData;
+
     return {
-      currentStreak: 0,
-      lastCompletionDate: '',
-      longestStreak: 0
+      streak: {
+        currentStreak: streakData.currentStreak || 0,
+        longestStreak: streakData.longestStreak || 0,
+        lastLoginDate: streakData.lastLoginDate
+      }
     };
   } catch (error) {
-    console.error("Error getting user streak:", error);
-    return {
-      currentStreak: 0,
-      lastCompletionDate: '',
-      longestStreak: 0
-    };
+    console.error('Error fetching user streak:', error);
+    return { streak: { currentStreak: 0, longestStreak: 0 }, error: (error as Error).message };
   }
 }
 
-// TODO : Não é assim que vou lidar com a streak
-async function updateUserStreak(userId: string) {
-  const streakRef = doc(db, 'userStreaks', userId);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  
-  const streakSnap = await getDoc(streakRef);
-  
-  if (streakSnap.exists()) {
-    const data = streakSnap.data();
-    const lastDate = data.lastCompletionDate.toDate();
-    lastDate.setHours(0, 0, 0, 0);
-    
-    const diffInDays = Math.floor((today.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
-    
-    if (diffInDays === 0) {
-      // Already logged activity today, nothing to update
-      return;
-    } else if (diffInDays === 1) {
-      // Next consecutive day
-      const newStreak = data.currentStreak + 1;
-      await updateDoc(streakRef, {
-        currentStreak: newStreak,
-        lastCompletionDate: Timestamp.now(),
-        longestStreak: Math.max(newStreak, data.longestStreak || 0)
-      });
-    } else {
-      // Streak broken
-      await updateDoc(streakRef, {
-        currentStreak: 1,
-        lastCompletionDate: Timestamp.now()
-      });
+/**
+ * Fetch recent activities for the user
+ */
+export async function fetchRecentActivities(limit = 5) {
+  try {
+    const { firebaseServerApp, currentUser } = await getAuthenticatedAppForUser();
+
+    if (!currentUser) {
+      return { activities: [], error: 'User not authenticated' };
     }
-  } else {
-    // First activity, start streak
-    await setDoc(streakRef, {
-      userId,
-      currentStreak: 1,
-      longestStreak: 1,
-      lastCompletionDate: Timestamp.now()
+
+    const { getFirestore } = await import('firebase/firestore');
+    const db = getFirestore(firebaseServerApp);
+
+    const activitiesQuery = query(
+      collection(db, 'users', currentUser.uid, 'activities'),
+      orderBy('timestamp', 'desc'),
+      limit(limit)
+    );
+
+    const activitiesSnapshot = await getDocs(activitiesQuery);
+    const activities: any[] = [];
+
+    activitiesSnapshot.forEach((doc) => {
+      activities.push({
+        id: doc.id,
+        ...doc.data()
+      });
     });
+
+    return { activities };
+  } catch (error) {
+    console.error('Error fetching recent activities:', error);
+    return { activities: [], error: (error as Error).message };
+  }
+}
+
+/**
+ * Update user streak
+ */
+export async function updateUserStreak() {
+  try {
+    const { firebaseServerApp, currentUser } = await getAuthenticatedAppForUser();
+
+    if (!currentUser) {
+      return { success: false, error: 'User not authenticated' };
+    }
+
+    const { getFirestore, serverTimestamp } = await import('firebase/firestore');
+    const db = getFirestore(firebaseServerApp);
+
+    const streakDocRef = doc(db, 'users', currentUser.uid, 'stats', 'streak');
+    const streakSnapshot = await getDoc(streakDocRef);
+
+    const now = new Date();
+    let currentStreak = 1;
+    let longestStreak = 1;
+
+    if (streakSnapshot.exists()) {
+      const streakData = streakSnapshot.data() as StreakData;
+      const lastLogin = streakData.lastLoginDate?.toDate();
+      longestStreak = streakData.longestStreak || 0;
+
+      if (lastLogin) {
+        // Check if last login was yesterday or today
+        const lastLoginDate = lastLogin.getDate();
+        const today = now.getDate();
+        const isConsecutive = (today - lastLoginDate === 1) || (today === lastLoginDate);
+
+        if (isConsecutive) {
+          // Continue the streak
+          currentStreak = (streakData.currentStreak || 0) + 1;
+        } else {
+          // Reset the streak
+          currentStreak = 1;
+        }
+      }
+
+      // Update longest streak if current is longer
+      if (currentStreak > longestStreak) {
+        longestStreak = currentStreak;
+      }
+    }
+
+    // Update streak document
+    await streakDocRef.set({
+      currentStreak,
+      longestStreak,
+      lastLoginDate: serverTimestamp()
+    });
+
+    return {
+      success: true,
+      streak: { currentStreak, longestStreak }
+    };
+  } catch (error) {
+    console.error('Error updating user streak:', error);
+    return { success: false, error: (error as Error).message };
   }
 }

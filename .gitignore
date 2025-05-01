@@ -17,6 +17,13 @@
 /.next/
 /out/
 
+# firebase
+firebase-debug.log
+firestore-debug.log
+pubsub-debug.log
+/firebase.json
+/.firebase/
+
 # production
 /build
 
@@ -43,3 +50,10 @@ next-env.d.ts
 apphosting.local.yaml
 
 *storybook.log
+
+#terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars.secret
+*.tfvars.local
