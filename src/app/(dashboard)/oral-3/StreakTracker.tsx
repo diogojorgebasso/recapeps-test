@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Box, Text, HStack, VStack, Progress, Badge, useToast, Flex, Circle, Tooltip } from '@chakra-ui/react';
 import { FaFire } from 'react-icons/fa';
-import { fetchUserStreak, updateUserStreak } from '../app/actions/firestoreQueries';
+import { fetchUserStreak, updateUserStreak } from '../../actions/firestoreQueries';
 
 interface SimpleStreakTrackerProps {
     days: number;
