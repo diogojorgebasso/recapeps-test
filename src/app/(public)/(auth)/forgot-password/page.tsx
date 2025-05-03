@@ -1,4 +1,7 @@
-import { useState } from "react";
+"use client";
+
+import { useFormState, useFormStatus } from "react-dom";
+import { useRouter } from "next/navigation";
 import {
     Flex,
     Card,
@@ -7,40 +10,35 @@ import {
     Input,
     Link as ChakraLink,
     Fieldset,
+    Button,
+    Field,
+    FormControl,
+    FormErrorMessage,
+    Stack,
 } from "@chakra-ui/react";
-import { useNavigate } from "react-router";
 import { useColorModeValue } from "@/components/ui/color-mode";
-import { Field } from "@/components/ui/field";
-import { Button } from "@/components/ui/button";
+import { forgotPasswordAction, type ForgotPasswordState } from "./actions";
+
+function SubmitButton() {
+    const { pending } = useFormStatus();
+    return (
+        <Button
+            type="submit"
+            colorScheme="blue"
+            w="full"
+            loading={pending}
+            disabled={pending}
+        >
+            Envoyer l'email de réinitialisation
+        </Button>
+    );
+}
 
 export default function ForgotPassword() {
-    const [email, setEmail] = useState("");
-    const [error, setError] = useState<string | null>(null);
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isEmailSent, setIsEmailSent] = useState(false);
+    const router = useRouter();
 
-    const navigate = useNavigate();
-
-    const handleResetPassword = async () => {
-        setError(null);
-
-        if (!email) {
-            setError("Veuillez entrer votre email.");
-            return;
-        }
-
-        setIsSubmitting(true);
-
-        try {
-            await resetPassword(email);
-            setIsEmailSent(true);
-        } catch (error) {
-            setError("Une erreur s'est produite. Vérifiez que l'email est correct.");
-            console.error("Erreur lors de la réinitialisation du mot de passe :", error);
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
+    const initialState: ForgotPasswordState = { message: "", errors: {}, fieldValues: { email: "" }, success: false };
+    const [state, formAction] = useFormState(forgotPasswordAction, initialState);
 
     return (
         <Flex
@@ -56,7 +54,7 @@ export default function ForgotPassword() {
                         Réinitialisation du mot de passe
                     </Heading>
                     <Text mt={2} fontSize="sm" color="gray.600">
-                        {isEmailSent
+                        {state.success
                             ? "Un email de réinitialisation a été envoyé."
                             : "Entrez votre email pour réinitialiser votre mot de passe"
                         }
@@ -64,39 +62,38 @@ export default function ForgotPassword() {
                 </Card.Header>
 
                 <Card.Body>
-                    {!isEmailSent ? (
-                        <>
-                            <Fieldset.Root>
-                                <Field.Root required>
-                                    <Field.Label>Email</Field.Label>
-                                    <Input
-                                        type="email"
-                                        placeholder="exemple@email.com"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        required
-                                    />
-                                </Field.Root>
-                            </Fieldset.Root>
+                    {!state.success ? (
+                        <form action={formAction}>
+                            <Stack gap={4}>
+                                <Fieldset.Root>
+                                    <FormControl isInvalid={!!state.errors?.email} isRequired>
+                                        <Field.Root required>
+                                            <Field.Label>Email</Field.Label>
+                                            <Input
+                                                type="email"
+                                                name="email"
+                                                placeholder="exemple@email.com"
+                                                defaultValue={state.fieldValues.email}
+                                                required
+                                            />
+                                            {state.errors?.email && (
+                                                <FormErrorMessage>{state.errors.email[0]}</FormErrorMessage>
+                                            )}
+                                        </Field.Root>
+                                    </FormControl>
+                                </Fieldset.Root>
 
-                            {error && <Text color="red.500" mt={4}>{error}</Text>}
+                                {state.errors?._form && <Text color="red.500">{state.errors._form[0]}</Text>}
 
-                            <Button
-                                colorPalette="blue"
-                                w="full"
-                                mt={4}
-                                onClick={handleResetPassword}
-                                loading={isSubmitting}
-                            >
-                                Envoyer l'email de réinitialisation
-                            </Button>
-                        </>
+                                <SubmitButton />
+                            </Stack>
+                        </form>
                     ) : (
                         <Button
-                            colorPalette="green"
+                            colorScheme="green"
                             w="full"
                             mt={4}
-                            onClick={() => navigate("/login")}
+                            onClick={() => router.push("/login")}
                         >
                             Retour à la page de connexion
                         </Button>

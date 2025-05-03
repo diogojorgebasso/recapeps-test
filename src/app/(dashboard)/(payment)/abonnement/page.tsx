@@ -13,14 +13,11 @@ import {
     Spinner,
 } from '@chakra-ui/react';
 import { LuCircleCheck } from 'react-icons/lu';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-
-import { httpsCallable } from 'firebase/functions';
-import { functions } from '@/lib/firebase/clientApp';
-import { loadStripe } from '@stripe/stripe-js';
+import Link from 'next/link';
 import { useAuth } from '@/components/AuthProvider';
-import { Toaster, toaster } from "@/components/ui/toaster"
+import { Toaster, toaster } from "@/components/ui/toaster";
 
 interface Plan {
     id: string;
@@ -32,15 +29,6 @@ interface Plan {
     buttonText: string;
     recommended?: boolean;
 }
-
-interface StripeResponse {
-    id: string;
-}
-
-/* ─── Stripe init ──────────────────────────────────────────────── */
-const stripePromise = loadStripe(
-    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
-);
 
 /* ─── Plans array ──────────────────────────────────────────────── */
 const PLANS: Plan[] = [
@@ -76,55 +64,19 @@ const PLANS: Plan[] = [
     },
 ];
 
-/* ─── Component ────────────────────────────────────────────────── */
-export default function CheckoutPage() {
+export const metadata = {
+    title: 'Passer Pro – Recapeps',
+    description: 'Découvrez notre offre PRO pour réussir le STAPS.',
+};
+
+export default function AbonnementPage() {
     const { user, isPro } = useAuth();
     const router = useRouter();
 
     const [selectedId, setSelectedId] = useState('yearly');
     const [loadingId, setLoadingId] = useState<string | null>(null);
+    const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
 
-    /* redirect paid users back to dashboard */
-    useEffect(() => {
-        if (isPro) router.replace('/dashboard');
-    }, [isPro, router]);
-
-    /* handle payment */
-    const handleCheckout = async (plan: Plan) => {
-        if (!user) {
-            toaster.create({
-                title: 'Connexion requise',
-                description: 'Vous devez être connecté pour vous abonner.',
-                type: 'error',
-            });
-            router.push('/login?from=/checkout');
-            return;
-        }
-
-        setLoadingId(plan.id);
-        try {
-            const create = httpsCallable(functions, 'createcheckoutsession');
-            const { data } = (await create({ priceId: plan.priceId })) as {
-                data: StripeResponse;
-            };
-
-            if (data?.id) {
-                const stripe = await stripePromise;
-                const { error } = await stripe!.redirectToCheckout({
-                    sessionId: data.id,
-                });
-                if (error) throw error;
-            }
-        } catch (err: any) {
-            toaster.create({
-                title: 'Erreur',
-                description: err.message ?? 'Une erreur s’est produite.',
-                type: 'error',
-            });
-        } finally {
-            setLoadingId(null);
-        }
-    };
 
     /* loading guard while we figure out pro state */
     if (isPro) {
@@ -135,7 +87,6 @@ export default function CheckoutPage() {
         );
     }
 
-    /* ─── UI ────────────────────────────────────────────────────── */
     return (
         <Box>
             <Toaster />
@@ -143,7 +94,6 @@ export default function CheckoutPage() {
                 <Heading as="h1" textAlign="center" mb={10}>
                     Choisissez votre formule
                 </Heading>
-
                 <Flex
                     direction={{ base: 'column', md: 'row' }}
                     justify="center"
@@ -154,6 +104,7 @@ export default function CheckoutPage() {
                 >
                     {PLANS.map((plan) => {
                         const isSelected = selectedId === plan.id;
+                        const isLoading = loadingId === plan.id;
                         return (
                             <Card.Root
                                 key={plan.id}
@@ -167,12 +118,12 @@ export default function CheckoutPage() {
                                     isSelected ? 'blue.400' : plan.recommended ? 'blue.200' : 'gray.200'
                                 }
                                 shadow={isSelected ? 'md' : 'none'}
-                                cursor="pointer"
+                                cursor={isLoading ? 'default' : 'pointer'}
+                                opacity={isLoading ? 0.7 : 1}
                                 transition="all 0.25s"
-                                _hover={{ borderColor: 'blue.400', transform: 'translateY(-4px)', shadow: 'md' }}
-                                onClick={() => setSelectedId(plan.id)}
+                                _hover={!isLoading ? { borderColor: 'blue.400', transform: 'translateY(-4px)', shadow: 'md' } : {}}
+                                onClick={() => !isLoading && setSelectedId(plan.id)}
                             >
-                                {/* badge */}
                                 {plan.recommended && (
                                     <Box
                                         pos="absolute"
@@ -203,7 +154,6 @@ export default function CheckoutPage() {
                                     </Text>
                                 </Flex>
 
-                                {/* features */}
                                 <List.Root spaceY={2} mb={6}>
                                     {plan.features.map((f) => (
                                         <List.Item key={f}>
@@ -214,27 +164,22 @@ export default function CheckoutPage() {
                                         </List.Item>
                                     ))}
                                 </List.Root>
-
-                                {/* CTA */}
-                                <Button
-                                    w="full"
-                                    size="lg"
-                                    variant={isSelected ? 'solid' : 'outline'}
-                                    colorPalette={isSelected ? 'blue' : 'gray'}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        setSelectedId(plan.id);
-                                        handleCheckout(plan);
-                                    }}
-                                    loading={loadingId === plan.id}
-                                >
-                                    {plan.buttonText}
-                                </Button>
+                                <Link href={`/checkout?${plan.priceId}`} passHref>
+                                    <Button
+                                        w="full"
+                                        size="lg"
+                                        variant={isSelected ? 'solid' : 'outline'}
+                                        colorPalette={isSelected ? 'blue' : 'gray'}
+                                        loading={isLoading}
+                                        disabled={isLoading}
+                                    >
+                                        {plan.buttonText}
+                                    </Button>
+                                </Link>
                             </Card.Root>
                         );
                     })}
                 </Flex>
-
                 <Text textAlign="center" mt={8} fontSize="sm" color="fg.muted">
                     Paiement sécurisé via Stripe. Vous pouvez annuler à tout moment.
                 </Text>

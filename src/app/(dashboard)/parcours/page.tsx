@@ -38,8 +38,8 @@ import {
 
 import { Toaster, toaster } from "@/components/ui/toaster"
 import { useAuth } from '@/components/AuthProvider';
-import { SubjectCard } from '@/components/SubjectCard';
-import { StreakTracker } from '@/components/StreakTracker';
+import { SubjectCard } from '@/app/(dashboard)/oral-3/SubjectCard';
+import { StreakTracker } from '@/app/(dashboard)/oral-3/StreakTracker';
 import { AchievementBadge } from '@/components/AchievementBadge';
 import { QuizResult } from '@/types/Quiz';
 

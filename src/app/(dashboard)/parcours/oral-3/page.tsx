@@ -22,9 +22,9 @@ import {
 } from '@chakra-ui/react';
 import { getSubjects, getQuizzes, completeQuiz } from '../actions/firestoreQueries';
 import { Subject, Quiz } from '../../types';
-import SubjectCard from '../../components/SubjectCard';
-import StreakTracker from '../../components/StreakTracker';
-import PathProgress from '../../components/PathProgress';
+import SubjectCard from './SubjectCard';
+import StreakTracker from './StreakTracker';
+import PathProgress from './PathProgress';
 import { FaBook, FaGamepad } from 'react-icons/fa';
 
 export default function HomePage() {

@@ -15,8 +15,8 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         <Flex minH="100vh">
             {/* ①  chrome that needs the browser (auth, tour, media queries) */}
             <Suspense fallback={<Spinner position="fixed" top={4} left={4} />}>
-                <DesktopMenu />       {/* shows itself ≥ 768 px (inside the component) */}
-                <MobileMenu />   {/* shows itself < 768 px */}
+                <DesktopMenu />
+                <MobileMenu />
             </Suspense>
 
             {/* ②  main scrollable panel */}

@@ -1,5 +1,8 @@
-import { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router";
+"use client";
+
+import { useEffect } from "react";
+import { useFormState, useFormStatus } from "react-dom";
+import { useSearchParams, useRouter } from "next/navigation";
 import {
     Flex,
     Card,
@@ -9,55 +12,53 @@ import {
     Link as ChakraLink,
     Fieldset,
     Button,
-    Field
+    Field,
+    FormControl,
+    FormErrorMessage,
+    Stack,
 } from "@chakra-ui/react";
 import { FaGoogle } from "react-icons/fa";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useColorModeValue } from "@/components/ui/color-mode";
+import { useAuth } from "@/components/AuthProvider";
+import { loginAction, type LoginState } from "./actions";
+
+function SubmitButton() {
+    const { pending } = useFormStatus();
+    return (
+        <Button
+            type="submit"
+            colorScheme="blue"
+            w="full"
+            loading={pending}
+            disabled={pending}
+        >
+            Se connecter
+        </Button>
+    );
+}
 
 export default function Login() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [error, setError] = useState<string | null>(null);
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    const { user, loginWithGoogle } = useAuth();
+    const router = useRouter();
+    const searchParams = useSearchParams();
 
-    const navigate = useNavigate();
-    const location = useLocation();
+    const from = searchParams.get("from") || "/dashboard";
 
-    // Get the redirect URL from location state or default to dashboard
-    const from = location.state?.from?.pathname || "/dashboard";
+    const initialState: LoginState = { message: "", errors: {}, fieldValues: { email: "" } };
+    const [state, formAction] = useFormState(loginAction, initialState);
 
     useEffect(() => {
-        if (isAuthenticated) {
-            navigate(from, { replace: true });
+        if (user) {
+            router.replace(from);
         }
-    }, [isAuthenticated, navigate, from]);
-
-    const handleLogin = async () => {
-        setError(null);
-        setIsSubmitting(true);
-        try {
-            await simpleLogin(email, password);
-            navigate(from, { replace: true });
-        } catch (error) {
-            setError("Identifiants incorrects. Veuillez réessayer.");
-            console.error("Erreur lors de la connexion :", error);
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
+    }, [user, router, from]);
 
     const handleGoogleLogin = async () => {
-        setError(null);
-        setIsSubmitting(true);
         try {
             await loginWithGoogle();
-            navigate(from, { replace: true });
         } catch (error) {
-            setError("Erreur lors de la connexion avec Google. Veuillez réessayer.");
             console.error("Erreur lors de la connexion avec Google :", error);
-        } finally {
-            setIsSubmitting(false);
         }
     };
 
@@ -80,55 +81,63 @@ export default function Login() {
                 </Card.Header>
 
                 <Card.Body>
-                    <Fieldset.Root>
-                        <Field.Root required>
-                            <Field.Label>Email</Field.Label>
-                            <Input
-                                type="email"
-                                placeholder="exemple@email.com"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                required
-                            />
-                        </Field.Root>
-                        <PasswordInput
-                            placeholder="Entrez votre mot de passe"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                        />
-                    </Fieldset.Root>
+                    <form action={formAction}>
+                        <Stack gap={4}>
+                            <Fieldset.Root>
+                                <FormControl isInvalid={!!state.errors?.email} isRequired>
+                                    <Field.Root>
+                                        <Field.Label>Email</Field.Label>
+                                        <Input
+                                            type="email"
+                                            name="email"
+                                            placeholder="exemple@email.com"
+                                            defaultValue={state.fieldValues.email}
+                                            required
+                                        />
+                                        {state.errors?.email && (
+                                            <FormErrorMessage>{state.errors.email[0]}</FormErrorMessage>
+                                        )}
+                                    </Field.Root>
+                                </FormControl>
+                                <FormControl isInvalid={!!state.errors?.password} isRequired>
+                                    <Field.Root>
+                                        <Field.Label>Mot de passe</Field.Label>
+                                        <PasswordInput
+                                            name="password"
+                                            placeholder="Entrez votre mot de passe"
+                                            required
+                                        />
+                                        {state.errors?.password && (
+                                            <FormErrorMessage>{state.errors.password[0]}</FormErrorMessage>
+                                        )}
+                                    </Field.Root>
+                                </FormControl>
+                            </Fieldset.Root>
 
-                    <ChakraLink
-                        href="/forgot-password"
-                        color="blue.500"
-                        display="block"
-                        mt={2}
-                        textAlign="right"
-                        fontSize="sm"
-                    >
-                        Mot de passe oublié ?
-                    </ChakraLink>
+                            <ChakraLink
+                                href="/forgot-password"
+                                color="blue.500"
+                                display="block"
+                                textAlign="right"
+                                fontSize="sm"
+                            >
+                                Mot de passe oublié ?
+                            </ChakraLink>
 
-                    {error && <Text color="red.500" mt={4}>{error}</Text>}
+                            {state.errors?._form && <Text color="red.500">{state.errors._form[0]}</Text>}
 
-                    <Button
-                        colorPalette="blue"
-                        w="full"
-                        mt={4}
-                        onClick={handleLogin}
-                        loading={isSubmitting}
-                    >
-                        Se connecter
-                    </Button>
+                            <SubmitButton />
+                        </Stack>
+                    </form>
 
                     <Button
                         variant="outline"
                         w="full"
                         mt={4}
                         onClick={handleGoogleLogin}
+                        leftIcon={<FaGoogle />}
                     >
-                        <FaGoogle mr={2} /> Se connecter avec Google
+                        Se connecter avec Google
                     </Button>
 
                     <Text mt={4} fontSize="sm" textAlign="center">

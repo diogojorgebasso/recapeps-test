@@ -67,14 +67,14 @@ export const createstripecheckoutsession = onCall<CheckoutSessionRequest>(
           },
         ],
         mode: "subscription",
-        return_url: "https://recapeps.fr/success?session_id={CHECKOUT_SESSION_ID}",
+        return_url: "https://recapeps.fr/return?session_id={CHECKOUT_SESSION_ID}",
         metadata: { firebaseUID: userId },
       });
 
       info(`Checkout session created for user ${userId}: ${session.id}`);
 
       // Return the session ID to the frontend
-      return { id: session.id };
+      return session.client_secret;
     } catch (err) {
       const e = err as Error;
       error("Error creating checkout session:", e);

@@ -114,14 +114,13 @@ export async function fetchUserStreak() {
  */
 export async function updateUserStreak() {
   try {
-    const { firebaseServerApp, currentUser } = await getAuthenticatedAppForUser();
+    const { currentUser } = await getAuthenticatedAppForUser();
 
     if (!currentUser) {
       return { success: false, error: 'User not authenticated' };
     }
 
     const { getFirestore, serverTimestamp, setDoc } = await import('firebase/firestore');
-    const db = getFirestore(firebaseServerApp);
 
     const streakDocRef = doc(db, 'users', currentUser.uid, 'stats', 'streak');
     const streakSnapshot = await getDoc(streakDocRef);

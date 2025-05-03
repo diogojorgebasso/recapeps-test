@@ -1,21 +1,31 @@
-import { Timestamp } from "firebase/firestore";
+import { Timestamp, DocumentReference } from "firebase/firestore";
 
-export interface QuizResult {
-    subjectId: string;
-    timestamp: Timestamp;
+// Le quiz soit dans la collection ecrit-1 soit dans la collection ecrit-2
+export interface Quiz {
+    id: string;
+    title: string; // Subject name or quiz title
+    level: number;
+    quizRef: DocumentReference;
+    premium: boolean;
+    questions: Array<Question>;
+}
+
+export interface AttemptQuiz {
+    id: string;
+    createdAt: Timestamp;
+    quizRef: DocumentReference;
+    questions: Array<Question>;
+    state: 'doing' | 'completed'
     score: number;
 }
 
-export interface UserQuiz {
-    timestamp: Timestamp;
-    score: number;
-    subjectId: string;
-    totalQuestions: number;
-    questions: Array<{
-        questionId: string;
-        selectedAnswers: string[];
-        timeToAnswer: number;
-        explanation: string;
+export interface Question {
+    id: string;
+    question: string;
+    answers: Array<{
+        id: string;
+        answer: string;
+        isCorrect: boolean;
     }>;
-    quizId: string;
+    explanation?: string;
 }

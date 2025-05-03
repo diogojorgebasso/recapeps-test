@@ -15,9 +15,11 @@ import { Toaster, toaster } from "@/components/ui/toaster"
 
 import { useAuth } from "@/components/AuthProvider";
 import SkillTreeClient from "./SkillTreeClient";
+import { get } from "http";
 
 export default function Ecrit1Page() {
     const { isPro } = useAuth();
+    const quizzes = getQuizState()
 
     return (
         <>

@@ -11,10 +11,10 @@ import {
     Input,
     Fieldset,
     Field,
-    FormControl, // Correct import location
-    FormErrorMessage, // Correct import location
-    Checkbox, // Assuming Checkbox is from Chakra
-    Button, // Assuming Button is from Chakra
+    Button,
+    FormControl, // Import directly from @chakra-ui/react
+    FormErrorMessage, // Import directly from @chakra-ui/react
+    Checkbox, // Import directly from @chakra-ui/react
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { FaGoogle } from "react-icons/fa";
@@ -29,7 +29,7 @@ function SubmitButton() {
     return (
         <Button
             type="submit"
-            colorPalette="blue"
+            colorScheme="blue"
             w="full"
             loading={pending}
             disabled={pending}
@@ -45,13 +45,20 @@ export default function Register() {
         user
     } = useAuth();
 
+    const router = useRouter();
+
     const initialState: SignUpState = { message: "", errors: {}, fieldValues: { email: "" } };
     const [state, formAction] = useFormState(signUpAction, initialState);
+
+    useEffect(() => {
+        if (user) {
+            router.push("/dashboard");
+        }
+    }, [user, router]);
 
     const handleGoogleSignUp = async () => {
         try {
             await loginWithGoogle();
-            router.push("/dashboard");
         } catch (error) {
             console.error("Erreur lors de la connexion avec Google :", (error as Error).message);
         }
@@ -96,14 +103,17 @@ export default function Register() {
                                 </FormControl>
 
                                 <FormControl isInvalid={!!state.errors?.password} isRequired>
-                                    <PasswordInput
-                                        name="password"
-                                        placeholder="Entrez votre mot de passe"
-                                        required
-                                    />
-                                    {state.errors?.password && (
-                                        <FormErrorMessage>{state.errors.password[0]}</FormErrorMessage>
-                                    )}
+                                    <Field.Root>
+                                        <Field.Label>Mot de passe</Field.Label>
+                                        <PasswordInput
+                                            name="password"
+                                            placeholder="Entrez votre mot de passe"
+                                            required
+                                        />
+                                        {state.errors?.password && (
+                                            <FormErrorMessage>{state.errors.password[0]}</FormErrorMessage>
+                                        )}
+                                    </Field.Root>
                                 </FormControl>
 
                                 <FormControl isRequired>
@@ -126,8 +136,9 @@ export default function Register() {
                         w="full"
                         mt={4}
                         onClick={handleGoogleSignUp}
+                        leftIcon={<FaGoogle />}
                     >
-                        <FaGoogle style={{ marginRight: '8px' }} /> S&apos;inscrire avec Google
+                        S&apos;inscrire avec Google
                     </Button>
 
                     <Text mt={4} fontSize="sm" textAlign="center">
