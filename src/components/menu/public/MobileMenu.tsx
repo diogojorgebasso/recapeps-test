@@ -1,9 +1,8 @@
 "use client";
 
 import { Box, HStack, Text } from "@chakra-ui/react";
-import NextLink from "next/link";
+import Link from "next/link";
 
-/** 7-item bottom bar shown on screens < 768 px */
 export default function MobileMenu() {
     return (
         <Box
@@ -26,11 +25,11 @@ export default function MobileMenu() {
                     { href: "/profil", label: "Profil" },
                     { href: "/contact", label: "Contact" },
                 ].map((item) => (
-                    <NextLink key={item.href} href={item.href}>
+                    <Link key={item.href} href={item.href}>
                         <Text fontSize="xs" fontWeight="semibold">
                             {item.label}
                         </Text>
-                    </NextLink>
+                    </Link>
                 ))}
             </HStack>
         </Box>

@@ -1,51 +1,22 @@
-"use client";
-import {
-    createContext, useContext, useEffect, useState, ReactNode,
-} from "react";
-import { onIdTokenChanged } from "@/lib/firebase/auth"; // Correct import for signIn and sendPasswordResetEmail
-import type { User } from "firebase/auth";
+'use client';
+
+import * as React from 'react';
+import { AuthContext, User } from './AuthContext';
+import { useEffect } from 'react';
 import { getToken, onMessage } from "firebase/messaging";
 import { messaging, functions } from "@/lib/firebase/clientApp"; // Import functions
 import { httpsCallable } from "firebase/functions";
 
-interface AuthCtx {
+
+export interface AuthProviderProps {
     user: User | null;
-    isPro: boolean;
+    children: React.ReactNode;
 }
 
-const Ctx = createContext<AuthCtx>({
-    user: null,
-    isPro: false,
-});
-
-export const useAuth = () => useContext(Ctx);
-
-export function AuthProvider({
-    initialUser,
-    initialIsPro,
-    children,
-}: {
-    initialUser: User | null;
-    initialIsPro: boolean;
-    children: ReactNode;
-}) {
-    const [user, setUser] = useState(initialUser);
-    const [isPro, setIsPro] = useState(initialIsPro);
-
-    /* 1️⃣  Auth / claim listener */
-    useEffect(() => {
-        const unsubscribe = onIdTokenChanged(async (u) => {
-            setUser(u);
-            if (u) {
-                const idTokenResult = await u.getIdTokenResult();
-                setIsPro(!!idTokenResult.claims.pro);
-            } else {
-                setIsPro(false);
-            }
-        });
-        return () => unsubscribe();
-    }, []);
-
+export const AuthProvider: React.FunctionComponent<AuthProviderProps> = ({
+    user,
+    children
+}) => {
     useEffect(() => {
         let unsubscribeMessaging: (() => void) | undefined;
         if (typeof window !== 'undefined' && user) {
@@ -100,8 +71,14 @@ export function AuthProvider({
             }
         };
     }, [user]);
-
     return (
-        <Ctx.Provider value={{ user, isPro }}>{children}</Ctx.Provider>
+        <AuthContext.Provider
+            value={{
+                user
+            }
+            }
+        >
+            {children}
+        </AuthContext.Provider>
     );
-}
+};

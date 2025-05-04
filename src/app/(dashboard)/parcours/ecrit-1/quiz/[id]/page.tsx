@@ -1,9 +1,7 @@
 import { getQuizForAttempt } from "@/services/QuizService";
-import { getAuthenticatedAppForUser } from '@/lib/firebase/serverApp'; // Import the server function
 import QuizComponent from './QuizComponent';
 
 export default async function QuizPage({ params }: { params: Promise<{ id: string }> }) {
-    const { currentUser } = await getAuthenticatedAppForUser();
     const { id } = await params
 
     const quizAttempt = await getQuizForAttempt(1, id, currentUser.uid);

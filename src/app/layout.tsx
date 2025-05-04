@@ -1,10 +1,10 @@
 // load the Auth. Does not impose any styles.
-import type { Metadata } from "next";
-import { Provider } from "@/components/ui/provider"
-import { getAuthenticatedAppForUser } from "@/lib/firebase/serverApp";
-import { AuthProvider } from "@/components/AuthProvider";
-
-export const dynamic = "force-dynamic"; // server side!
+import { Metadata } from 'next';
+import { getTokens } from 'next-firebase-auth-edge';
+import { cookies, headers } from 'next/headers';
+import { AuthProvider } from '../auth/AuthProvider';
+import { toUser } from '../lib/user';
+import { Provider } from '@/components/ui/provider';
 
 export const metadata: Metadata = {
   title: "Recap'eps",
@@ -16,13 +16,19 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { currentUser, isPro } = await getAuthenticatedAppForUser();
+  const tokens = await getTokens(await cookies(), {
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
+    cookieName: 'AuthToken',
+    cookieSignatureKeys: process.env.AUTH_COOKIE_SIGNATURE_KEY_CURRENT ? [process.env.AUTH_COOKIE_SIGNATURE_KEY_CURRENT] : [],
+    headers: await headers()
+  });
+  const user = tokens ? toUser(tokens) : null;
+
 
   return (
     <html suppressHydrationWarning lang="fr">
       <body>
-        {/* currentUser?.toJSON()*/}
-        <AuthProvider initialUser={currentUser ?? null} initialIsPro={isPro}>
+        <AuthProvider user={user}>
           <Provider >
             {children}
           </Provider>

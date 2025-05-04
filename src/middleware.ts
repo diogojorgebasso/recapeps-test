@@ -1,21 +1,22 @@
-// middleware.ts  (Edge by default, no Node libs!)
 import { NextRequest, NextResponse } from 'next/server';
+
 import {
     authMiddleware,
     redirectToHome,
     redirectToLogin,
 } from 'next-firebase-auth-edge';
-import { cookies } from 'next/headers'; // Import cookies if needed elsewhere, or remove if unused
 
 // Define public paths that don't require authentication
 const PUBLIC_PATHS = ['/signin', '/register', '/reset-password']; // Adjust as needed
 
 // Get configuration from environment variables
 const firebaseApiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY!;
+
 const cookieSignatureKeys = [
     process.env.AUTH_COOKIE_SIGNATURE_KEY_CURRENT!,
     process.env.AUTH_COOKIE_SIGNATURE_KEY_PREVIOUS!, // Add previous key for rotation
 ].filter(Boolean);
+
 const cookieSerializeOptions = {
     path: '/',
     httpOnly: true,
@@ -23,6 +24,7 @@ const cookieSerializeOptions = {
     sameSite: 'lax' as const,
     maxAge: 12 * 60 * 60 * 24, // twelve days
 };
+
 const serviceAccount = {
     projectId: process.env.FIREBASE_PROJECT_ID!,
     clientEmail: process.env.FIREBASE_CLIENT_EMAIL!,
@@ -33,7 +35,6 @@ const serviceAccount = {
 };
 
 export async function middleware(request: NextRequest) {
-    // Check if required environment variables are set
     if (!firebaseApiKey || cookieSignatureKeys.length === 0 || !serviceAccount.projectId || !serviceAccount.clientEmail || !serviceAccount.privateKey) {
         console.error("Missing Firebase configuration in environment variables.");
         // Return a generic error response or redirect
@@ -41,8 +42,8 @@ export async function middleware(request: NextRequest) {
     }
 
     return authMiddleware(request, {
-        loginPath: '/api/login', // Your API route for handling login
-        logoutPath: '/api/logout', // Your API route for handling logout
+        loginPath: '/api/login',
+        logoutPath: '/api/logout',
         apiKey: firebaseApiKey,
         cookieName: "AuthToken",
         cookieSignatureKeys: cookieSignatureKeys,
@@ -109,21 +110,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
     matcher: [
-        /*
-         * Match all request paths except for the ones starting with:
-         * - api (API routes)
-         * - _next/static (static files)
-         * - _next/image (image optimization files)
-         * - favicon.ico (favicon file)
-         * - /signin (public sign-in page)
-         * - /register (public registration page)
-         * - /reset-password (public reset password page)
-         * - /verify-email (public email verification page)
-         *
-         * Also include the root path '/'.
-         * Include API routes for login/logout if handled by `authMiddleware`.
-         */
-        '/', // Protect the root path
         '/((?!_next/static|_next/image|favicon.ico|signin|register|reset-password|verify-email).*)',
         '/parcours/:path*',         // modules d’entraînement
         '/compte/:path*',           // profil, notifications, facturation
