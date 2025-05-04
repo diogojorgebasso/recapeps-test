@@ -11,11 +11,10 @@ export default function VerifyEmailPage() {
     const [checking, setChecking] = useState(false);
     const [error, setError] = useState<string | null>(null); // Optional: add error state
 
-    // Updated handler to call the server action
     async function handleCheckVerified() {
         if (!auth.currentUser) return;
         setChecking(true);
-        setError(null); // Reset error on new check
+        setError(null);
 
         try {
             // Optional: Reload client state first, though server check is primary

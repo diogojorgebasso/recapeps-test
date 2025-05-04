@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-
 import {
     authMiddleware,
     redirectToHome,
@@ -7,7 +6,9 @@ import {
 } from 'next-firebase-auth-edge';
 
 // Define public paths that don't require authentication
-const PUBLIC_PATHS = ['/', '/signin', '/register', '/reset-password'];
+const PUBLIC_PATHS = ['/',];
+const AUTH_PATHS = ['forgot-password', '/login', '/register', '/verify-email'];
+const FREE_QUIZ_IDS = ['BN0QbVdUQdMmwRvtbgxx', 'g81h7u4B1kyQoYDSIClm']
 
 const firebaseApiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY!;
 
@@ -26,11 +27,15 @@ const cookieSerializeOptions = {
 
 
 export async function middleware(request: NextRequest) {
-    if (!firebaseApiKey || cookieSignatureKeys.length === 0 || !serviceAccount.projectId || !serviceAccount.clientEmail || !serviceAccount.privateKey) {
+
+    if (!firebaseApiKey || cookieSignatureKeys.length === 0) {
         console.error("Missing Firebase configuration in environment variables.");
         // Return a generic error response or redirect
         return new Response("Internal Server Error: Missing configuration", { status: 500 });
     }
+
+    const { pathname } = request.nextUrl
+
 
     return authMiddleware(request, {
         loginPath: '/api/login',
@@ -43,14 +48,23 @@ export async function middleware(request: NextRequest) {
         debug: process.env.NODE_ENV !== 'production',
         checkRevoked: false, // Set to true if needed, consider performance impact
 
-        handleValidToken: async ({ token, decodedToken }, headers) => {
-            // Example: Redirect authenticated users from public paths like /signin
-            if (PUBLIC_PATHS.includes(request.nextUrl.pathname)) {
-                return redirectToHome(request); // Redirect to '/' or a dashboard page
+        handleValidToken: async ({ decodedToken }, headers) => {
+            const isPro = decodedToken.pro === true
+
+            const redirectUrl = request.nextUrl.pathname + request.nextUrl.search;
+
+            const hitsQuiz = pathname.startsWith('/ecrit-1/')
+            const quizId = hitsQuiz ? pathname.split('/')[2] : null
+            const isFreeQuiz = hitsQuiz && FREE_QUIZ_IDS.includes(quizId ?? '')
+
+            /* 1 · Already signed-in? → never show auth pages */
+            if (AUTH_PATHS.includes(pathname)) {
+                return redirectToHome(request)
             }
 
             if (!decodedToken.email_verified &&
                 !request.nextUrl.pathname.startsWith('/verify-email')) {
+
                 const verifyUrl = new URL('/verify-email', request.url);
                 return NextResponse.redirect(verifyUrl);
             }
@@ -58,6 +72,7 @@ export async function middleware(request: NextRequest) {
             headers.set('X-User-ID', decodedToken.uid || ''); // Handle cases where uid might be null
             headers.set('X-User-Email', decodedToken.email || ''); // Handle cases where email might be null
             headers.set('X-User-Email-Verified', String(decodedToken.email_verified || false));
+            headers.set('X-User-Pro', String(isPro))
 
             return NextResponse.next({
                 request: {
@@ -65,6 +80,7 @@ export async function middleware(request: NextRequest) {
                 },
             });
         },
+
         handleInvalidToken: async (reason) => {
             console.info('Authentication failed:', reason);
             return redirectToLogin(request, {
@@ -72,6 +88,7 @@ export async function middleware(request: NextRequest) {
                 publicPaths: PUBLIC_PATHS,
             });
         },
+
         handleError: async (error) => {
             console.error('Authentication middleware error:', error);
             return redirectToLogin(request, {

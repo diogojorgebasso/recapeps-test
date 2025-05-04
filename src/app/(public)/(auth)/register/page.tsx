@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import {
     Flex,
@@ -12,9 +12,7 @@ import {
     Fieldset,
     Field,
     Button,
-    FormControl, // Import directly from @chakra-ui/react
-    FormErrorMessage, // Import directly from @chakra-ui/react
-    Checkbox, // Import directly from @chakra-ui/react
+    Checkbox,
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { FaGoogle } from "react-icons/fa";

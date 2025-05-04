@@ -1,7 +1,6 @@
 "use server";
 
 import { firebaseAdmin } from "@/lib/firebase/serverApp"; // Assuming serverApp exports initialized admin SDK as firebaseAdmin
-import { AuthErrorCodes } from "firebase-admin/auth";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
@@ -53,7 +52,7 @@ export async function signUpAction(prevState: SignUpState, formData: FormData): 
             password: validatedFields.data.password,
         });
 
-        // User created successfully, now attempt to sign them in on the client
+        // User created successfully, now attempt to login them in on the client
         // Or handle session creation server-side if preferred
 
     } catch (error: any) {

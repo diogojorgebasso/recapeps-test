@@ -21,7 +21,7 @@ export type LoginState = {
     }
 };
 
-export async function loginAction(prevState: LoginState, formData: FormData): Promise<LoginState> {
+export async function login(prevState: LoginState, formData: FormData): Promise<LoginState> {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
@@ -40,7 +40,7 @@ export async function loginAction(prevState: LoginState, formData: FormData): Pr
     }
 
     try {
-        // Attempt to sign in using the client-side helper function
+        // Attempt to login  in using the client-side helper function
         // Note: This still executes on the server, but uses the client SDK config.
         // For true server-side session management, you'd typically use the Admin SDK
         // to verify an ID token passed from the client after Firebase auth.

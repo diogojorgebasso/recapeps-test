@@ -1,58 +1,27 @@
 "use client";
 
-import { useEffect } from "react";
-import { useFormState, useFormStatus } from "react-dom";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useActionState } from 'react'
+
 import {
     Flex,
     Card,
     Heading,
     Text,
     Input,
-    Link as ChakraLink,
     Fieldset,
     Button,
     Field,
-    FormControl,
-    FormErrorMessage,
     Stack,
 } from "@chakra-ui/react";
 import { FaGoogle } from "react-icons/fa";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useColorModeValue } from "@/components/ui/color-mode";
-import { useAuth } from "@/components/AuthProvider";
-import { loginAction, type LoginState } from "./actions";
+import { login } from "./actions";
 
-function SubmitButton() {
-    const { pending } = useFormStatus();
-    return (
-        <Button
-            type="submit"
-            colorScheme="blue"
-            w="full"
-            loading={pending}
-            disabled={pending}
-        >
-            Se connecter
-        </Button>
-    );
-}
+export default async function Page() {
+    const [state, action, pending] = useActionState(login, undefined)
 
-export default function Login() {
     const { user, loginWithGoogle } = useAuth();
-    const router = useRouter();
-    const searchParams = useSearchParams();
-
-    const from = searchParams.get("from") || "/dashboard";
-
-    const initialState: LoginState = { message: "", errors: {}, fieldValues: { email: "" } };
-    const [state, formAction] = useFormState(loginAction, initialState);
-
-    useEffect(() => {
-        if (user) {
-            router.replace(from);
-        }
-    }, [user, router, from]);
 
     const handleGoogleLogin = async () => {
         try {
@@ -81,17 +50,16 @@ export default function Login() {
                 </Card.Header>
 
                 <Card.Body>
-                    <form action={formAction}>
+                    <form action={action}>
                         <Stack gap={4}>
                             <Fieldset.Root>
-                                <FormControl isInvalid={!!state.errors?.email} isRequired>
+                                <FormControl >
                                     <Field.Root>
                                         <Field.Label>Email</Field.Label>
                                         <Input
                                             type="email"
                                             name="email"
                                             placeholder="exemple@email.com"
-                                            defaultValue={state.fieldValues.email}
                                             required
                                         />
                                         {state.errors?.email && (
@@ -99,7 +67,7 @@ export default function Login() {
                                         )}
                                     </Field.Root>
                                 </FormControl>
-                                <FormControl isInvalid={!!state.errors?.password} isRequired>
+                                <FormControl>
                                     <Field.Root>
                                         <Field.Label>Mot de passe</Field.Label>
                                         <PasswordInput
@@ -126,7 +94,15 @@ export default function Login() {
 
                             {state.errors?._form && <Text color="red.500">{state.errors._form[0]}</Text>}
 
-                            <SubmitButton />
+                            <Button
+                                type="submit"
+                                colorScheme="blue"
+                                w="full"
+                                loading={pending}
+                                disabled={pending}
+                            >
+                                Se connecter
+                            </Button>
                         </Stack>
                     </form>
 

@@ -1,115 +1,80 @@
 "use client";
 
-import { useFormState, useFormStatus } from "react-dom";
-import { useRouter } from "next/navigation";
+import { useActionState } from 'react'
 import {
     Flex,
-    Card,
     Heading,
     Text,
     Input,
-    Link as ChakraLink,
     Fieldset,
     Button,
     Field,
-    FormControl,
-    FormErrorMessage,
     Stack,
 } from "@chakra-ui/react";
-import { useColorModeValue } from "@/components/ui/color-mode";
-import { forgotPasswordAction, type ForgotPasswordState } from "./actions";
-
-function SubmitButton() {
-    const { pending } = useFormStatus();
-    return (
-        <Button
-            type="submit"
-            colorScheme="blue"
-            w="full"
-            loading={pending}
-            disabled={pending}
-        >
-            Envoyer l'email de réinitialisation
-        </Button>
-    );
-}
+import Link from 'next/link';
+import { forgotPasswordAction } from "./actions";
 
 export default function ForgotPassword() {
-    const router = useRouter();
 
-    const initialState: ForgotPasswordState = { message: "", errors: {}, fieldValues: { email: "" }, success: false };
-    const [state, formAction] = useFormState(forgotPasswordAction, initialState);
+    const [state, action, pending] = useActionState(forgotPasswordAction, undefined)
 
     return (
         <Flex
             height="100vh"
             alignItems="center"
             justifyContent="center"
-            bg={useColorModeValue("gray.50", "gray.800")}
             p={4}
         >
-            <Card.Root width="sm" shadow="md">
-                <Card.Header textAlign="center">
-                    <Heading as="h2" size="lg">
-                        Réinitialisation du mot de passe
-                    </Heading>
-                    <Text mt={2} fontSize="sm" color="gray.600">
-                        {state.success
-                            ? "Un email de réinitialisation a été envoyé."
-                            : "Entrez votre email pour réinitialiser votre mot de passe"
-                        }
-                    </Text>
-                </Card.Header>
+            <Heading as="h2" size="lg">
+                Réinitialisation du mot de passe
+            </Heading>
 
-                <Card.Body>
-                    {!state.success ? (
-                        <form action={formAction}>
-                            <Stack gap={4}>
-                                <Fieldset.Root>
-                                    <FormControl isInvalid={!!state.errors?.email} isRequired>
-                                        <Field.Root required>
-                                            <Field.Label>Email</Field.Label>
-                                            <Input
-                                                type="email"
-                                                name="email"
-                                                placeholder="exemple@email.com"
-                                                defaultValue={state.fieldValues.email}
-                                                required
-                                            />
-                                            {state.errors?.email && (
-                                                <FormErrorMessage>{state.errors.email[0]}</FormErrorMessage>
-                                            )}
-                                        </Field.Root>
-                                    </FormControl>
-                                </Fieldset.Root>
+            <Text mt={2} fontSize="sm" color="gray.600">
+                {state?.success
+                    ? "Un email de réinitialisation a été envoyé."
+                    : "Entrez votre email pour réinitialiser votre mot de passe"
+                }
+            </Text>
 
-                                {state.errors?._form && <Text color="red.500">{state.errors._form[0]}</Text>}
+            <form action={action}>
+                <Stack gap={4}>
+                    <Fieldset.Root>
+                        <Field.Root required>
+                            <Field.Label>Email</Field.Label>
+                            <Input
+                                type="email"
+                                name="email"
+                                placeholder="exemple@email.com"
+                                required
+                            />
+                            {state?.errors?.email && (
+                                <Field.ErrorText>{state.errors.email[0]}</Field.ErrorText>
+                            )}
+                        </Field.Root>
+                    </Fieldset.Root>
 
-                                <SubmitButton />
-                            </Stack>
-                        </form>
-                    ) : (
-                        <Button
-                            colorScheme="green"
-                            w="full"
-                            mt={4}
-                            onClick={() => router.push("/login")}
-                        >
-                            Retour à la page de connexion
-                        </Button>
-                    )}
+                    <Button
+                        type="submit"
+                        colorScheme="blue"
+                        w="full"
+                        loading={pending}
+                        disabled={pending}
+                    >
+                        Envoyer l'email de réinitialisation
+                    </Button>
+                </Stack>
+            </form>
 
-                    <Text mt={4} fontSize="sm" textAlign="center">
-                        Vous vous souvenez de votre mot de passe ?{" "}
-                        <ChakraLink
-                            href="/login"
-                            color="blue.500"
-                        >
-                            Connectez-vous
-                        </ChakraLink>
-                    </Text>
-                </Card.Body>
-            </Card.Root>
-        </Flex>
+
+            <Text mt={4} fontSize="sm" textAlign="center">
+                Vous vous souvenez de votre mot de passe ?{" "}
+                <Link
+                    href="/login"
+                    color="blue.500"
+                >
+                    Connectez-vous
+                </Link>
+            </Text>
+        </Flex >
     );
 }
