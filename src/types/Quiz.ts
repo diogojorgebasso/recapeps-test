@@ -17,6 +17,7 @@ export interface AttemptQuiz {
     questions: Array<Question>;
     state: 'doing' | 'completed'
     score: number;
+    premium: boolean;
 }
 
 export interface Question {

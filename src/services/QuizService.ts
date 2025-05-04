@@ -1,5 +1,6 @@
 import { db } from "@/lib/firebase/clientApp";
-import { AttemptQuiz, Quiz } from "@/types/Quiz";
+import { doc } from "firebase/firestore";
+import { AttemptQuiz } from "@/types/Quiz";
 import {
     findActiveAttempt, fetchBaseQuiz,
     createAttempt, findCompletedAttempts
@@ -45,10 +46,12 @@ export async function getQuizForAttempt(numberOfEcrit: number, quizId: string, u
             state: "doing", // Initial state
             questions: questionsForAttempt,
             score: 0,
+            premium: baseQuiz.premium, // Assuming baseQuiz has a property indicating if it's Pro-only
         };
 
-        attempt = await createAttempt(numberOfEcrit, quizId, uid, newAttemptData);
+        attempt = await createAttempt(numberOfEcrit, uid, newAttemptData);
         console.log("Created new attempt:", attempt.id);
+
         return attempt;
 
     } catch (error) {

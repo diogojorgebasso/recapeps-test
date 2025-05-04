@@ -1,18 +1,21 @@
 'use client';
 
-import { auth } from '@/lib/firebaseClient';
 import { useState } from 'react';
 import { sendEmailVerification } from 'firebase/auth';
 import { VStack, Heading, Text, Button, Spinner } from '@chakra-ui/react'; // Import Chakra components
 import { checkEmailVerified } from './actions'; // Import the server action
+import { useAuth } from '@/auth/AuthContext';
+import { redirect } from 'next/navigation';
 
 export default function VerifyEmailPage() {
+    const { user } = useAuth()
+
     const [sentAgain, setSentAgain] = useState(false);
     const [checking, setChecking] = useState(false);
     const [error, setError] = useState<string | null>(null); // Optional: add error state
 
     async function handleCheckVerified() {
-        if (!auth.currentUser) return;
+        if (!user) return;
         setChecking(true);
         setError(null);
 
@@ -26,12 +29,12 @@ export default function VerifyEmailPage() {
             // }
 
             // Call the server action to check verification status
-            const isServerVerified = await checkEmailVerified(auth.currentUser.uid);
+            const isServerVerified = await checkEmailVerified(user.uid);
 
             if (isServerVerified) {
                 // Optional: Force refresh client state if needed after server confirmation
-                await auth.currentUser.reload();
-                router.replace('/'); // ✅ Rediriger
+                await auth.user.reload();
+                redirect('/'); // ✅ Rediriger
             } else {
                 // Optional: Inform user if server says still not verified
                 setError("L'adresse e-mail n'est pas encore vérifiée. Veuillez vérifier votre boîte de réception ou réessayer.");
@@ -47,11 +50,11 @@ export default function VerifyEmailPage() {
     }
 
     async function handleResendEmail() {
-        if (auth.currentUser) {
+        if (user) {
             try {
-                await sendEmailVerification(auth.currentUser);
+                await sendEmailVerification(user);
                 setSentAgain(true);
-                setError(null); // Clear error if resend succeeds
+                setError(null);
             } catch (err) {
                 console.error("Failed to resend email:", err);
                 setError("Échec de l'envoi de l'e-mail.");
@@ -65,7 +68,7 @@ export default function VerifyEmailPage() {
                 Vérifiez votre adresse e-mail
             </Heading>
             <Text>
-                Nous venons d'envoyer un lien à <strong>{auth.currentUser?.email}</strong>. <br />
+                Nous venons d'envoyer un lien à <strong>{auth.user?.email}</strong>. <br />
                 Cliquez dessus, puis revenez et appuyez sur le bouton ci-dessous.
             </Text>
 

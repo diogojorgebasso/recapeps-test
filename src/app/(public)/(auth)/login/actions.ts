@@ -21,7 +21,7 @@ export type LoginState = {
     }
 };
 
-export async function login(prevState: LoginState, formData: FormData): Promise<LoginState> {
+export async function login(state: LoginState, formData: FormData) {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
@@ -30,7 +30,6 @@ export async function login(prevState: LoginState, formData: FormData): Promise<
         password: password,
     });
 
-    // Return validation errors
     if (!validatedFields.success) {
         return {
             message: "Erreur de validation.",
@@ -74,10 +73,7 @@ export async function login(prevState: LoginState, formData: FormData): Promise<
         };
     }
 
-    // Redirect to dashboard on successful login
-    // This must happen outside the try/catch block
     redirect("/dashboard"); // Or redirect based on 'from' state if passed somehow
 
-    // Unreachable, but needed for type safety
-    // return { message: "Connexion réussie!", fieldValues: { email: "" } };
+    return { message: "Connexion réussie!", fieldValues: { email: "" } };
 }

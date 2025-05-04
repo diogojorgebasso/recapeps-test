@@ -16,9 +16,8 @@ import { LuCircleCheck } from 'react-icons/lu';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useAuth } from '@/components/AuthProvider';
 import { Toaster, toaster } from "@/components/ui/toaster";
-
+import { headers } from 'next/headers';
 interface Plan {
     id: string;
     name: string;
@@ -69,13 +68,11 @@ export const metadata = {
     description: 'Découvrez notre offre PRO pour réussir le STAPS.',
 };
 
-export default function AbonnementPage() {
-    const { user, isPro } = useAuth();
-    const router = useRouter();
+export default async function AbonnementPage() {
+    const isPro = (await headers()).get('x-user-pro') === 'true'
 
     const [selectedId, setSelectedId] = useState('yearly');
     const [loadingId, setLoadingId] = useState<string | null>(null);
-    const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
 
 
     /* loading guard while we figure out pro state */

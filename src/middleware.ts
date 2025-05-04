@@ -10,7 +10,9 @@ const PUBLIC_PATHS = ['/',];
 const AUTH_PATHS = ['forgot-password', '/login', '/register', '/verify-email'];
 const FREE_QUIZ_IDS = ['BN0QbVdUQdMmwRvtbgxx', 'g81h7u4B1kyQoYDSIClm']
 
-const firebaseApiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY!;
+const configString = process.env.FIREBASE_WEBAPP_CONFIG;
+const configFirebase = configString ? JSON.parse(configString) : null;
+const firebaseApiKey = configFirebase.apiKey;
 
 const cookieSignatureKeys = [
     process.env.AUTH_COOKIE_SIGNATURE_KEY_CURRENT!,
@@ -59,7 +61,7 @@ export async function middleware(request: NextRequest) {
 
             /* 1 · Already signed-in? → never show auth pages */
             if (AUTH_PATHS.includes(pathname)) {
-                return redirectToHome(request)
+                return redirectToHome(request) //TODO : redirect to dashboard
             }
 
             if (!decodedToken.email_verified &&

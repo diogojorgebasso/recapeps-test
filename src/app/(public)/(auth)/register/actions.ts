@@ -6,10 +6,7 @@ import { z } from "zod";
 
 const SignUpSchema = z.object({
     email: z.string().email({ message: "Email invalide." }),
-    // Add password complexity requirements if needed
     password: z.string().min(6, { message: "Le mot de passe doit contenir au moins 6 caractères." }),
-    // Add terms agreement if necessary for validation server-side
-    // terms: z.literal(true, { errorMap: () => ({ message: "Vous devez accepter la politique de confidentialité." }) }),
 });
 
 export type SignUpState = {
@@ -18,25 +15,24 @@ export type SignUpState = {
         email?: string[];
         password?: string[];
         _form?: string[];
-        // terms?: string[];
+        terms?: string[];
     };
     fieldValues: {
         email: string;
     }
 };
 
-export async function signUpAction(prevState: SignUpState, formData: FormData): Promise<SignUpState> {
+export async function register(state: SignUpState, formData: FormData): Promise<SignUpState> {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
-    // const terms = formData.get("terms") === "on"; // Checkbox value is "on" when checked
+    const terms = formData.get("terms") === "on";
 
     const validatedFields = SignUpSchema.safeParse({
         email: email,
         password: password,
-        // terms: terms,
+        terms: terms,
     });
 
-    // Return validation errors
     if (!validatedFields.success) {
         return {
             message: "Erreur de validation.",
@@ -58,7 +54,8 @@ export async function signUpAction(prevState: SignUpState, formData: FormData): 
     } catch (error: any) {
         console.error("Firebase Admin SDK error:", error);
         let errorMessage = "Une erreur inconnue s'est produite lors de l'inscription.";
-        if (error.code === AuthErrorCodes.EMAIL_EXISTS) {
+        // TODO : Add more specific error handling based on Firebase Admin SDK error codes
+        if (error.code === "auth/email-already-exists") {
             errorMessage = "Cet email est déjà utilisé.";
             return {
                 message: "Erreur d'inscription.",
@@ -73,9 +70,7 @@ export async function signUpAction(prevState: SignUpState, formData: FormData): 
         };
     }
 
-    // Redirect to dashboard on successful sign-up
-    // Note: Redirects must happen outside the try/catch block
-    redirect("/dashboard");
+    redirect("/verify-email");
 
     // This part is technically unreachable due to redirect, but needed for type safety
     // return { message: "Inscription réussie!", fieldValues: { email: "" } };

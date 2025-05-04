@@ -1,14 +1,7 @@
-/* eslint-disable react-refresh/only-export-components */
 'use client';
 
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import {
-    getAnalytics, setAnalyticsCollectionEnabled,
-} from 'firebase/analytics';
-import {
-    getPerformance,
-} from 'firebase/performance';
-import { app } from '@/utils/firebase';
+import { firebaseApp } from '@/lib/firebase/clientApp';
 
 type ConsentCtx = { consentGiven: boolean | null; setConsent: (v: boolean) => void };
 const CookieContext = createContext<ConsentCtx | undefined>(undefined);
@@ -32,12 +25,11 @@ export const CookieProvider = ({ children }: { children: React.ReactNode }) => {
     useEffect(() => {
         if (consentGiven === null) return;
         import('firebase/analytics').then(({ getAnalytics, setAnalyticsCollectionEnabled }) => {
-            const analytics = getAnalytics(app);
+            const analytics = getAnalytics(firebaseApp);
             setAnalyticsCollectionEnabled(analytics, consentGiven);
         });
-        import('firebase/performance').then(({ getPerformance, setPerformanceCollectionEnabled }) => {
-            const perf = getPerformance(app);
-            setPerformanceCollectionEnabled(perf, consentGiven);
+        import('firebase/performance').then(({ getPerformance }) => {
+            const perf = getPerformance(firebaseApp);
         });
     }, [consentGiven]);
 

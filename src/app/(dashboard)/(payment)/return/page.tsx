@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation'
+import { Box, Text, Link } from '@chakra-ui/react' // Import Chakra UI components
 
 import { stripe } from '@/lib/stripe'
 
@@ -14,7 +15,7 @@ export default async function Return({
 
     const {
         status,
-        customer_details: { email: customerEmail, name: customerName },
+        customer_details,
     } = await stripe.checkout.sessions.retrieve(session_id, {
         expand: ['line_items', 'payment_intent']
     })
@@ -25,13 +26,13 @@ export default async function Return({
 
     if (status === 'complete') {
         return (
-            <section id="success">
-                <p>
-                    We appreciate your business{customerName ? `, ${customerName}` : ''}! A confirmation email will be sent to{' '}
-                    {customerEmail}. If you have any questions, please email{' '}
-                </p>
-                <a href="mailto:orders@example.com">orders@example.com</a>.
-            </section>
+            <Box as="section" id="success">
+                <Text>
+                    We appreciate your business{customer_details?.name}! A confirmation email will be sent to{' '}
+                    {customer_details?.email}. If you have any questions, please email{' '}
+                </Text>
+                <Link href="mailto:orders@example.com">orders@example.com</Link>. {/* Use Link for anchor */}
+            </Box>
         )
     }
 }

@@ -84,9 +84,8 @@ export async function fetchUserAnsweredQuestionIds(numberOfEcrit: number, quizId
  */
 export async function createAttempt(
     numberOfEcrit: number,
-    quizId: string,
     uid: string,
-    attemptData: AttemptQuiz
+    attemptData: Omit<AttemptQuiz, "id" | "createdAt"> // Exclude id and createdAt from the data to be passed
 ): Promise<AttemptQuiz> {
     try {
         const userQuizAttemptsRef = collection(db, "users", uid, `ecrit-${numberOfEcrit}`);
@@ -101,15 +100,14 @@ export async function createAttempt(
 
         return {
             id: newAttemptRef.id,
+            createdAt: data.createdAt as Timestamp,
             quizRef: data.quizRef as DocumentReference<DocumentData>,
-            title: data.title,
-            level: data.level,
             premium: data.premium,
             state: data.state,
             questions: data.questions as Question[],
-            createdAt: data.createdAt as Timestamp, // Now it's a Timestamp
-            // Add other fields if they exist
+            score: data.score,
         } as AttemptQuiz;
+
     } catch (error) {
         console.error("Error creating quiz attempt:", error);
         throw new Error(`Failed to create quiz attempt: ${error instanceof Error ? error.message : 'Unknown error'}`);

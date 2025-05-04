@@ -16,18 +16,19 @@ import {
     updateDoc,
 } from 'firebase/firestore';
 import { revalidatePath } from 'next/cache';
-import { useAuth } from '@/components/AuthProvider';
 import { db } from '@/lib/firebase/clientApp';
 import { IoIosNotificationsOff } from "react-icons/io";
 import { Notification } from '@/types/Notification';
+import { headers } from 'next/headers';
 
 // Server Action to mark a notification as read
 async function markAsRead(notificationId: string) {
     'use server';
-    const { user } = useAuth();
-    const userId = user?.uid;
-    if (!userId) return;
+    const userId = (await headers()).get('X-User-ID'); // Get the specific header value
 
+    if (!userId) {
+        throw new Error('User ID is required to mark a notification as read.');
+    }
     const notificationRef = doc(db, 'users', userId, 'notifications', notificationId);
     await updateDoc(notificationRef, { isRead: true });
     revalidatePath('/notifications');
@@ -46,8 +47,8 @@ async function getNotifications(userId: string): Promise<Notification[]> {
 }
 
 export default async function NotificationsPage() {
-    const { user } = useAuth();
-    const userId = user?.uid;
+    const userId = (await headers()).get('X-User-ID');
+
     if (!userId) {
         return (
             <Box p={4}>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from 'react'
+import Link from 'next/link';
 
 import {
     Flex,
@@ -17,11 +18,12 @@ import { FaGoogle } from "react-icons/fa";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { login } from "./actions";
+import { useAuth } from "@/auth/AuthContext";
 
 export default async function Page() {
     const [state, action, pending] = useActionState(login, undefined)
 
-    const { user, loginWithGoogle } = useAuth();
+    const { loginWithGoogle } = useAuth();
 
     const handleGoogleLogin = async () => {
         try {
@@ -53,46 +55,39 @@ export default async function Page() {
                     <form action={action}>
                         <Stack gap={4}>
                             <Fieldset.Root>
-                                <FormControl >
-                                    <Field.Root>
-                                        <Field.Label>Email</Field.Label>
-                                        <Input
-                                            type="email"
-                                            name="email"
-                                            placeholder="exemple@email.com"
-                                            required
-                                        />
-                                        {state.errors?.email && (
-                                            <FormErrorMessage>{state.errors.email[0]}</FormErrorMessage>
-                                        )}
-                                    </Field.Root>
-                                </FormControl>
-                                <FormControl>
-                                    <Field.Root>
-                                        <Field.Label>Mot de passe</Field.Label>
-                                        <PasswordInput
-                                            name="password"
-                                            placeholder="Entrez votre mot de passe"
-                                            required
-                                        />
-                                        {state.errors?.password && (
-                                            <FormErrorMessage>{state.errors.password[0]}</FormErrorMessage>
-                                        )}
-                                    </Field.Root>
-                                </FormControl>
+                                <Field.Root>
+                                    <Field.Label>Email</Field.Label>
+                                    <Input
+                                        type="email"
+                                        name="email"
+                                        placeholder="exemple@email.com"
+                                        required
+                                    />
+                                    {state?.errors?.email && (
+                                        <Field.ErrorText>{state?.errors.email[0]}</Field.ErrorText>
+                                    )}
+                                </Field.Root>
+                                <Field.Root>
+                                    <Field.Label>Mot de passe</Field.Label>
+                                    <PasswordInput
+                                        name="password"
+                                        placeholder="Entrez votre mot de passe"
+                                        required
+                                    />
+                                    {state?.errors?.password && (
+                                        <Fieldset.ErrorText>{state?.errors.password[0]}</Fieldset.ErrorText>
+                                    )}
+                                </Field.Root>
                             </Fieldset.Root>
 
-                            <ChakraLink
+                            <Link
                                 href="/forgot-password"
                                 color="blue.500"
-                                display="block"
-                                textAlign="right"
-                                fontSize="sm"
                             >
                                 Mot de passe oublié ?
-                            </ChakraLink>
+                            </Link>
 
-                            {state.errors?._form && <Text color="red.500">{state.errors._form[0]}</Text>}
+                            {state?.errors?._form && <Text color="red.500">{state?.errors._form[0]}</Text>}
 
                             <Button
                                 type="submit"
@@ -111,19 +106,19 @@ export default async function Page() {
                         w="full"
                         mt={4}
                         onClick={handleGoogleLogin}
-                        leftIcon={<FaGoogle />}
                     >
+                        <FaGoogle />
                         Se connecter avec Google
                     </Button>
 
                     <Text mt={4} fontSize="sm" textAlign="center">
                         Vous n'avez pas de compte ?{" "}
-                        <ChakraLink
+                        <Link
                             href="/register"
                             color="blue.500"
                         >
                             Inscrivez-vous
-                        </ChakraLink>
+                        </Link>
                     </Text>
                 </Card.Body>
             </Card.Root>

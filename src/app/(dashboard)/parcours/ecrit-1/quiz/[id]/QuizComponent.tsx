@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Quiz } from "@/types/Quiz";
-import { useAuth } from "@/components/AuthProvider";
+import { useAuth } from "@/auth/AuthContext";
 import { saveQuizResultsAction, saveQuizProgressAction } from "./actions";
 
 import {
@@ -33,13 +33,10 @@ interface QuestionResult {
   timeSpent: number; // Time in milliseconds
 }
 
-export type QuizPageClientProps = {
-  quiz: Quiz;
-};
 
 export default function QuizComponent({
   quiz,
-}: QuizPageClientProps) {
+}: { quiz: Quiz }) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [selectedAnswerIds, setSelectedAnswerIds] = useState<string[]>([]);
@@ -58,7 +55,7 @@ export default function QuizComponent({
   const router = useRouter();
 
   const handleSaveResults = useCallback(async () => {
-    if (!quiz.subjectId || !user) {
+    if (!quiz.id || !user) {
       console.error("Missing subjectId or user for saving.");
       toaster.create({
         title: "Erreur: Impossible de sauvegarder les résultats.",
@@ -69,7 +66,7 @@ export default function QuizComponent({
     setIsSaving(true);
     try {
       const payload = {
-        subjectId: quiz.subjectId,
+        subjectId: quiz.id,
         score: score,
         totalQuestions: quiz.questions.length,
         questions: quizResults,
@@ -93,7 +90,7 @@ export default function QuizComponent({
     } finally {
       setIsSaving(false);
     }
-  }, [quiz.subjectId, score, quiz.questions.length, quizResults, user]);
+  }, [quiz.id, score, quiz.questions.length, quizResults, user]);
 
   const handleSelectOption = (answerId: string) => {
     if (quizState !== QuizState.QUESTION_DISPLAY) return;
@@ -143,7 +140,7 @@ export default function QuizComponent({
   };
 
   const handleSaveForLater = async () => {
-    if (!quiz.subjectId || !user) return;
+    if (!quiz.id || !user) return;
     setIsSaving(true);
     toaster.create({
       title: "Sauvegarde en cours...",
@@ -158,7 +155,7 @@ export default function QuizComponent({
 
     try {
       const result = await saveQuizProgressAction(
-        quiz.subjectId,
+        quiz.id,
         currentQuestionIndex,
         score,
         currentResultsSnapshot
@@ -201,7 +198,7 @@ export default function QuizComponent({
   if (quizState === QuizState.QUIZ_COMPLETED) {
     return (
       <Center w="100%" h="100vh" p={4} >
-        <Card maxW="md" w="full" boxShadow="lg" >
+        <Card.Root maxW="md" w="full" boxShadow="lg" >
           <CardBody p={4}>
             <Heading size="md" mb={4} > Quiz terminé! </Heading>
             <Text fontSize="lg" mb={2} >
@@ -216,14 +213,14 @@ export default function QuizComponent({
             <Button
               width="full"
               mt={6}
-              colorScheme="blue"
+              colorPalette="blue"
               onClick={() => router.push("/ecrit-1")}
               loading={isSaving}
             >
               Retour aux sujets
             </Button>
           </CardBody>
-        </Card>
+        </Card.Root>
       </Center>
     );
   }
@@ -242,7 +239,7 @@ export default function QuizComponent({
       p={4}
       bg="gray.50"
     >
-      <Card maxW="2xl" w="full" boxShadow="lg" position="relative" >
+      <Card.Root maxW="2xl" w="full" boxShadow="lg" position="relative" >
         <CardBody>
           <Heading size="md" mb={4} >{currentQuestion.question}</Heading>
           <Stack gap={4} >
@@ -250,18 +247,18 @@ export default function QuizComponent({
               const isCorrect = answer.isCorrect;
               const isSelected = selectedAnswerIds.includes(answer.id);
 
-              let colorScheme = "gray";
+              let colorPalette = "gray";
               if (showFeedback) {
-                if (isCorrect) colorScheme = "green";
-                else if (isSelected && !isCorrect) colorScheme = "red";
+                if (isCorrect) colorPalette = "green";
+                else if (isSelected && !isCorrect) colorPalette = "red";
               } else if (isSelected) {
-                colorScheme = "blue";
+                colorPalette = "blue";
               }
 
               return (
                 <Button
                   key={answer.id}
-                  colorScheme={colorScheme}
+                  colorPalette={colorPalette}
                   variant={isSelected || showFeedback ? "solid" : "outline"}
                   onClick={() => handleSelectOption(answer.id)}
                   textAlign="left"
@@ -298,14 +295,16 @@ export default function QuizComponent({
                 {progress.toFixed(0)} %
               </Text>
             </Flex>
-            <Progress value={progress} size="sm" borderRadius="md" colorScheme="blue" />
+            <Progress.Root value={progress} size="sm" borderRadius="md" colorPalette="blue" >
+              <Progress.Track />
+            </Progress.Root>
           </Box>
 
           {/* Action Buttons */}
           <Flex mt={6} direction={{ base: "column", sm: "row" }} gap={3} >
             <Button
               flex={1}
-              colorScheme="gray"
+              colorPalette="gray"
               variant="outline"
               onClick={handleSaveForLater}
               loading={isSaving}
@@ -315,7 +314,7 @@ export default function QuizComponent({
             </Button>
             <Button
               flex={2}
-              colorScheme="blue"
+              colorPalette="blue"
               disabled={selectedAnswerIds.length === 0 || isSaving}
               loading={isSaving && showFeedback}
               onClick={showFeedback ? handleNextQuestion : handleValidation}
@@ -324,7 +323,7 @@ export default function QuizComponent({
             </Button>
           </Flex>
         </CardBody>
-      </Card>
+      </Card.Root>
     </Box>
   );
 }

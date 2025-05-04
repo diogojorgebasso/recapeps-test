@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
-import { useFormState, useFormStatus } from "react-dom";
 import {
     Flex,
     Card,
@@ -18,41 +16,15 @@ import Link from "next/link";
 import { FaGoogle } from "react-icons/fa";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { PasswordInput } from "@/components/ui/password-input";
-import { useAuth } from "@/components/AuthProvider";
-import { useRouter } from "next/navigation";
-import { signUpAction, type SignUpState } from "./actions";
-
-function SubmitButton() {
-    const { pending } = useFormStatus();
-    return (
-        <Button
-            type="submit"
-            colorScheme="blue"
-            w="full"
-            loading={pending}
-            disabled={pending}
-        >
-            S&apos;inscrire
-        </Button>
-    );
-}
+import { useAuth } from "@/auth/AuthContext";
+import { register } from "./actions";
 
 export default function Register() {
     const {
         loginWithGoogle,
-        user
     } = useAuth();
 
-    const router = useRouter();
-
-    const initialState: SignUpState = { message: "", errors: {}, fieldValues: { email: "" } };
-    const [state, formAction] = useFormState(signUpAction, initialState);
-
-    useEffect(() => {
-        if (user) {
-            router.push("/dashboard");
-        }
-    }, [user, router]);
+    const [state, action, pending] = useActionState(register, undefined)
 
     const handleGoogleSignUp = async () => {
         try {
@@ -81,51 +53,54 @@ export default function Register() {
                 </Card.Header>
 
                 <Card.Body>
-                    <form action={formAction}>
+                    <form action={action}>
                         <Stack gap={4}>
                             <Fieldset.Root>
-                                <FormControl isInvalid={!!state.errors?.email} isRequired>
-                                    <Field.Root>
-                                        <Field.Label>Email</Field.Label>
-                                        <Input
-                                            type="email"
-                                            name="email"
-                                            placeholder="exemple@email.com"
-                                            defaultValue={state.fieldValues.email}
-                                            required
-                                        />
-                                        {state.errors?.email && (
-                                            <FormErrorMessage>{state.errors.email[0]}</FormErrorMessage>
-                                        )}
-                                    </Field.Root>
-                                </FormControl>
+                                <Field.Root>
+                                    <Field.Label>Email</Field.Label>
+                                    <Input
+                                        type="email"
+                                        name="email"
+                                        placeholder="exemple@email.com"
+                                        defaultValue={state.fieldValues.email}
+                                        required
+                                    />
+                                    {state?.errors?.email && (
+                                        <Field.ErrorText>{state?.errors.email[0]}</Field.ErrorText>
+                                    )}
+                                </Field.Root>
 
-                                <FormControl isInvalid={!!state.errors?.password} isRequired>
-                                    <Field.Root>
-                                        <Field.Label>Mot de passe</Field.Label>
-                                        <PasswordInput
-                                            name="password"
-                                            placeholder="Entrez votre mot de passe"
-                                            required
-                                        />
-                                        {state.errors?.password && (
-                                            <FormErrorMessage>{state.errors.password[0]}</FormErrorMessage>
-                                        )}
-                                    </Field.Root>
-                                </FormControl>
+                                <Field.Root>
+                                    <Field.Label>Mot de passe</Field.Label>
+                                    <PasswordInput
+                                        name="password"
+                                        placeholder="Entrez votre mot de passe"
+                                        required
+                                    />
+                                    {state.errors?.password && (
+                                        <Field.ErrorText>{state.errors.password[0]}</Field.ErrorText>
+                                    )}
+                                </Field.Root>
 
-                                <FormControl isRequired>
-                                    <Field.Root required>
-                                        <Checkbox name="terms" defaultChecked>
-                                            J’ai lu et j’accepte la <Link href="/legal/politique-confidentialite"> Politique de Confidentialité.</Link>
-                                        </Checkbox>
-                                    </Field.Root>
-                                </FormControl>
+                                <Field.Root required>
+                                    <Checkbox.Root defaultChecked>
+                                        <Checkbox.Indicator />
+                                        <Checkbox.Label>J’ai lu et j’accepte la <Link href="/legal/politique-confidentialite"> Politique de Confidentialité.</Link></Checkbox.Label>
+                                    </Checkbox.Root>
+                                </Field.Root>
                             </Fieldset.Root>
 
                             {state.errors?._form && <Text color="red.500">{state.errors._form[0]}</Text>}
 
-                            <SubmitButton />
+                            <Button
+                                type="submit"
+                                colorScheme="blue"
+                                w="full"
+                                loading={pending}
+                                disabled={pending}
+                            >
+                                S&apos;inscrire
+                            </Button>
                         </Stack>
                     </form>
 
@@ -134,8 +109,8 @@ export default function Register() {
                         w="full"
                         mt={4}
                         onClick={handleGoogleSignUp}
-                        leftIcon={<FaGoogle />}
                     >
+                        <FaGoogle />
                         S&apos;inscrire avec Google
                     </Button>
 

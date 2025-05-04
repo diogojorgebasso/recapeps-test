@@ -1,8 +1,8 @@
 'use server';
 
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { getAuthenticatedAppForUser } from '@/lib/firebase/serverApp';
 import { updateUserStreak } from '../../../../actions/firestoreQueries'; // Import the existing streak update action
+import { headers } from 'next/headers';
 
 interface QuestionResult {
     questionId: string;
@@ -22,13 +22,13 @@ interface QuizResultPayload {
  */
 export async function saveQuizResultsAction(payload: QuizResultPayload) {
     try {
-        const { firebaseServerApp, currentUser } = await getAuthenticatedAppForUser();
-        if (!currentUser) {
+
+        const uid = (await headers()).get('X-User-ID'); // Get the specific header value
+        if (!uid) {
             throw new Error('User not authenticated');
         }
 
         const { getFirestore } = await import('firebase/firestore');
-        const db = getFirestore(firebaseServerApp);
 
         const resultsData = {
             ...payload,
