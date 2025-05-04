@@ -7,9 +7,8 @@ import {
 } from 'next-firebase-auth-edge';
 
 // Define public paths that don't require authentication
-const PUBLIC_PATHS = ['/signin', '/register', '/reset-password']; // Adjust as needed
+const PUBLIC_PATHS = ['/', '/signin', '/register', '/reset-password'];
 
-// Get configuration from environment variables
 const firebaseApiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY!;
 
 const cookieSignatureKeys = [
@@ -25,14 +24,6 @@ const cookieSerializeOptions = {
     maxAge: 12 * 60 * 60 * 24, // twelve days
 };
 
-const serviceAccount = {
-    projectId: process.env.FIREBASE_PROJECT_ID!,
-    clientEmail: process.env.FIREBASE_CLIENT_EMAIL!,
-    // Replace newline characters for environment variable compatibility
-    privateKey: process.env.FIREBASE_PRIVATE_KEY
-        ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n')
-        : undefined!,
-};
 
 export async function middleware(request: NextRequest) {
     if (!firebaseApiKey || cookieSignatureKeys.length === 0 || !serviceAccount.projectId || !serviceAccount.clientEmail || !serviceAccount.privateKey) {
@@ -48,17 +39,8 @@ export async function middleware(request: NextRequest) {
         cookieName: "AuthToken",
         cookieSignatureKeys: cookieSignatureKeys,
         cookieSerializeOptions: cookieSerializeOptions,
-        serviceAccount: serviceAccount,
-
-        // Optional: Enable multi-cookie support if tokens get large
         enableMultipleCookies: true,
-        // Optional: Enable custom token support if needed (default: false)
-        enableCustomToken: false,
-        // Optional: Enable debug logging (set to false in production)
         debug: process.env.NODE_ENV !== 'production',
-        // Optional: Set tenant ID if using Firebase multi-tenancy
-        // tenantId: process.env.FIREBASE_TENANT_ID,
-        // Optional: Enable revoked token check (requires network request)
         checkRevoked: false, // Set to true if needed, consider performance impact
 
         handleValidToken: async ({ token, decodedToken }, headers) => {
@@ -67,19 +49,13 @@ export async function middleware(request: NextRequest) {
                 return redirectToHome(request); // Redirect to '/' or a dashboard page
             }
 
-            // Add custom logic here if needed after successful authentication
-            // e.g., check for email verification before allowing access to certain routes
-
-            /* Example: Check for e-mail verification (similar to your original logic) */
             if (!decodedToken.email_verified &&
                 !request.nextUrl.pathname.startsWith('/verify-email')) {
-                // Redirect to email verification page
                 const verifyUrl = new URL('/verify-email', request.url);
                 return NextResponse.redirect(verifyUrl);
             }
 
-            // Inject authentication headers for server components or API routes
-            headers.set('X-User-ID', decodedToken.uid);
+            headers.set('X-User-ID', decodedToken.uid || ''); // Handle cases where uid might be null
             headers.set('X-User-Email', decodedToken.email || ''); // Handle cases where email might be null
             headers.set('X-User-Email-Verified', String(decodedToken.email_verified || false));
 
@@ -91,17 +67,15 @@ export async function middleware(request: NextRequest) {
         },
         handleInvalidToken: async (reason) => {
             console.info('Authentication failed:', reason);
-            // Redirect to login page if token is invalid or missing
             return redirectToLogin(request, {
-                path: '/signin', // Your sign-in page path
+                path: '/login',
                 publicPaths: PUBLIC_PATHS,
             });
         },
         handleError: async (error) => {
             console.error('Authentication middleware error:', error);
-            // Redirect to login page on unexpected errors
             return redirectToLogin(request, {
-                path: '/signin', // Your sign-in page path
+                path: '/login',
                 publicPaths: PUBLIC_PATHS,
             });
         },
