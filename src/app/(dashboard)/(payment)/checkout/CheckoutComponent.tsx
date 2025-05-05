@@ -10,9 +10,8 @@ import { fetchClientSecret } from './actions'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '')
 
-export default async function Checkout({ searchParams }: { searchParams: Promise<{ priceId: string }> }) {
+export default async function Checkout({ priceId }: { priceId: string }) {
 
-    const { priceId } = await searchParams
 
     if (!priceId) {
         throw new Error('Please provide a valid priceId (`price_1...`)')
