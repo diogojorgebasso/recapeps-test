@@ -1,7 +1,7 @@
+'use client'
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router";
-import { useAuth } from "@/hooks/useAuth";
-import { getFirestore, doc, getDoc } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase/clientApp";
 import {
     Box,
     Container,
@@ -19,6 +19,8 @@ import {
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { FaDownload } from "react-icons/fa";
 import { FaChevronLeft } from "react-icons/fa6";
+import { useAuth } from "@/auth/AuthContext";
+import { useRouter, useParams } from "next/navigation";
 
 interface TranscriptionData {
     transcription: string;
@@ -32,8 +34,8 @@ interface TranscriptionData {
 
 export default function Transcription() {
     const { subjectId, transcriptId } = useParams();
-    const navigate = useNavigate();
-    const { currentUser } = useAuth();
+    const navigate = useRouter();
+    const { user } = useAuth();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [transcription, setTranscription] = useState<TranscriptionData | null>(null);
@@ -44,20 +46,16 @@ export default function Transcription() {
 
     useEffect(() => {
         async function fetchTranscription() {
-            if (!currentUser || !transcriptId) {
+            if (!user || !transcriptId) {
                 setError("Missing user or transcription ID");
                 setLoading(false);
                 return;
             }
 
             try {
-                const db = getFirestore();
                 const transcriptDoc = doc(
                     db,
-                    "users",
-                    currentUser.uid,
-                    "transcripts",
-                    transcriptId
+                    `users/${user.uid}/transcripts/transcriptId`
                 );
 
                 const transcriptSnapshot = await getDoc(transcriptDoc);
@@ -70,7 +68,7 @@ export default function Transcription() {
 
                 // Fetch subject title if subjectId exists
                 if (subjectId) {
-                    const subjectDoc = doc(db, "subjects", subjectId);
+                    const subjectDoc = doc(db, `subjects/${subjectId}`);
                     const subjectSnapshot = await getDoc(subjectDoc);
 
                     if (subjectSnapshot.exists()) {
@@ -87,7 +85,7 @@ export default function Transcription() {
         }
 
         fetchTranscription();
-    }, [currentUser, transcriptId, subjectId]);
+    }, [user, transcriptId, subjectId]);
 
     const formatDate = (date: Date) => {
         return new Intl.DateTimeFormat("en-US", {
@@ -116,7 +114,7 @@ export default function Transcription() {
             <Container centerContent py={20}>
                 <Heading size="md" color="red.500">Error</Heading>
                 <Text mt={4}>{error}</Text>
-                <Button mt={6} onClick={() => navigate(-1)}>Go Back</Button>
+                <Button mt={6} onClick={() => navigate.forward()}>Go Back</Button>
             </Container>
         );
     }
@@ -127,7 +125,7 @@ export default function Transcription() {
                 <HStack justify="space-between">
                     <Button
                         variant="ghost"
-                        onClick={() => navigate(-1)}
+                        onClick={() => navigate.forward()}
                     >
                         <FaChevronLeft />
                         Back

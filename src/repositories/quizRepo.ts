@@ -167,6 +167,3 @@ export async function findCompletedAttempts(uid: string, numberOfEcrit: number, 
         throw new Error(`Failed to fetch quiz history: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
 }
-
-// --- Removed original fetchQuiz and fetchQuizHistory functions ---
-// Business logic moved to QuizService
