@@ -1,22 +1,32 @@
 'use client';
 
 import * as React from 'react';
+import { useState } from 'react';
 import { AuthContext, User } from './AuthContext';
 import { useEffect } from 'react';
 import { getToken, onMessage } from "firebase/messaging";
-import { messaging, functions } from "@/lib/firebase/clientApp"; // Import functions
+import { messaging, functions } from "@/lib/firebase/clientApp"; // Import auth from your client app
 import { httpsCallable } from "firebase/functions";
-
+import { updateProfile, getAuth } from 'firebase/auth';
 
 export interface AuthProviderProps {
     user: User | null;
     children: React.ReactNode;
+    updatePhotoURLInContext: (photoURL: string) => Promise<boolean>;
 }
 
 export const AuthProvider: React.FunctionComponent<AuthProviderProps> = ({
-    user,
+    user: initialUser,
     children
 }) => {
+    // Add state to manage user so we can update it
+    const [user, setUser] = useState<User | null>(initialUser);
+
+    // Update local state when prop changes
+    useEffect(() => {
+        setUser(initialUser);
+    }, [initialUser]);
+
     useEffect(() => {
         let unsubscribeMessaging: (() => void) | undefined;
         if (typeof window !== 'undefined' && user) {
@@ -71,12 +81,36 @@ export const AuthProvider: React.FunctionComponent<AuthProviderProps> = ({
             }
         };
     }, [user]);
+
+    const updatePhotoURLInContext = async (photoURL: string) => {
+        try {
+            const auth = getAuth();
+            if (auth.currentUser) {
+                await updateProfile(auth.currentUser, { photoURL });
+
+                // Then update the local context state
+                setUser((prevUser) => {
+                    if (!prevUser) return null;
+                    return {
+                        ...prevUser,
+                        photoURL: photoURL
+                    };
+                });
+            }
+
+            return true;
+        } catch (error) {
+            console.error("Error updating photo URL in context:", error);
+            return false;
+        }
+    };
+
     return (
         <AuthContext.Provider
             value={{
-                user
-            }
-            }
+                user,
+                updatePhotoURLInContext
+            }}
         >
             {children}
         </AuthContext.Provider>

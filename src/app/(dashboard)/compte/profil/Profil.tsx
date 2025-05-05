@@ -1,6 +1,9 @@
-import React, { useState } from "react";
+"use client"
+
+import React, { useState, useEffect } from "react";
 import Cropper, { Area } from "react-easy-crop";
 import {
+    Avatar,
     Box,
     Button,
     Fieldset,
@@ -10,50 +13,43 @@ import {
     Input,
     Text,
     VStack,
+    Checkbox,
+    Dialog,
+    Field,
+    FileUpload
 } from "@chakra-ui/react";
-import { Checkbox } from "@/components/ui/checkbox";
+
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { getFirestore, doc, updateDoc } from "firebase/firestore";
-import { useAuth } from "@/hooks/useAuth";
-import { Link } from "react-router";
-import { Avatar } from "@/components/ui/avatar";
-import {
-    DialogBody,
-    DialogTrigger,
-    DialogActionTrigger,
-    DialogContent,
-    DialogFooter,
-    DialogHeader,
-    DialogRoot,
-    DialogCloseTrigger,
-} from "@/components/ui/dialog"
-import { Field } from "@/components/ui/field";
 import { Toaster, toaster } from "@/components/ui/toaster"
-import {
-    FileUploadRoot,
-    FileUploadTrigger,
-} from "@/components/ui/file-upload"
 import { HiUpload } from "react-icons/hi";
 import { PasswordInput } from "@/components/ui/password-input";
-import { useSubscription } from "@/hooks/useSubscription";
-import { functions } from "@/utils/firebase";
 import { httpsCallable } from "firebase/functions";
+import { functions } from "@/lib/firebase/clientApp";
+import Link from "next/link";
+import { useAuth } from "@/auth/AuthContext";
+import { handleEmailChange, updateUserName, isEmailNotificationEnabled, updateEmailNotificationPreference } from "./actions";
 
-import DeleteAccountDialog from "@/components/DeleteAccountDialog";
 export default function Profil() {
-    const { handleEmailChange, updateUserName, isAuthenticated,
-        isEmailNotificationEnabled, updateEmailNotificationPreference, currentUser } = useAuth();
-    const { isSubscribed, lastPurchaseDate } = useSubscription();
-    const [newEmailNotification, setNewEmailNotification] = useState(isEmailNotificationEnabled);
+
+    const { user, updatePhotoURLInContext } = useAuth();
+    const [newEmailNotification, setNewEmailNotification] = useState<boolean>(false);
+
+    useEffect(() => {
+        (async () => {
+            const isEnabled = await isEmailNotificationEnabled();
+            setNewEmailNotification(isEnabled);
+        })();
+    }, []);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
     const [crop, setCrop] = useState({ x: 0, y: 0 });
     const [zoom, setZoom] = useState(1);
     const [isUploading, setIsUploading] = useState(false);
     const [openDialog, setOpenDialog] = useState(false)
-    const [newEmail, setNewEmail] = useState(currentUser?.email);
-    const [newFirstName, setNewFirstName] = useState(currentUser?.displayName || "Prenom")
-    const [newSecondName, setNewSecondName] = useState(currentUser?.displayName || "Nom")
+    const [newEmail, setNewEmail] = useState(user?.email);
+    const [newFirstName, setNewFirstName] = useState(user?.displayName || "Prenom")
+    const [newSecondName, setNewSecondName] = useState(user?.displayName || "Nom")
     const [currentPassword, setCurrentPassword] = useState("")
     const [loadingGererAbonemant, setLoadingGererAbonemant] = useState(false)
 
@@ -105,17 +101,17 @@ export default function Profil() {
         }
 
         const storage = getStorage();
-        const storageRef = ref(storage, `user/${currentUser?.uid}/profile.jpg`);
+        const storageRef = ref(storage, `user/${user?.uid}/profile.jpg`);
 
         await uploadBytes(storageRef, blob);
         const downloadURL = await getDownloadURL(storageRef);
 
         const firestore = getFirestore();
-        if (!currentUser?.uid) {
+        if (!user?.uid) {
             alert("User ID is not available.");
             return;
         }
-        const userRef = doc(firestore, "users", currentUser.uid);
+        const userRef = doc(firestore, "users", user.uid);
         await updateDoc(userRef, { photoURL: downloadURL });
 
         await updatePhotoURLInContext(downloadURL);
@@ -132,9 +128,9 @@ export default function Profil() {
         setIsUploading(true);
         await updateUserName(newFirstName, newSecondName);
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (newEmail && currentUser && newEmail !== currentUser.email && emailRegex.test(newEmail)) {
-            if (currentUser?.email) {
-                await handleEmailChange(currentPassword, currentUser.email);
+        if (newEmail && user && newEmail !== user.email && emailRegex.test(newEmail)) {
+            if (user?.email) {
+                await handleEmailChange(currentPassword, user.email);
             }
         }
         setIsUploading(false);
@@ -180,19 +176,22 @@ export default function Profil() {
             <Flex gap={10}>
                 <VStack gap={4} >
                     <Box w="200px" h="200px">
-                        <Avatar size="full" name="Profile Photo" src={currentUser?.photoURL || "/avatar.svg"} />
+                        <Avatar.Root>
+                            <Avatar.Fallback name={user?.displayName || "Profile Photo"} />
+                            <Avatar.Image src={user?.photoURL || "/avatar.svg"} />
+                        </Avatar.Root>
                     </Box>
-                    <FileUploadRoot color="orange.500" onChange={handleFileChange}>
-                        <FileUploadTrigger>
+                    <FileUpload.Root color="orange.500" onChange={handleFileChange}>
+                        <FileUpload.Trigger>
                             <Button >
                                 <HiUpload /> Changez votre photo de profil
                             </Button>
-                        </FileUploadTrigger>
-                    </FileUploadRoot>
-                    <DialogRoot lazyMount open={openDialog} size="xl">
-                        <DialogContent>
-                            <DialogHeader>Crop photo</DialogHeader>
-                            <DialogBody>
+                        </FileUpload.Trigger>
+                    </FileUpload.Root>
+                    <Dialog.Root lazyMount open={openDialog} size="xl">
+                        <Dialog.Content>
+                            <Dialog.Header>Crop photo</Dialog.Header>
+                            <Dialog.Body>
                                 {selectedFile && (
                                     <Box position="relative" width="100%" height="400px">
                                         <Cropper
@@ -206,71 +205,75 @@ export default function Profil() {
                                         />
                                     </Box>
                                 )}
-                            </DialogBody>
-                            <DialogFooter>
-                                <DialogActionTrigger asChild>
+                            </Dialog.Body>
+                            <Dialog.Footer>
+                                <Dialog.ActionTrigger asChild>
                                     <Button variant="ghost" mr={3}>
                                         Annuler
                                     </Button>
-                                </DialogActionTrigger>
+                                </Dialog.ActionTrigger>
                                 {isUploading ?
                                     <Text>Enregistrement...</Text>
                                     :
                                     <Button colorPalette="green" onClick={uploadImage}>
                                         Enregistrer
                                     </Button>}
-                            </DialogFooter>
-                        </DialogContent>
-                    </DialogRoot>
+                            </Dialog.Footer>
+                        </Dialog.Content>
+                    </Dialog.Root>
                 </VStack>
 
                 <VStack>
                     <Fieldset.Root>
                         <Fieldset.Content>
                             <HStack>
-                                <Field label="Prénom">
+                                <Field.Root>
+                                    <Field.Label>Prénom</Field.Label>
                                     <Input onChange={e => setNewFirstName(e.target.value)} value={newFirstName} />
-                                </Field>
-                                <Field label="Nom">
+                                </Field.Root>
+                                <Field.Root>
+                                    <Field.Label>Nom</Field.Label>
                                     <Input onChange={e => setNewSecondName(e.target.value)} value={newSecondName} />
-                                </Field>
+                                </Field.Root>
                             </HStack>
                             <PasswordInput onChange={e => setCurrentPassword(e.target.value)} value={currentPassword} />
-                            <Field errorText="Vous besoin de ecrire ton mot de passe actuel" label="Adresse Email">
+                            <Field.Root>
+                                <Field.Label>Adresse Email</Field.Label>
                                 <Input onChange={(e) => setNewEmail(e.target.value)} value={newEmail || ''} />
-                            </Field>
-                            <Field label="Nouveau Mot de Passe">
+                                <Field.ErrorText>Vous besoin de ecrire ton mot de passe actuel</Field.ErrorText>
+                            </Field.Root>
+                            <Field.Root>
+                                <Field.Label>Nouveau mot de Passe</Field.Label>
                                 <Input autoComplete="new-password" type="password" placeholder="Nouveau mot de passe" />
-                            </Field>
+                            </Field.Root>
                         </Fieldset.Content>
-                        <DialogRoot placement="top">
-                            <DialogTrigger>
+                        <Dialog.Root placement="top">
+                            <Dialog.Trigger>
                                 <Button disabled={isUploading} onClick={() => handleUserChange()}>
                                     Enregistrer
                                 </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                                <DialogHeader>Confirmation</DialogHeader>
-                                <DialogBody>
+                            </Dialog.Trigger>
+                            <Dialog.Content>
+                                <Dialog.Header>Confirmation</Dialog.Header>
+                                <Dialog.Body>
                                     <Text>
                                         Si'l vous plait, confirmez votre email.
                                     </Text>
-                                </DialogBody>
-                                <DialogFooter>
-                                </DialogFooter>
-                                <DialogCloseTrigger />
-                            </DialogContent>
-                        </DialogRoot>
+                                </Dialog.Body>
+                                <Dialog.Footer>
+                                </Dialog.Footer>
+                                <Dialog.CloseTrigger />
+                            </Dialog.Content>
+                        </Dialog.Root>
                     </Fieldset.Root>
                 </VStack>
             </Flex>
-
             <Box mt={8}>
                 <Heading as="h3" size="md" mb={4}>
                     Préférences Email
                 </Heading>
                 <VStack align="start" gap={2}>
-                    <Checkbox checked={newEmailNotification} onCheckedChange={() => {
+                    <Checkbox.Root checked={newEmailNotification} onCheckedChange={() => {
                         setNewEmailNotification(!newEmailNotification)
                         updateEmailNotificationPreference(!newEmailNotification)
                         toaster.create({
@@ -278,7 +281,7 @@ export default function Profil() {
                             type: "success",
                             description: "Vos préférences de notification ont été mises à jour avec succès.",
                         })
-                    }}>Recevoir des notifications</Checkbox>
+                    }}>Recevoir des notifications</Checkbox.Root>
                 </VStack>
             </Box>
 
@@ -287,7 +290,7 @@ export default function Profil() {
                     Gestion de vos données personnelles
                 </Heading>
                 <Text>
-                    Veuillez consulter notre   <Link to="/legal/politique-confidentialite">Politique de Confidentialité </Link>
+                    Veuillez consulter notre   <Link href="/legal/politique-confidentialite">Politique de Confidentialité </Link>
                     pour tout savoir sur la manière dont nous traitons vos données personnelles
                 </Text>
             </Box>
@@ -296,10 +299,10 @@ export default function Profil() {
                 <Heading as="h3" size="md" mb={4}>
                     Mon abonnement
                 </Heading>
-                {isSubscribed ? (
+                {user?.customToken === "pro" ? (
                     <VStack align="start">
                         <Text>
-                            Vous bénéficiez d'un abonnement Recape'ps pro depuis le {lastPurchaseDate}.
+                            Vous bénéficiez d'un abonnement Recape'ps pro.
                         </Text>
                         <Button
                             mt={4}
@@ -312,27 +315,11 @@ export default function Profil() {
                     </VStack>
                 ) : (
                     <Button asChild>
-                        <Link to="/checkout">Passer à Recap'eps pro</Link>
+                        <Link href="/checkout">Passer à Recap'eps pro</Link>
                     </Button>
                 )}
             </Box>
-            <Box mt={8}>
-                {isAuthenticated &&
-                    <DeleteAccountDialog />}
-            </Box>
         </Box>
     );
-}
-
-function updatePhotoURLInContext(downloadURL: string) {
-    const { setCurrentUser } = useAuth();
-    setCurrentUser((prevUser) => {
-        if (!prevUser) return null;
-        return {
-            ...prevUser,
-            photoURL: downloadURL,
-            emailVerified: prevUser.emailVerified,
-        };
-    });
 }
 
