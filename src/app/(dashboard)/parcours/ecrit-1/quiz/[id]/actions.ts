@@ -1,8 +1,9 @@
 'use server';
 
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { updateUserStreak } from '../../../../actions/firestoreQueries'; // Import the existing streak update action
 import { headers } from 'next/headers';
+import { updateUserStreak } from '../../../oral-3/actions';
+import { db } from '@/lib/firebase/clientApp';
 
 interface QuestionResult {
     questionId: string;
@@ -24,20 +25,20 @@ export async function saveQuizResultsAction(payload: QuizResultPayload) {
     try {
 
         const uid = (await headers()).get('X-User-ID'); // Get the specific header value
+
         if (!uid) {
             throw new Error('User not authenticated');
         }
 
-        const { getFirestore } = await import('firebase/firestore');
 
         const resultsData = {
             ...payload,
-            userId: currentUser.uid,
+            userId: uid,
             date: serverTimestamp(), // Use server timestamp
         };
 
         // Save the quiz results
-        const docRef = await addDoc(collection(db, 'users', currentUser.uid, 'quizResults'), resultsData);
+        const docRef = await addDoc(collection(db, 'users', uid, 'quizResults'), resultsData);
         console.log("Quiz results saved with ID: ", docRef.id);
 
         // Update the user's streak after successfully saving results
@@ -63,13 +64,14 @@ export async function saveQuizResultsAction(payload: QuizResultPayload) {
  */
 export async function saveQuizProgressAction(subjectId: string, currentQuestionIndex: number, currentScore: number, currentResults: QuestionResult[]) {
     try {
-        const { currentUser } = await getAuthenticatedAppForUser();
-        if (!currentUser) {
+        const uid = (await headers()).get('X-User-ID'); // Get the specific header value
+
+        if (!uid) {
             throw new Error('User not authenticated');
         }
 
         console.log("Attempting to save progress for later:", {
-            userId: currentUser.uid,
+            userId: uid,
             subjectId,
             currentQuestionIndex,
             currentScore,
