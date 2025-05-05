@@ -1,9 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Box, Text, HStack, VStack, Progress, Badge, useToast, Flex, Circle, Tooltip } from '@chakra-ui/react';
+import { Box, Text, HStack, VStack, Progress, Badge, Flex, Circle } from '@chakra-ui/react';
 import { FaFire } from 'react-icons/fa';
-import { fetchUserStreak, updateUserStreak } from '../../actions/firestoreQueries';
+import { Tooltip } from "@/components/ui/tooltip"
+
+// Correct the import path for firestoreQueries
+import { fetchUserStreak, updateUserStreak } from './actions';
 
 interface SimpleStreakTrackerProps {
     days: number;
@@ -25,8 +28,7 @@ export function StreakTracker({ days, maxDisplay = 7 }: SimpleStreakTrackerProps
                 {daysArray.map((day, index) => (
                     <Tooltip
                         key={index}
-                        label={day.isActive ? 'Jour actif' : 'Jour inactif'}
-                        placement="top"
+                        content={day.isActive ? 'Jour actif' : 'Jour inactif'}
                     >
                         <Box textAlign="center">
                             <Circle
@@ -60,7 +62,6 @@ export function FullStreakTracker() {
         lastUpdated: null as Date | null
     });
     const [loading, setLoading] = useState(true);
-    const toast = useToast();
 
     useEffect(() => {
         async function loadStreak() {
@@ -82,18 +83,6 @@ export function FullStreakTracker() {
                     lastUpdated: userStreak.lastLoginDate?.toDate() || null
                 });
 
-                // Show achievement toast for streak milestones
-                if (userStreak.currentStreak === 7 ||
-                    userStreak.currentStreak === 30 ||
-                    userStreak.currentStreak === 100) {
-                    toast({
-                        title: 'Félicitations!',
-                        description: `Vous avez maintenu votre série pendant ${userStreak.currentStreak} jours!`,
-                        status: 'success',
-                        duration: 5000,
-                        isClosable: true,
-                    });
-                }
             } catch (error) {
                 console.error("Failed to load streak data:", error);
             } finally {
@@ -102,7 +91,7 @@ export function FullStreakTracker() {
         }
 
         loadStreak();
-    }, [toast]);
+    }, []);
 
     return (
         <Box
@@ -113,7 +102,7 @@ export function FullStreakTracker() {
             border="1px"
             borderColor="orange.200"
         >
-            <HStack spacing={4} align="center">
+            <HStack gap={4} align="center">
                 <Box position="relative" display="flex" alignItems="center" justifyContent="center">
                     <Box
                         bg="orange.100"
@@ -123,21 +112,15 @@ export function FullStreakTracker() {
                         overflow="hidden"
                     >
                         <FaFire size="32px" color="#ED8936" />
-                        <Progress
-                            value={streak.currentStreak > 30 ? 100 : (streak.currentStreak / 30) * 100}
-                            colorScheme="orange"
-                            size="sm"
-                            position="absolute"
-                            bottom="0"
-                            left="0"
-                            right="0"
-                            borderRadius="0"
-                            height="3px"
-                        />
+                        <Progress.Root colorPalette="orange" value={streak.currentStreak > 30 ? 100 : (streak.currentStreak / 30) * 100}>
+                            <Progress.Track>
+                                <Progress.Range />
+                            </Progress.Track>
+                        </Progress.Root>
                     </Box>
                 </Box>
 
-                <VStack align="start" spacing={0}>
+                <VStack align="start" gap={0}>
                     <HStack>
                         <Text fontWeight="bold" fontSize="xl">{streak.currentStreak}</Text>
                         <Text fontSize="md">jours</Text>
@@ -154,7 +137,7 @@ export function FullStreakTracker() {
                 )}
 
                 {streak.longestStreak > streak.currentStreak && (
-                    <VStack align="start" spacing={0} ml={4}>
+                    <VStack align="start" gap={0} ml={4}>
                         <Text fontSize="sm">Record: {streak.longestStreak} jours</Text>
                     </VStack>
                 )}

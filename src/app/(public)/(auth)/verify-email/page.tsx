@@ -6,6 +6,7 @@ import { VStack, Heading, Text, Button, Spinner } from '@chakra-ui/react'; // Im
 import { checkEmailVerified } from './actions'; // Import the server action
 import { useAuth } from '@/auth/AuthContext';
 import { redirect } from 'next/navigation';
+import { auth } from '@/lib/firebase/clientApp'; // Import the auth instance
 
 export default function VerifyEmailPage() {
     const { user } = useAuth()
@@ -20,26 +21,17 @@ export default function VerifyEmailPage() {
         setError(null);
 
         try {
-            // Optional: Reload client state first, though server check is primary
-            // await auth.currentUser.reload();
-            // const isClientVerified = auth.currentUser.emailVerified;
-            // if (isClientVerified) {
-            //     router.replace('/');
-            //     return;
-            // }
 
-            // Call the server action to check verification status
-            const isServerVerified = await checkEmailVerified(user.uid);
+            const isServerVerified = await checkEmailVerified();
 
             if (isServerVerified) {
-                // Optional: Force refresh client state if needed after server confirmation
-                await auth.user.reload();
+                await auth?.currentUser?.reload();
                 redirect('/'); // ✅ Rediriger
             } else {
                 // Optional: Inform user if server says still not verified
                 setError("L'adresse e-mail n'est pas encore vérifiée. Veuillez vérifier votre boîte de réception ou réessayer.");
                 // Consider reloading client state here too in case of race conditions
-                // await auth.currentUser.reload();
+                await auth?.currentUser?.reload();
             }
         } catch (err) {
             console.error("Verification check failed:", err);
@@ -50,9 +42,9 @@ export default function VerifyEmailPage() {
     }
 
     async function handleResendEmail() {
-        if (user) {
+        if (auth.currentUser) {
             try {
-                await sendEmailVerification(user);
+                await sendEmailVerification(auth.currentUser);
                 setSentAgain(true);
                 setError(null);
             } catch (err) {
@@ -68,7 +60,7 @@ export default function VerifyEmailPage() {
                 Vérifiez votre adresse e-mail
             </Heading>
             <Text>
-                Nous venons d'envoyer un lien à <strong>{auth.user?.email}</strong>. <br />
+                Nous venons d'envoyer un lien à <strong>{auth?.currentUser?.email}</strong>. <br />
                 Cliquez dessus, puis revenez et appuyez sur le bouton ci-dessous.
             </Text>
 
@@ -77,7 +69,7 @@ export default function VerifyEmailPage() {
             <Button
                 onClick={handleCheckVerified}
                 colorScheme="blue"
-                isLoading={checking}
+                loading={checking}
                 spinner={<Spinner size="sm" />}
                 loadingText="Vérification…"
             >
@@ -85,8 +77,7 @@ export default function VerifyEmailPage() {
             </Button>
 
             <Button
-                variant="link"
-                isDisabled={sentAgain}
+                disabled={sentAgain}
                 onClick={handleResendEmail}
                 size="sm"
                 mt={2}

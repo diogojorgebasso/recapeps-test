@@ -26,7 +26,7 @@ import {
 } from "react-icons/lu";
 import { useState } from "react";
 import { signOut } from "@/lib/firebase/auth";
-import { useAuth } from "@/components/AuthProvider";
+import { useAuth } from "@/auth/AuthContext";
 import { SimpleColorModeButton } from "@/components/ui/color-mode";
 
 const ITEMS = [
@@ -82,7 +82,7 @@ export const TourViewport = TourOverlay.Viewport;
 /* ─── 3 · MAIN COMPONENT ─────────────────────────────────────────── */
 
 export default function DesktopMenu() {
-    const { user, profile } = useAuth();
+    const { user } = useAuth();
     const [isDesktop] = useMediaQuery(["(min-width:768px)"], { ssr: false });
 
     /* intro dialog: offer the tour once */

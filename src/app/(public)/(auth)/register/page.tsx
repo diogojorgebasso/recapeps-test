@@ -16,19 +16,17 @@ import Link from "next/link";
 import { FaGoogle } from "react-icons/fa";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { PasswordInput } from "@/components/ui/password-input";
-import { useAuth } from "@/auth/AuthContext";
 import { register } from "./actions";
+import { signInWithGoogle } from "@/lib/firebase/auth";
+import { useActionState } from "react";
 
 export default function Register() {
-    const {
-        loginWithGoogle,
-    } = useAuth();
 
     const [state, action, pending] = useActionState(register, undefined)
 
     const handleGoogleSignUp = async () => {
         try {
-            await loginWithGoogle();
+            await signInWithGoogle(); //two awaits.
         } catch (error) {
             console.error("Erreur lors de la connexion avec Google :", (error as Error).message);
         }
@@ -62,7 +60,6 @@ export default function Register() {
                                         type="email"
                                         name="email"
                                         placeholder="exemple@email.com"
-                                        defaultValue={state.fieldValues.email}
                                         required
                                     />
                                     {state?.errors?.email && (
@@ -77,9 +74,11 @@ export default function Register() {
                                         placeholder="Entrez votre mot de passe"
                                         required
                                     />
-                                    {state.errors?.password && (
-                                        <Field.ErrorText>{state.errors.password[0]}</Field.ErrorText>
-                                    )}
+                                    {state?.errors && 'password' in state.errors && Array.isArray(state.errors.password) &&
+                                        state.errors.password.map((error: string) => (
+                                            <Field.ErrorText key={error}>- {error}</Field.ErrorText>
+                                        ))
+                                    }
                                 </Field.Root>
 
                                 <Field.Root required>
@@ -89,8 +88,6 @@ export default function Register() {
                                     </Checkbox.Root>
                                 </Field.Root>
                             </Fieldset.Root>
-
-                            {state.errors?._form && <Text color="red.500">{state.errors._form[0]}</Text>}
 
                             <Button
                                 type="submit"

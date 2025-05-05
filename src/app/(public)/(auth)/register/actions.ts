@@ -1,28 +1,26 @@
 "use server";
 
-import { firebaseAdmin } from "@/lib/firebase/serverApp"; // Assuming serverApp exports initialized admin SDK as firebaseAdmin
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { signUpWithEmailAndPassword } from "@/lib/firebase/auth";
 
 const SignUpSchema = z.object({
     email: z.string().email({ message: "Email invalide." }),
     password: z.string().min(6, { message: "Le mot de passe doit contenir au moins 6 caractères." }),
 });
 
-export type SignUpState = {
-    message: string;
-    errors?: {
-        email?: string[];
-        password?: string[];
-        _form?: string[];
-        terms?: string[];
-    };
-    fieldValues: {
-        email: string;
-    }
-};
+export type SignUpState =
+    | {
+        message: string;
+        errors?: {
+            email?: string[];
+            password?: string[];
+            _form?: string[];
+            terms?: string[];
+        }
+    } | undefined;
 
-export async function register(state: SignUpState, formData: FormData): Promise<SignUpState> {
+export async function register(state: SignUpState, formData: FormData) {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     const terms = formData.get("terms") === "on";
@@ -37,16 +35,14 @@ export async function register(state: SignUpState, formData: FormData): Promise<
         return {
             message: "Erreur de validation.",
             errors: validatedFields.error.flatten().fieldErrors,
-            fieldValues: { email },
         };
     }
 
     try {
-        // Use Firebase Admin SDK to create the user
-        await firebaseAdmin.auth().createUser({
-            email: validatedFields.data.email,
-            password: validatedFields.data.password,
-        });
+        await signUpWithEmailAndPassword(
+            validatedFields.data.email,
+            validatedFields.data.password
+        );
 
         // User created successfully, now attempt to login them in on the client
         // Or handle session creation server-side if preferred
@@ -60,13 +56,11 @@ export async function register(state: SignUpState, formData: FormData): Promise<
             return {
                 message: "Erreur d'inscription.",
                 errors: { email: [errorMessage], _form: [errorMessage] },
-                fieldValues: { email },
             };
         }
         return {
             message: "Erreur d'inscription.",
             errors: { _form: [errorMessage] },
-            fieldValues: { email },
         };
     }
 

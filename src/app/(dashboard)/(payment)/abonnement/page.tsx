@@ -9,15 +9,12 @@ import {
     Text,
     Icon,
     Button,
-    Center,
-    Spinner,
 } from '@chakra-ui/react';
 import { LuCircleCheck } from 'react-icons/lu';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Toaster, toaster } from "@/components/ui/toaster";
-import { headers } from 'next/headers';
+
 interface Plan {
     id: string;
     name: string;
@@ -63,26 +60,9 @@ const PLANS: Plan[] = [
     },
 ];
 
-export const metadata = {
-    title: 'Passer Pro – Recapeps',
-    description: 'Découvrez notre offre PRO pour réussir le STAPS.',
-};
-
-export default async function AbonnementPage() {
-    const isPro = (await headers()).get('x-user-pro') === 'true'
-
+export default function AbonnementPage() {
     const [selectedId, setSelectedId] = useState('yearly');
     const [loadingId, setLoadingId] = useState<string | null>(null);
-
-
-    /* loading guard while we figure out pro state */
-    if (isPro) {
-        return (
-            <Center h="80vh">
-                <Spinner />
-            </Center>
-        );
-    }
 
     return (
         <Box>

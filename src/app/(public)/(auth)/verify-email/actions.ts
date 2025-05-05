@@ -1,13 +1,11 @@
 'use server';
 
-import { getAuth } from 'firebase-admin/auth';
-import { initializeAdminApp } from '@/lib/firebaseAdmin'; // Assuming you have this helper
+import { headers } from "next/headers";
 
-export async function checkEmailVerified(uid: string): Promise<boolean> {
+
+export async function checkEmailVerified(): Promise<boolean> {
     try {
-        await initializeAdminApp(); // Ensure admin app is initialized
-        const userRecord = await getAuth().getUser(uid);
-        return userRecord.emailVerified;
+        return (await headers()).get("X-User-Email-Verified") === "true";
     } catch (error) {
         console.error("Error checking email verification status:", error);
         return false; // Return false on error

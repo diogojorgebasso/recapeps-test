@@ -38,7 +38,7 @@ export function SubjectCard({ title, icon, progress, onClick }: SubjectCardProps
                 >
                     {icon}
                 </Center>
-                <Text fontWeight="bold" fontSize="md" noOfLines={2}>
+                <Text fontWeight="bold" fontSize="md">
                     {title}
                 </Text>
             </Flex>
@@ -52,7 +52,8 @@ export function SubjectCard({ title, icon, progress, onClick }: SubjectCardProps
                         {progress}%
                     </Text>
                 </Flex>
-                <Progress
+
+                <Progress.Root
                     value={progress}
                     size="sm"
                     colorScheme={

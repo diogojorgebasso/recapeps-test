@@ -7,7 +7,7 @@ import {
 } from "@chakra-ui/react";
 import Link from "next/link";
 
-export default function APropos() {
+export default function Page() {
     return (
         <Box
             minH="100vh"

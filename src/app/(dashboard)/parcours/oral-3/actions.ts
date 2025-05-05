@@ -1,7 +1,8 @@
 'use server';
 
-import { collection, doc, getDoc, getDocs, query, orderBy, Timestamp } from 'firebase/firestore';
-import { getAuthenticatedAppForUser } from '@/lib/firebase/serverApp';
+import { setDoc, doc, getDoc, Timestamp, serverTimestamp } from 'firebase/firestore';
+import { headers } from 'next/headers';
+import { db } from '@/lib/firebase/clientApp';
 
 interface Subject {
   id: string;
@@ -10,11 +11,6 @@ interface Subject {
   icon?: string;
 }
 
-interface UserProgress {
-  subjectId: string;
-  progress: number;
-  lastAccessed?: Timestamp;
-}
 
 interface StreakData {
   currentStreak: number;
@@ -22,71 +18,20 @@ interface StreakData {
   longestStreak: number;
 }
 
-/**
- * Fetch subjects with user progress data
- */
-export async function fetchSubjectsWithProgress() {
-  try {
-    const { firebaseServerApp, currentUser } = await getAuthenticatedAppForUser();
-
-    if (!currentUser) {
-      return { subjects: [], error: 'User not authenticated' };
-    }
-
-    const { getFirestore } = await import('firebase/firestore');
-    const db = getFirestore(firebaseServerApp);
-
-    // Fetch all subjects
-    const subjectsSnapshot = await getDocs(collection(db, 'subjects'));
-    const subjects: Subject[] = [];
-
-    subjectsSnapshot.forEach((doc) => {
-      subjects.push({
-        id: doc.id,
-        ...doc.data() as Subject
-      });
-    });
-
-    // Fetch user progress for each subject
-    const userProgressSnapshot = await getDocs(
-      collection(db, 'users', currentUser.uid, 'progress')
-    );
-
-    const progressMap: Record<string, number> = {};
-
-    userProgressSnapshot.forEach((doc) => {
-      const progress = doc.data() as UserProgress;
-      progressMap[progress.subjectId] = progress.progress;
-    });
-
-    // Combine subjects with progress
-    const subjectsWithProgress = subjects.map((subject) => ({
-      ...subject,
-      progress: progressMap[subject.id] || 0
-    }));
-
-    return { subjects: subjectsWithProgress };
-  } catch (error) {
-    console.error('Error fetching subjects with progress:', error);
-    return { subjects: [], error: (error as Error).message };
-  }
-}
 
 /**
  * Fetch user streak data
  */
 export async function fetchUserStreak() {
   try {
-    const { firebaseServerApp, currentUser } = await getAuthenticatedAppForUser();
+    const uid = (await headers()).get('X-User-ID');
 
-    if (!currentUser) {
+    if (!uid) {
       return { streak: { currentStreak: 0, longestStreak: 0 }, error: 'User not authenticated' };
     }
 
-    const { getFirestore } = await import('firebase/firestore');
-    const db = getFirestore(firebaseServerApp);
 
-    const streakDocRef = doc(db, 'users', currentUser.uid, 'stats', 'streak');
+    const streakDocRef = doc(db, 'users', uid, 'stats', 'streak');
     const streakSnapshot = await getDoc(streakDocRef);
 
     if (!streakSnapshot.exists()) {
@@ -114,15 +59,12 @@ export async function fetchUserStreak() {
  */
 export async function updateUserStreak() {
   try {
-    const { currentUser } = await getAuthenticatedAppForUser();
-
-    if (!currentUser) {
+    const uid = (await headers()).get('X-User-ID');
+    if (!uid) {
       return { success: false, error: 'User not authenticated' };
     }
 
-    const { getFirestore, serverTimestamp, setDoc } = await import('firebase/firestore');
-
-    const streakDocRef = doc(db, 'users', currentUser.uid, 'stats', 'streak');
+    const streakDocRef = doc(db, 'users', uid, 'stats', 'streak');
     const streakSnapshot = await getDoc(streakDocRef);
 
     const now = new Date();
@@ -182,7 +124,7 @@ export async function updateUserStreak() {
       await setDoc(streakDocRef, {
         currentStreak,
         longestStreak,
-        lastLoginDate: serverTimestamp() // Use serverTimestamp for consistency
+        lastLoginDate: serverTimestamp()
       }, { merge: true }); // Use merge: true to avoid overwriting other potential fields
     }
 

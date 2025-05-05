@@ -1,392 +1,160 @@
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { Chart, useChart } from "@chakra-ui/charts"
+'use client';
 
+import { useState, useEffect } from 'react';
 import {
-    VStack,
     Box,
+    Container,
+    Tab,
+    Tabs,
+    SimpleGrid,
     Heading,
     Text,
     Flex,
-    SimpleGrid,
+    Spinner,
     Button,
-    Icon,
-    Card,
-    Grid,
-    GridItem,
-    Stack,
-    Table,
-    EmptyState,
+    useColorModeValue,
+    Alert,
+    AlertIcon,
+    AlertDescription
 } from '@chakra-ui/react';
-import {
-    FiArrowRight,
-    FiBookOpen,
-    FiAward,
-    FiCalendar,
-} from 'react-icons/fi';
-import { FaPlugCircleBolt } from "react-icons/fa6";
-import {
-    LineChart,
-    Line,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
-    ResponsiveContainer,
-    Legend,
-} from 'recharts';
+import { getSubjects, getQuizzes, completeQuiz } from '../actions/firestoreQueries';
+import { Subject, Quiz } from '../../types';
+import SubjectCard from './oral-3/SubjectCard';
+import StreakTracker from './oral-3/StreakTracker';
+import PathProgress from './oral-3/PathProgress';
+import { FaBook, FaGamepad } from 'react-icons/fa';
 
-import { Toaster, toaster } from "@/components/ui/toaster"
-import { useAuth } from '@/components/AuthProvider';
-import { SubjectCard } from '@/app/(dashboard)/oral-3/SubjectCard';
-import { StreakTracker } from '@/app/(dashboard)/oral-3/StreakTracker';
-import { AchievementBadge } from '@/components/AchievementBadge';
-import { QuizResult } from '@/types/Quiz';
+export default function HomePage() {
+    const [activeTab, setActiveTab] = useState(0);
+    const [subjects, setSubjects] = useState<Subject[]>([]);
+    const [quizzes, setQuizzes] = useState<Quiz[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
 
-import { getUserQuizzes, getUserStreak } from "@/lib/firebase/serverQueries";
+    useEffect(() => {
+        async function loadData() {
+            try {
+                setLoading(true);
+                if (activeTab === 0) {
+                    const subjectsData = await getSubjects(userId);
+                    setSubjects(subjectsData);
+                } else {
+                    const quizzesData = await getQuizzes(userId);
+                    setQuizzes(quizzesData);
+                }
+            } catch (err) {
+                setError("Une erreur s'est produite lors du chargement des données.");
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        }
 
-export const dynamic = "force-dynamic";   // we read the session cookie
+        loadData();
+    }, [activeTab]);
 
-/* ------------------------------------------------------------------ *
- *                      Define Actual Subjects                        *
- * ------------------------------------------------------------------ */
-// TODO: Replace with actual subject data and icons
-const SUBJECTS = [
-    { id: 'ecrit-1', title: 'Écrit 1', icon: FiBookOpen, progress: 75 },
-    { id: 'ecrit-2', title: 'Écrit 2', icon: FiAward, progress: 50 },
-    { id: 'oral-1', title: 'Oral 1', icon: FiCalendar, progress: 25 },
-    { id: 'oral-2', title: 'Oral 2', icon: FiCalendar, progress: 10 },
-    // Add more subjects as needed
-];
+    const handleQuizSelect = async (quizId: string) => {
+        try {
+            // In a real app, this would navigate to the quiz page
+            // For now, we'll just mark it as completed
+            await completeQuiz(userId, quizId);
 
-export default async function DashboardPage() {
-    const quizzes = await getUserQuizzes();
-    const streak = await getUserStreak();
+            // Refresh quizzes
+            const refreshedQuizzes = await getQuizzes(userId);
+            setQuizzes(refreshedQuizzes);
+        } catch (err) {
+            console.error("Failed to complete quiz:", err);
+        }
+    };
 
-    return <DashboardComponent initialQuizzes={quizzes} initialStreak={streak} />;
-}
+    const bgColor = useColorModeValue('gray.50', 'gray.900');
+    const cardBg = useColorModeValue('white', 'gray.800');
 
-/* ------------------------------------------------------------------ *
- *                      Client Component Logic                        *
- * ------------------------------------------------------------------ */
-'use client';
-
-function DashboardComponent({
-    initialQuizzes,
-    initialStreak,
-}: {
-    initialQuizzes: QuizResult[];
-    initialStreak: number;
-}) {
-    const { user, isPro } = useAuth();
-    const router = useRouter();
-
-    const chartData = initialQuizzes.map(({ subjectId, score, date }) => ({
-        subjectId,
-        score,
-        date: date.toDate().toLocaleDateString('fr-FR', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-        }),
-    }));
-
-    // Use initialQuizzes prop instead of quizData
-    const grouped = initialQuizzes.reduce<Record<
-        string,
-        { attempts: number; best: number; last: string }
-    >>((acc, q) => {
-        const g = acc[q.subjectId] ?? { attempts: 0, best: 0, last: q.date };
-        g.attempts += 1;
-        g.best = Math.max(g.best, q.score);
-        g.last = q.date.toDate() > new Date(g.last) ? q.date.toDate() : new Date(g.last);
-        acc[q.subjectId] = g;
-        return acc;
-    }, {});
-
-    const tableRows = Object.entries(grouped).map(([name, s]) => ({
-        subjectId: name,
-        attempts: s.attempts,
-        best: s.best,
-        last: s.last,
-    }));
-
-    /* ------------------------------- UI ------------------------ */
     return (
-        <Box>
-            <Toaster />
-
-            <Box mb={8}>
-                <Heading size="xl" mb={2}>
-                    Bonjour, {user?.displayName ?? 'utilisateur'}
-                </Heading>
-                <Text color="fg.muted">
-                    Continuez votre préparation pour le CAPEPS.
-                </Text>
-            </Box>
-
-            <Grid
-                templateColumns={{ base: '1fr', lg: 'minmax(0, 3fr) minmax(0,1fr)' }}
-                gap={8}
-            >
-                {/* ================= LEFT COLUMN ========================= */}
-                <GridItem>
-                    {/* subjects */}
-                    <SectionTitle
-                        title="Vos matières"
-                        ctaLabel="Voir tout"
-                        onCta={() => router.push('/subjects')}
-                    />
-                    <SimpleGrid
-                        columns={{ base: 1, sm: 2, md: 3, xl: 4 }}
-                        gap={4}
-                        mb={8}
-                    >
-                        {SUBJECTS.map((s) => (
-                            <Link key={s.id} href={`/subjects/${s.id}`} passHref legacyBehavior>
-                                <SubjectCard
-                                    title={s.title}
-                                    icon={s.icon}
-                                    progress={s.progress}
-                                />
-                            </Link>
-                        ))}
-                    </SimpleGrid>
-
-                    <Heading as="h2" size="lg" mb={4}>
-                        Activités recommandées
+        <Box bg={bgColor} minH="100vh" py={10}>
+            <Container maxW="container.xl">
+                <Flex direction="column" mb={6}>
+                    <Heading as="h1" size="xl" mb={2}>
+                        RecapEPS
                     </Heading>
-                    <SimpleGrid columns={{ base: 1, md: 3 }} gap={4} mb={10}>
-                        <ActivityCard
-                            title="Écrit 1"
-                            icon={FiBookOpen}
-                            color="blue"
-                            desc="Révisez les concepts clés."
-                            route="/ecrit-1"
-                        />
-                        <ActivityCard
-                            title="Écrit 2"
-                            icon={FiAward}
-                            color="green"
-                            desc="Testez vos connaissances."
-                            route="/ecrit-2"
-                        />
-                        <ActivityCard
-                            title="Oral"
-                            icon={FiCalendar}
-                            color="purple"
-                            desc="Simulateur interactif pour l'oral."
-                            route="/oral-3"
-                        />
-                    </SimpleGrid>
+                    <Text color="gray.600">
+                        Améliorez vos connaissances en éducation physique et sportive
+                    </Text>
+                </Flex>
 
-                    <Heading as="h2" size="lg" mb={4}>
-                        Vos derniers résultats
-                    </Heading>
+                <StreakTracker userId={userId} />
 
-                    {/* Use initialQuizzes prop */}
-                    {initialQuizzes.length === 0 ? (
-                        <EmptyState.Root>
-                            <EmptyState.Content>
-                                <EmptyState.Indicator>
-                                    <FaPlugCircleBolt />
-                                </EmptyState.Indicator>
-
-                                <VStack gap={3} textAlign="center">
-                                    <EmptyState.Title>Aucun résultat</EmptyState.Title>
-
-                                    <EmptyState.Description>
-                                        Commencez un quiz pour voir vos résultats ici.
-                                    </EmptyState.Description>
-
-                                    <Flex gap={4} justify="center">
-                                        <Button onClick={() => router.push('/quiz')}>Faire un quiz</Button>
-                                        <Button variant="outline" onClick={() => router.push('/notes')}>
-                                            Explorer les fiches
-                                        </Button>
-                                    </Flex>
-                                </VStack>
-                            </EmptyState.Content>
-                        </EmptyState.Root>
-                    ) : (
-                        <>
-                            {/* chart */}
-                            <Flex justify="center" mb={8}>
-                                <ResponsiveContainer height={360}>
-                                    <LineChart data={chartData}>
-                                        <CartesianGrid strokeDasharray="3 3" />
-                                        <XAxis dataKey="subjectId" />
-                                        <YAxis />
-                                        <Tooltip />
-                                        <Legend />
-                                        <Line
-                                            type="monotone"
-                                            dataKey="score"
-                                            stroke="#38A169"
-                                            strokeWidth={2}
-                                            dot={{ r: 4 }}
-                                        />
-                                    </LineChart>
-                                </ResponsiveContainer>
-                            </Flex>
-
-                            {/* table */}
-                            <Box overflowX="auto">
-                                <Table.Root variant="outline">
-                                    <Table.Caption>Historique par matière</Table.Caption>
-                                    <Table.Header>
-                                        <Table.Row>
-                                            <Table.ColumnHeader>Matière</Table.ColumnHeader>
-                                            <Table.ColumnHeader >Tentatives</Table.ColumnHeader>
-                                            <Table.ColumnHeader>Meilleure note</Table.ColumnHeader>
-                                            <Table.ColumnHeader>Dernière tentative</Table.ColumnHeader>
-                                        </Table.Row>
-                                    </Table.Header>
-
-                                    <Table.Body>
-                                        {tableRows.map((r) => (
-                                            <Table.Row key={r.subjectId}>
-                                                <Table.Cell>{r.subjectId}</Table.Cell>
-                                                <Table.Cell>{r.attempts}</Table.Cell>
-                                                <Table.Cell>{r.best}</Table.Cell>
-                                                <Table.Cell>
-                                                    {new Date(r.last).toLocaleDateString('fr-FR', {
-                                                        year: 'numeric',
-                                                        month: 'long',
-                                                        day: 'numeric',
-                                                    })}
-                                                </Table.Cell>
-                                            </Table.Row>
-                                        ))}
-                                    </Table.Body>
-                                </Table.Root>
-                            </Box>
-                        </>
-                    )}
-                </GridItem>
-
-                {/* ================= RIGHT SIDEBAR ======================= */}
-                <GridItem>
-                    <Stack gap={6}>
-                        {/* streak */}
-                        <Card.Root p={4} rounded="lg"></Card.Root>
-                        <Heading size="md" mb={3}>
-                            Votre progression
-                        </Heading>
-                        {/* Use initialStreak prop */}
-                        <StreakTracker days={initialStreak} />
-                        <Text mt={3} textAlign="center">
-                            {/* Use initialStreak prop */}
-                            {initialStreak} jours de révision consécutifs !
-                        </Text>
-
-                        {/* upsell */}
-                        {!isPro && (
-                            <Card.Root
-                                p={4}
-                                rounded="lg"
-                                bgGradient="linear(to-r, blue.400, purple.500)"
-                                color="white"
-                            >
-                                <Heading size="md" mb={3}>
-                                    Débloquez tout le contenu
-                                </Heading>
-                                <Text mb={4}>
-                                    Accédez à tout le contenu premium avec notre abonnement.
-                                </Text>
-                                <Button
-                                    colorScheme="whiteAlpha"
-                                    onClick={() => router.push('/checkout')}
-                                >
-                                    S'abonner
-                                </Button>
-                            </Card.Root>
-                        )}
-
-                        {/* badges */}
-                        <Card.Root p={4} rounded="lg">
-                            <Heading size="md" mb={3}>
-                                Vos badges
-                            </Heading>
-                            <SimpleGrid columns={3} gap={3}>
-                                <AchievementBadge title="Premier quiz" icon="🏆" achieved />
-                                <AchievementBadge
-                                    title="5 jours consécutifs"
-                                    icon="🔥"
-                                    // Use initialStreak prop
-                                    achieved={initialStreak >= 5}
-                                />
-                                <AchievementBadge title="Expert" icon="🎓" achieved={false} />
-                            </SimpleGrid>
-                        </Card.Root>
-                    </Stack>
-                </GridItem>
-            </Grid>
-        </Box >
-    );
-}
-
-/* ------------------------------------------------------------------ *
- *                          tiny helpers                              *
- * ------------------------------------------------------------------ */
-function SectionTitle({
-    title,
-    ctaLabel,
-    onCta,
-}: {
-    title: string;
-    ctaLabel: string;
-    onCta: () => void;
-}) {
-    return (
-        <Flex justify="space-between" align="center" mb={4}>
-            <Heading size="lg">{title}</Heading>
-            <Button
-                variant="ghost"
-                colorScheme="blue"
-                onClick={onCta}
-            >
-                <FiArrowRight />
-                {ctaLabel}
-            </Button>
-        </Flex>
-    );
-}
-
-function ActivityCard({
-    title,
-    desc,
-    icon,
-    color,
-    route,
-}: {
-    title: string;
-    desc: string;
-    icon: any;
-    color: string;
-    route: string;
-}) {
-    const router = useRouter();
-    return (
-        <Card.Root p={5} rounded="lg">
-            <Flex direction="column" h="full">
-                <Icon as={icon} boxSize={8} color={`${color}.500`} mb={3} />
-                <Heading size="md" mb={2}>
-                    {title}
-                </Heading>
-                <Text flex="1" mb={4}>
-                    {desc}
-                </Text>
-                <Button
-                    colorScheme={color}
-                    mt="auto"
-                    onClick={() => router.push(route)}
+                <Tabs
+                    variant="soft-rounded"
+                    colorScheme="blue"
+                    onChange={(index) => setActiveTab(index)}
+                    mb={6}
                 >
-                    Commencer
-                </Button>
-            </Flex>
-        </Card.Root>
+                    <TabList mb={4}>
+                        <Tab fontWeight="medium" leftIcon={<FaBook />}>Matières</Tab>
+                        <Tab fontWeight="medium" leftIcon={<FaGamepad />}>Quiz</Tab>
+                    </TabList>
+
+                    <TabPanels>
+                        <TabPanel px={0}>
+                            {loading ? (
+                                <Flex justify="center" py={10}>
+                                    <Spinner size="xl" color="blue.500" />
+                                </Flex>
+                            ) : error ? (
+                                <Alert status="error" borderRadius="lg">
+                                    <AlertIcon />
+                                    <AlertDescription>{error}</AlertDescription>
+                                </Alert>
+                            ) : subjects.length === 0 ? (
+                                <Box textAlign="center" py={10}>
+                                    <Text fontSize="lg" mb={4}>Aucune matière disponible pour le moment.</Text>
+                                    <Button colorScheme="blue">Actualiser</Button>
+                                </Box>
+                            ) : (
+                                <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
+                                    {subjects.map((subject) => (
+                                        <SubjectCard key={subject.id} subject={subject} />
+                                    ))}
+                                </SimpleGrid>
+                            )}
+                        </TabPanel>
+
+                        <TabPanel px={0}>
+                            {loading ? (
+                                <Flex justify="center" py={10}>
+                                    <Spinner size="xl" color="blue.500" />
+                                </Flex>
+                            ) : error ? (
+                                <Alert status="error" borderRadius="lg">
+                                    <AlertIcon />
+                                    <AlertDescription>{error}</AlertDescription>
+                                </Alert>
+                            ) : quizzes.length === 0 ? (
+                                <Box textAlign="center" py={10}>
+                                    <Text fontSize="lg" mb={4}>Aucun quiz disponible pour le moment.</Text>
+                                    <Button colorScheme="blue">Actualiser</Button>
+                                </Box>
+                            ) : (
+                                <Box
+                                    bg={cardBg}
+                                    borderRadius="xl"
+                                    p={6}
+                                    boxShadow="md"
+                                >
+                                    <Heading as="h2" size="md" mb={6} textAlign="center">
+                                        Parcours d'apprentissage
+                                    </Heading>
+                                    <PathProgress
+                                        quizzes={quizzes}
+                                        onQuizSelect={handleQuizSelect}
+                                    />
+                                </Box>
+                            )}
+                        </TabPanel>
+                    </TabPanels>
+                </Tabs>
+            </Container>
+        </Box>
     );
 }
-
-
