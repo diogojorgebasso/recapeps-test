@@ -86,8 +86,8 @@ export default function DesktopMenu() {
     const [isDesktop] = useMediaQuery(["(min-width:768px)"], { ssr: false });
 
     /* intro dialog: offer the tour once */
-    const intro = useDisclosure({
-        defaultOpen: isDesktop && profile?.hasSeenTour,
+    const intro = useDisclosure({ // && profile?.hasSeenTour
+        defaultOpen: isDesktop
     });
 
     /* current tour step (null = not running) */
