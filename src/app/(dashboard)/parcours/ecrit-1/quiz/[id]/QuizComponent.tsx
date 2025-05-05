@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Quiz } from "@/types/Quiz";
+import { AttemptQuiz, Quiz } from "@/types/Quiz";
 import { useAuth } from "@/auth/AuthContext";
 import { saveQuizResultsAction, saveQuizProgressAction } from "./actions";
 
@@ -29,14 +29,14 @@ enum QuizState {
 
 interface QuestionResult {
   questionId: string;
-  selectedAnswerIds: string[];
+  selectedAnswer: number[]; // Changed to match the actions.ts interface
   timeSpent: number; // Time in milliseconds
 }
 
 
 export default function QuizComponent({
   quiz,
-}: { quiz: Quiz }) {
+}: { quiz: Quiz | AttemptQuiz }) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [selectedAnswerIds, setSelectedAnswerIds] = useState<string[]>([]);
@@ -108,7 +108,7 @@ export default function QuizComponent({
     // Add result for the current question
     const newResult: QuestionResult = {
       questionId: currentQuestion.id,
-      selectedAnswerIds: [...selectedAnswerIds],
+      selectedAnswer: selectedAnswerIds.map(id => parseInt(id)), // Convert string IDs to numbers
       timeSpent: timeSpent,
     };
     setQuizResults(prevResults => [...prevResults, newResult]);

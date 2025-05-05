@@ -1,6 +1,6 @@
 import { db } from "@/lib/firebase/clientApp";
 import { doc } from "firebase/firestore";
-import { AttemptQuiz } from "@/types/Quiz";
+import { AttemptQuiz, QuizState } from "@/types/Quiz";
 import {
     findActiveAttempt, fetchBaseQuiz,
     createAttempt, findCompletedAttempts
@@ -42,8 +42,8 @@ export async function getQuizForAttempt(numberOfEcrit: number, quizId: string, u
         // 5. Create a new attempt document in Firestore
         const newAttemptData = {
             quizRef: doc(db, `ecrit-${numberOfEcrit}`, quizId), // Reference to the base quiz
-            title: baseQuiz.title,
-            state: "doing", // Initial state
+            name: baseQuiz.name,
+            state: "doing" as QuizState,
             questions: questionsForAttempt,
             score: 0,
             premium: baseQuiz.premium, // Assuming baseQuiz has a property indicating if it's Pro-only
