@@ -1,78 +1,93 @@
-// SkillTree.client.tsx  –  "use client"
 'use client';
+
 import { subjects } from './subjects';
 import {
     Box, Circle, Flex, Text, VStack,
-    useBreakpointValue,
 } from '@chakra-ui/react';
+import Link from 'next/link';
 
-export type ClientQuiz = {
-    id: string;
-    subject: string;
-    level: number;
-    state: 'passed' | 'retry' | 'doing' | 'locked';
-};
+import { QuizTrail } from '@/types/Quiz';
+import { use } from 'react';
 
-const COLOUR: Record<ClientQuiz['state'], string> = {
-    passed: 'green.400',
+const COLOUR: Record<QuizTrail['state'], string> = {
+    completed: 'green.400',
     retry: 'orange.400',
-    doing: 'blue.400',
+    doing: 'yellow.400',
+    unlocked: 'blue.400',
     locked: 'gray.300',
 };
 
+export default function SkillTreeClient({ QuizNode }: { QuizNode: Promise<QuizTrail[]> }) {
+    const QuizNodes = use(QuizNode);
 
-export default function SkillTreeClient({ quizzes }: { quizzes: ClientQuiz[] }) {
-    /* group by subject─level */
-    const grouped = quizzes.reduce<Record<string, ClientQuiz[]>>((acc, q) => {
-        acc[q.subject] ??= [];
-        acc[q.subject][q.level - 1] = q;
+    const grouped = QuizNodes.reduce<Record<string, QuizTrail[]>>((acc, q) => {
+        acc[q.name] ??= [];
+        acc[q.name][q.level - 1] = q;
         return acc;
     }, {});
 
-    const size = useBreakpointValue({ base: '48px', md: '64px' });
-    const gap = useBreakpointValue({ base: 3, md: 4 });
+    const circleSize = { base: '48px', md: '64px' };
+    const flexGap = { base: 3, md: 4 };
 
     return (
         <Box maxW="100%" overflowX="auto" p={4}>
             <VStack align="stretch" gap={0}>
-                {subjects.map((subj, idx) => (
-                    <Flex key={subj} align="center" pos="relative" py={{ base: 3, md: 4 }}>
+                {subjects.map((subj, subjIdx) => (
+                    <Flex key={String(subj)} align="center" pos="relative" py={{ base: 3, md: 4 }}>
                         <Text
                             flexShrink={0}
                             w={{ base: '120px', md: '160px' }}
                             fontWeight="bold"
                             fontSize={{ base: 'sm', md: 'md' }}
                         >
-                            {subj}
+                            {subj.toString()}
                         </Text>
 
-                        {/* branch */}
-                        <Box flex="1" h="2px" bg="gray.300" mr={gap} pos="relative">
+                        <Box flex="1" h="2px" bg="gray.300" mr={flexGap} pos="relative">
                             <Box pos="absolute" left="-2px" top="-6px"
                                 w="2px" h="calc(100% + 12px)" bg="gray.300" />
                         </Box>
 
-                        {/* 3 circles */}
-                        <Flex gap={gap}>
-                            {(grouped[subj] ?? []).map(q => (
-                                <Flex key={q.id} dir="column" align="center">
+                        <Flex gap={flexGap}>
+                            {[1, 2, 3].map(level => {
+                                const quiz = grouped[subj.toString()]?.[level - 1];
+                                const state: QuizTrail['state'] = quiz ? quiz.state : 'locked';
+                                const key = `${subj}-level-${level}`;
+                                const isClickable = state !== 'locked';
+
+                                const CircleNode = (
                                     <Circle
-                                        size={size}
-                                        bg={COLOUR[q.state]}
-                                        color={q.state === 'locked' ? 'gray.500' : 'white'}
+                                        size={circleSize}
+                                        bg={COLOUR[state]}
+                                        color={state === 'locked' ? 'gray.500' : 'white'}
                                         shadow="md"
-                                        _hover={{
-                                            filter: q.state !== 'locked' ? 'brightness(1.1)' : undefined,
-                                            cursor: q.state !== 'locked' ? 'pointer' : 'not-allowed',
+                                        _hover={isClickable ? {
+                                            filter: 'brightness(1.1)',
+                                            cursor: 'pointer',
+                                        } : {
+                                            cursor: 'not-allowed',
                                         }}
+                                        as={isClickable ? 'a' : 'div'}
                                     >
-                                        <Text fontWeight="bold">{q.level}</Text>
+                                        <Text fontWeight="bold">{level}</Text>
                                     </Circle>
-                                    {idx < subjectOrder.length - 1 && (
-                                        <Box w="2px" h={{ base: '24px', md: '32px' }} bg="gray.300" />
-                                    )}
-                                </Flex>
-                            ))}
+                                );
+
+                                return (
+                                    <Flex key={key} dir="column" align="center">
+                                        {isClickable ? (
+                                            <Link href={`/parcours/ecrit-1/quiz/${quiz.id}`} passHref>
+                                                {CircleNode}
+                                            </Link>
+                                        ) : (
+                                            CircleNode
+                                        )}
+                                        {subjIdx < subjects.length - 1 && (
+                                            <Box w="2px" h={{ base: '24px', md: '32px' }} bg="gray.300" />
+                                        )}
+                                    </Flex>
+                                );
+                            })}
                         </Flex>
                     </Flex>
                 ))}

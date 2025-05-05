@@ -10,8 +10,6 @@ export const subjects: Subject[] = [
     { id: 'nature-citoyennete', name: 'Nature et citoyenneté', image: '/img/nature.jpg', premium: false },
     { id: 'mutations-systeme', name: 'Mutations du système éducatif', image: '/img/mutations.jpg', premium: true },
     { id: 'mixite-sexuee', name: 'La mixité sexuée', image: '/img/mixite.jpg', premium: true },
-    {
-        id: 'evaluation', name: 'Evaluation', image: '/img/evaluation.jpg', premium: true
-    },
+    { id: 'evaluation', name: 'Evaluation', image: '/img/evaluation.jpg', premium: true },
     { id: 'culture-corporelle', name: 'Culture corporelle', image: '/img/culture-corporelle.jpg', premium: true },
 ];

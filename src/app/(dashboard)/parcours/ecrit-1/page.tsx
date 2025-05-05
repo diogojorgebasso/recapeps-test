@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { subjects } from "./subjects";
 import {
     Box,
@@ -11,19 +10,20 @@ import {
     Dialog,
     Tabs
 } from "@chakra-ui/react";
-import { Toaster, toaster } from "@/components/ui/toaster"
-
-import { useAuth } from "@/components/AuthProvider";
 import SkillTreeClient from "./SkillTreeClient";
-import { get } from "http";
+import { headers } from "next/headers";
+import { getProgressOverview } from "@/repositories/quizRepo";
+import { QuizTrail } from "@/types/Quiz";
+import { Suspense } from "react";
 
-export default function Ecrit1Page() {
-    const { isPro } = useAuth();
-    const quizzes = getQuizState()
+export default async function Page() {
+    const isPro = (await headers()).get("X-User-Pro") === "true";
+    const userId = (await headers()).get("X-User-Id") || "";
+    const progressData = await getProgressOverview(userId, 1);
+    const quizNodesArray: QuizTrail[] = progressData ? Object.values(progressData) : [];
 
     return (
         <>
-            <Toaster />
             <Tabs.Root>
                 <Tabs.List>
                     <Tabs.Trigger value="apprendre" colorScheme="blue" fontSize="2xl" fontWeight="bold">
@@ -55,11 +55,9 @@ export default function Ecrit1Page() {
                     </Box >
                 </Tabs.Content>
                 <Tabs.Content value="s-entraner">
-                    <SkillTreeClient quizzes={[
-                        { id: "1", subject: "Travail des élèves", level: 1, state: "doing" },
-                        { id: "2", subject: "Les techniques", level: 2, state: "passed" },
-                        { id: "3", subject: "Sport scolaire", level: 3, state: "retry" },
-                    ]} />
+                    <Suspense fallback={<div>Loading...</div>}>
+                        <SkillTreeClient QuizNode={Promise.resolve(quizNodesArray)} />
+                    </Suspense>
                 </Tabs.Content>
 
             </Tabs.Root>

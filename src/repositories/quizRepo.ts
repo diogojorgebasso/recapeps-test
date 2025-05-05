@@ -3,7 +3,8 @@ import {
 } from "firebase/firestore";
 
 import { db } from "@/lib/firebase/clientApp";
-import { Quiz, Question, AttemptQuiz } from "@/types/Quiz";
+// Import QuizTrail
+import { Quiz, Question, AttemptQuiz, QuizTrail } from "@/types/Quiz";
 
 /**
  * Finds an active (state === 'doing') quiz attempt for a user.
@@ -46,13 +47,11 @@ export async function fetchBaseQuiz(numberOfEcrit: number, quizId: string): Prom
             const data = quizSnapshot.data();
             return {
                 id: quizSnapshot.id,
-                quizRef: quizDocRef, // Add the reference
-                title: data.title,
+                name: data.name,
                 level: data.level,
                 premium: data.premium,
                 questions: data.questions as Question[],
-                // Add other fields if they exist on the base quiz document
-            } as Quiz; // Ensure this matches the Quiz interface
+            } as Quiz;
         }
         return null;
     } catch (error) {
@@ -114,6 +113,16 @@ export async function createAttempt(
     }
 }
 
+// Update return type and add type assertion
+export async function getProgressOverview(uid: string, numberOfEcrit: number): Promise<Record<string, QuizTrail> | null> {
+    const progressOverviewRef = doc(db, "users", uid, `ecrit-${numberOfEcrit}`, "progressOverview");
+    const progressOverviewSnapshot = await getDoc(progressOverviewRef);
+    if (progressOverviewSnapshot.exists()) {
+        // Assert the data type
+        return progressOverviewSnapshot.data() as Record<string, QuizTrail>;
+    }
+    return null; // or handle the case where the document doesn't exist
+}
 
 /**
  * Fetches completed quiz attempts for a user.

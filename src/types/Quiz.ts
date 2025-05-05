@@ -1,11 +1,18 @@
 import { Timestamp, DocumentReference } from "firebase/firestore";
 
-// Le quiz soit dans la collection ecrit-1 soit dans la collection ecrit-2
+export type QuizState = 'completed' | 'retry' | 'doing' | 'unlocked' | 'locked';
+
+export interface QuizTrail {
+    id: string;
+    name: string;
+    level: number;
+    state: QuizState;
+};
+
 export interface Quiz {
     id: string;
-    title: string; // Subject name or quiz title
+    name: string;
     level: number;
-    quizRef: DocumentReference;
     premium: boolean;
     questions: Array<Question>;
 }
@@ -15,7 +22,7 @@ export interface AttemptQuiz {
     createdAt: Timestamp;
     quizRef: DocumentReference;
     questions: Array<Question>;
-    state: 'doing' | 'completed'
+    state: QuizState;
     score: number;
     premium: boolean;
 }
