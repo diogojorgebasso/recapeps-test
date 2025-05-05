@@ -12,7 +12,6 @@ import { updateProfile, getAuth } from 'firebase/auth';
 export interface AuthProviderProps {
     user: User | null;
     children: React.ReactNode;
-    updatePhotoURLInContext: (photoURL: string) => Promise<boolean>;
 }
 
 export const AuthProvider: React.FunctionComponent<AuthProviderProps> = ({

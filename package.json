@@ -9,7 +9,8 @@
     "lint": "next lint",
     "serve": "firebase emulators:start",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "pre-commit": "next lint --fix"
   },
   "dependencies": {
     "@chakra-ui/charts": "^3.17.0",
@@ -47,6 +48,8 @@
     "@vitest/browser": "^3.1.2",
     "@vitest/coverage-v8": "^3.1.2",
     "esbuild": "^0.25.3",
+    "eslint": "9.26.0",
+    "eslint-config-next": "15.3.1",
     "playwright": "^1.52.0",
     "storybook": "^8.6.12",
     "typescript": "^5.8.3",

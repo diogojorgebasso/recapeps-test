@@ -58,7 +58,7 @@ export async function login(state: LoginState, formData: FormData) {
 
     } catch (error: any) {
         console.error("Firebase login error:", error);
-        let errorMessage = "Identifiants incorrects ou erreur serveur.";
+        const errorMessage = "Identifiants incorrects ou erreur serveur.";
         // Example: Check for specific Firebase Auth error codes if needed
         // if (error.code === AuthErrorCodes.INVALID_LOGIN_CREDENTIALS) {
         //   errorMessage = "Identifiants incorrects.";
