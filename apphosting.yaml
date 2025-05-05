@@ -8,9 +8,18 @@ runConfig:
 env:
   - variable: COOKIE_SECRET_CURRENT
     secret: COOKIE_SECRET_CURRENT
+    availability:
+      - RUNTIME
   - variable: COOKIE_SECRET_PREVIOUS
     secret: COOKIE_SECRET_PREVIOUS
+    availability:
+      - RUNTIME
   - variable: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
     value: pk_test_51QqK3sIj1lxZjyG3UJ7RWgAsPinlIZHeUdbthRk6OUHuRS5VoAGVXzR69vtW2jkxe6DWOY2ZQZybQdYliWhFpa3G00GHICwwgy
+    availability:
+      - BUILD
+      - RUNTIME
   - variable: STRIPE_SECRET_KEY
     secret: stripe_secret_key
+    availability:
+      - RUNTIME
