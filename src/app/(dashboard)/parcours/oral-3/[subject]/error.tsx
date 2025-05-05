@@ -1,6 +1,6 @@
 "use client"; // Error components must be Client Components
 
-export default function Error({ reset }) {
+export default function Error({ reset }: { reset: () => void }) {
 
     return (
         <div>

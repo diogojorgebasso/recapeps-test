@@ -18,16 +18,14 @@ import { FaGoogle } from "react-icons/fa";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { login } from "./actions";
-import { useAuth } from "@/auth/AuthContext";
+import { signInWithGoogle } from "@/lib/firebase/auth";
 
 export default async function Page() {
     const [state, action, pending] = useActionState(login, undefined)
 
-    const { loginWithGoogle } = useAuth();
-
     const handleGoogleLogin = async () => {
         try {
-            await loginWithGoogle();
+            await signInWithGoogle();
         } catch (error) {
             console.error("Erreur lors de la connexion avec Google :", error);
         }
@@ -63,8 +61,8 @@ export default async function Page() {
                                         placeholder="exemple@email.com"
                                         required
                                     />
-                                    {state?.errors?.email && (
-                                        <Field.ErrorText>{state?.errors.email[0]}</Field.ErrorText>
+                                    {state?.errors && "email" in state.errors && Array.isArray(state.errors.email) && (
+                                        <Field.ErrorText>{state.errors.email[0]}</Field.ErrorText>
                                     )}
                                 </Field.Root>
                                 <Field.Root>
@@ -74,8 +72,8 @@ export default async function Page() {
                                         placeholder="Entrez votre mot de passe"
                                         required
                                     />
-                                    {state?.errors?.password && (
-                                        <Fieldset.ErrorText>{state?.errors.password[0]}</Fieldset.ErrorText>
+                                    {state?.errors && "password" in state.errors && state.errors.password && (
+                                        <Fieldset.ErrorText>{state.errors.password[0]}</Fieldset.ErrorText>
                                     )}
                                 </Field.Root>
                             </Fieldset.Root>
@@ -87,7 +85,6 @@ export default async function Page() {
                                 Mot de passe oublié ?
                             </Link>
 
-                            {state?.errors?._form && <Text color="red.500">{state?.errors._form[0]}</Text>}
 
                             <Button
                                 type="submit"

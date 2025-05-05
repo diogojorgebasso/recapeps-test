@@ -1,8 +1,7 @@
-import { getSpecifyOral } from "@/api/getSpecifyOral";
-import { useParams } from "react-router";
+'use client';
+
 import { useState, useRef, useEffect } from "react";
-import { getStorage, ref, uploadBytes } from "firebase/storage";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/auth/AuthContext";
 
 import {
     Box,
@@ -15,14 +14,20 @@ import {
     Container,
     CloseButton
 } from "@chakra-ui/react";
-import { useNavigate } from "react-router";
+import { uploadRecordingAction } from "./actions";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase/clientApp";
+import { useRouter } from 'next/navigation'; // Import useRouter
 
-export default function Subject() {
-    const [title, setTitle] = useState("");
-    const router = useParams();
-    const { subjectId } = router;
-    const navigate = useNavigate();
-    const { currentUser } = useAuth();
+async function getOral(subjectId: string) {
+    return await getDoc(doc(db, "oral", subjectId));
+}
+
+export default async function Page({ params }: { params: Promise<{ subjectId: string }> }) {
+    const { user } = useAuth();
+    const { subjectId } = await params;
+    const title = (await getOral(subjectId)).data()?.title;
+    const router = useRouter();
 
     const [isRecording, setIsRecording] = useState(false);
     const [timeLeft, setTimeLeft] = useState(180);
@@ -37,14 +42,6 @@ export default function Subject() {
     const analyserRef = useRef<AnalyserNode | null>(null);
     const animationRef = useRef<number | null>(null);
 
-    useEffect(() => {
-        if (subjectId) {
-            getSpecifyOral(subjectId).then(data => {
-                console.log(data);
-                setTitle(data.data()?.title || "");
-            });
-        }
-    }, [subjectId]);
 
     // Timer countdown effect
     useEffect(() => {
@@ -192,17 +189,17 @@ export default function Subject() {
 
         try {
             const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-            const storage = getStorage();
-            const fileName = `oral_${subjectId}_${Date.now()}.webm`;
-            if (!currentUser) {
-                throw new Error("User is not authenticated");
+            const formData = new FormData();
+            // Use a filename that the server action can recognize
+            formData.append('audioBlob', blob, `oral_${subjectId}_${Date.now()}.webm`);
+
+            const result = await uploadRecordingAction(formData, subjectId);
+
+            if (result.filePath) {
+                router.push(result.filePath);
+            } else {
+                console.error("File path is undefined.");
             }
-            const storageRef = ref(storage, `user/${currentUser.uid}/transcripts/${fileName}`);
-
-            await uploadBytes(storageRef, blob);
-            setOpen(false)
-
-            navigate(`/oral-3/${subjectId}/transcripts/${fileName.split('.')[0]}`);
         } catch (error) {
             console.error("Error uploading recording:", error);
         }

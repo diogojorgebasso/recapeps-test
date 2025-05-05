@@ -9,17 +9,15 @@ const LoginSchema = z.object({
     password: z.string().min(1, { message: "Le mot de passe est requis." }), // Basic check
 });
 
-export type LoginState = {
-    message: string;
-    errors?: {
-        email?: string[];
-        password?: string[];
-        _form?: string[];
-    };
-    fieldValues: {
-        email: string;
-    }
-};
+export type LoginState =
+    | {
+        message: string;
+        errors?: {
+            email?: string[];
+            password?: string[];
+            _form?: string[];
+        }
+    } | undefined;
 
 export async function login(state: LoginState, formData: FormData) {
     const email = formData.get("email") as string;
@@ -51,7 +49,6 @@ export async function login(state: LoginState, formData: FormData) {
             return {
                 message: "Erreur de connexion.",
                 errors: { _form: ["Identifiants incorrects ou erreur inconnue."] },
-                fieldValues: { email },
             };
         }
 
@@ -69,11 +66,8 @@ export async function login(state: LoginState, formData: FormData) {
         return {
             message: "Erreur de connexion.",
             errors: { _form: [errorMessage] },
-            fieldValues: { email },
         };
     }
 
     redirect("/dashboard"); // Or redirect based on 'from' state if passed somehow
-
-    return { message: "Connexion réussie!", fieldValues: { email: "" } };
 }
