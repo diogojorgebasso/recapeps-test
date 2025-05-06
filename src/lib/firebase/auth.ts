@@ -9,8 +9,9 @@ import {
 } from "firebase/auth";
 
 import { auth } from "./clientApp";
-import type { NextOrObserver } from "firebase/auth";
+import type { NextOrObserver, UserCredential } from "firebase/auth";
 import type { User } from "firebase/auth";
+import { loginWithCredential } from "@/api";
 
 export function onAuthStateChanged(cb: NextOrObserver<User>) {
   return _onAuthStateChanged(auth, cb);
@@ -24,9 +25,13 @@ export async function signInWithGoogle() {
   const provider = new GoogleAuthProvider();
 
   try {
-    await signInWithPopup(auth, provider);
+    const result = await signInWithPopup(auth, provider);
+    // Call loginWithCredential to establish the server-side session
+    await loginWithCredential(result);
+    return { success: true, result };
   } catch (error) {
     console.error("Error signing in with Google", error);
+    return { success: false, error };
   }
 }
 
