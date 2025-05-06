@@ -10,7 +10,7 @@ import { fetchClientSecret } from './actions'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '')
 
-export default async function Checkout({ priceId }: { priceId: string }) {
+export default function Checkout({ priceId }: { priceId: string }) {
 
 
     if (!priceId) {

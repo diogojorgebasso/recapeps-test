@@ -48,7 +48,7 @@ export function StreakTracker({ days, maxDisplay = 7 }: SimpleStreakTrackerProps
             </Flex>
             <Flex justify="space-between" mt={1}>
                 <Text fontSize="xs" color="gray.500">Il y a {maxDisplay} jours</Text>
-                <Text fontSize="xs" color="gray.500">Aujourd'hui</Text>
+                <Text fontSize="xs" color="gray.500">Aujourd&apos;hui</Text>
             </Flex>
         </Box>
     );

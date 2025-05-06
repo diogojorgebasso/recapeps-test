@@ -8,7 +8,8 @@ import {
     Button,
     Link,
     Dialog,
-    Tabs
+    Tabs,
+    Text
 } from "@chakra-ui/react";
 import SkillTreeClient from "./SkillTreeClient";
 import { headers } from "next/headers";
@@ -30,7 +31,7 @@ export default async function Page() {
                         Apprendre
                     </Tabs.Trigger>
                     <Tabs.Trigger value="s-entraner" colorScheme="blue" fontSize="2xl" fontWeight="bold">
-                        S'entrâner
+                        S&apos;entrâner
                     </Tabs.Trigger>
                 </Tabs.List>
                 <Tabs.Content value="apprendre">
@@ -110,13 +111,14 @@ function ExamCard({
                             </Dialog.Trigger>
                             <Dialog.Content>
                                 <Dialog.Header>
-                                    <Dialog.Title>Passer à Recap'eps pro?
+                                    <Dialog.Title>Passer à Recap&apos;eps pro?
                                     </Dialog.Title>
                                 </Dialog.Header>
                                 <Dialog.Body>
-                                    <p>
-                                        Tu apprécies le contenu que nous te proposons mais tu restes sur ta faim? Tu aimerai accéder à tout le contenu que nous t'avons concocté? Alors n'hésite plus et passe à Recap'eps pro ! 🎯
-                                    </p>
+                                    <Text>
+                                        Tu apprécies le contenu que nous te proposons mais tu restes sur ta faim? Tu aimerai accéder à tout le contenu que nous t&apos;avons concocté?
+                                        Alors n&apos;hésite plus et passe à Recap&apos;eps pro ! 🎯
+                                    </Text>
                                 </Dialog.Body>
                                 <Dialog.Footer>
                                     <Dialog.ActionTrigger asChild>
