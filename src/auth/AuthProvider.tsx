@@ -4,10 +4,12 @@ import * as React from 'react';
 import { useState } from 'react';
 import { AuthContext, User } from './AuthContext';
 import { useEffect } from 'react';
-import { getToken, onMessage } from "firebase/messaging";
-import { messaging, functions } from "@/lib/firebase/clientApp"; // Import auth from your client app
+import { functions } from "@/lib/firebase/clientApp"; // Import without messaging
 import { httpsCallable } from "firebase/functions";
 import { updateProfile, getAuth } from 'firebase/auth';
+
+// Don't import messaging at the top level
+// We'll conditionally import it later
 
 export interface AuthProviderProps {
     user: User | null;
@@ -28,14 +30,26 @@ export const AuthProvider: React.FunctionComponent<AuthProviderProps> = ({
 
     useEffect(() => {
         let unsubscribeMessaging: (() => void) | undefined;
-        if (typeof window !== 'undefined' && user) {
-            if ('Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window) {
-                Notification.requestPermission().then((permission) => {
-                    if (permission === "granted") {
-                        console.log("Notification permission granted.");
 
-                        getToken(messaging, { vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY })
-                            .then(async (currentToken) => {
+        // Only run this code in the browser, not during SSR
+        const setupMessaging = async () => {
+            if (typeof window !== 'undefined' && user) {
+                // Check for all required browser features
+                if ('Notification' in window && 'serviceWorker' in navigator && 'PushManager' in window) {
+                    try {
+                        // Dynamically import messaging modules only when needed
+                        const { getToken, onMessage } = await import("firebase/messaging");
+                        const { messaging } = await import("@/lib/firebase/clientApp");
+
+                        const permission = await Notification.requestPermission();
+                        if (permission === "granted") {
+                            console.log("Notification permission granted.");
+
+                            try {
+                                const currentToken = await getToken(messaging, {
+                                    vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY
+                                });
+
                                 if (currentToken) {
                                     console.log("FCM Token:", currentToken);
                                     try {
@@ -46,33 +60,35 @@ export const AuthProvider: React.FunctionComponent<AuthProviderProps> = ({
                                         console.error("Error saving FCM token:", error);
                                     }
                                 } else {
-                                    console.log("No registration token available. Request permission to generate one.");
+                                    console.log("No registration token available.");
                                 }
-                            })
-                            .catch((err) => {
-                                console.error("An error occurred while retrieving token. ", err);
-                            });
 
-                        unsubscribeMessaging = onMessage(messaging, (payload) => {
-                            console.log("Message received in foreground. ", payload);
-                            const notificationTitle = payload.notification?.title ?? "Nouveau Message";
-                            const notificationOptions = {
-                                body: payload.notification?.body ?? "",
-                                icon: payload.notification?.icon ?? "/favicon.ico",
-                            };
-                            new Notification(notificationTitle, notificationOptions);
-                        });
-
-                    } else {
-                        console.log("Unable to get permission to notify.");
+                                // Set up message handling
+                                unsubscribeMessaging = onMessage(messaging, (payload) => {
+                                    console.log("Message received in foreground. ", payload);
+                                    const notificationTitle = payload.notification?.title ?? "Nouveau Message";
+                                    const notificationOptions = {
+                                        body: payload.notification?.body ?? "",
+                                        icon: payload.notification?.icon ?? "/favicon.ico",
+                                    };
+                                    new Notification(notificationTitle, notificationOptions);
+                                });
+                            } catch (err) {
+                                console.error("Error setting up Firebase messaging:", err);
+                            }
+                        } else {
+                            console.log("Unable to get permission to notify.");
+                        }
+                    } catch (error) {
+                        console.error("Error loading Firebase messaging:", error);
                     }
-                }).catch((error) => {
-                    console.error("An error occurred while requesting permission. ", error);
-                });
-            } else {
-                console.log("Push messaging is not supported.");
+                } else {
+                    console.log("Push messaging is not supported on this browser.");
+                }
             }
-        }
+        };
+
+        setupMessaging();
 
         return () => {
             if (unsubscribeMessaging) {

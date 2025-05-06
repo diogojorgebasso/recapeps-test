@@ -1,5 +1,6 @@
-import { initializeApp } from "firebase/app";
-import { getMessaging, onBackgroundMessage } from "firebase/messaging/sw";
+// Service workers don't use ES module imports, use importScripts instead
+importScripts('https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/9.15.0/firebase-messaging-compat.js');
 
 const firebaseConfig = {
     apiKey: "AIzaSyCQL9kH3r-y4Q4PtzQ_t9lBJl5J3zuty7k",
@@ -11,20 +12,22 @@ const firebaseConfig = {
     measurementId: "G-9PK8PPVBSE"
 };
 
-const app = initializeApp(firebaseConfig);
-const messaging = getMessaging(app);
+// Initialize Firebase with compat version
+firebase.initializeApp(firebaseConfig);
+const messaging = firebase.messaging();
 
 console.log("Firebase messaging service worker initializing...");
 
-onBackgroundMessage(messaging, (payload) => {
+// Handle background messages
+messaging.onBackgroundMessage((payload) => {
     console.log("[firebase-messaging-sw.js] Received background message ", payload);
 
     // Customize notification here
-    const notificationTitle = payload.notification?.title ?? "Nouveau message";
+    const notificationTitle = payload.notification?.title || "Nouveau message";
     const notificationOptions = {
-        body: payload.notification?.body ?? "Vous avez un nouveau message",
-        icon: payload.notification?.icon ?? "/favicon.ico",
-        // TODO : You can add more options like 'data', 'actions', etc.
+        body: payload.notification?.body || "Vous avez un nouveau message",
+        icon: payload.notification?.icon || "/favicon.ico",
+        // You can add more options like 'data', 'actions', etc.
     };
 
     self.registration.showNotification(notificationTitle, notificationOptions);
