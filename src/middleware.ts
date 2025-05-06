@@ -24,8 +24,7 @@ const cookieSerializeOptions = {
 
 export async function middleware(request: NextRequest) {
     if (!firebaseApiKey || cookieSignatureKeys.length === 0) {
-        console.log('Firebase API key or cookie signature keys are missing.', configFirebase);
-        console.log('Cookie signature keys:', cookieSignatureKeys);
+        console.log('Cookie signature keys:', firebaseApiKey, cookieSignatureKeys);
         console.error('Missing Firebase configuration in environment variables.');
         return new Response('Internal Server Error: Missing configuration', { status: 500 });
     }
