@@ -45,6 +45,10 @@ export async function middleware(request: NextRequest) {
         handleValidToken: async ({ decodedToken }, headers) => {
             const isPro = decodedToken.pro === true;
 
+            if (PUBLIC_PATHS.includes(pathname)) {
+                return NextResponse.next();
+            }
+
             // Handle redirection after login
             const redirectPath = searchParams.get('redirect');
 
@@ -89,7 +93,7 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
     matcher: [
-        '/((?!_next/static|_next/image|favicon.ico|signin|register|reset-password|verify-email).*)',
+        '/((?!_next/static|_next/image|favicon.ico).*)',
         '/parcours/:path*',
         '/compte/:path*',
     ],

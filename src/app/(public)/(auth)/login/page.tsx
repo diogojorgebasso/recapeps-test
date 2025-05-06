@@ -20,7 +20,7 @@ import { useColorModeValue } from "@/components/ui/color-mode";
 import { login } from "./actions";
 import { signInWithGoogle } from "@/lib/firebase/auth";
 
-export default async function Page() {
+export default function Page() {
     const [state, action, pending] = useActionState(login, undefined)
 
     const handleGoogleLogin = async () => {
@@ -109,7 +109,7 @@ export default async function Page() {
                     </Button>
 
                     <Text mt={4} fontSize="sm" textAlign="center">
-                        Vous n'avez pas de compte ?{" "}
+                        Vous n&apos;avez pas de compte ?{" "}
                         <Link
                             href="/register"
                             color="blue.500"
