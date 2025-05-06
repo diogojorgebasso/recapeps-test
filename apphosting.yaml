@@ -26,5 +26,13 @@ env:
     availability:
       - RUNTIME
       - BUILD
-  - variable: FIREBASE_API_KEY
+  - variable: NEXT_PUBLIC_FIREBASE_API_KEY
     value: AIzaSyCQL9kH3r-y4Q4PtzQ_t9lBJl5J3zuty7k
+    availability:
+      - RUNTIME
+      - BUILD
+  - variable: NEXT_PUBLIC_FIREBASE_APP_CHECK_KEY
+    value: 6Lco8f4qAAAAAPFNsctWY6ASBbDBnWZ50v5jF9eP
+    availability:
+      - RUNTIME
+      - BUILD

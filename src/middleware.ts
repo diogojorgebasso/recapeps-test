@@ -7,7 +7,7 @@ import {
 const PUBLIC_PATHS = ['/'];
 const AUTH_PATHS = ['/forgot-password', '/login', '/register', '/verify-email'];
 
-const firebaseApiKey = process.env.FIREBASE_API_KEY;
+const firebaseApiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
 
 const cookieSignatureKeys = [
     process.env.AUTH_COOKIE_SIGNATURE_KEY_CURRENT!,
