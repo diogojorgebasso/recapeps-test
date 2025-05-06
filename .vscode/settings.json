@@ -4,7 +4,6 @@
         "source.fixAll": "always", // VSCode built-in fixes
         "source.fixAll.eslint": "always" // ESLint fixes
     },
-    // 2. Make sure ESLint is validating your files
     "eslint.validate": [
         "javascript",
         "javascriptreact",

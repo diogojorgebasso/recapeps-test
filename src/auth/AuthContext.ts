@@ -11,7 +11,7 @@ export interface User extends UserInfo {
 
 export interface AuthContextValue {
     user: User | null;
-    updatePhotoURLInContext: (photoURL: string) => Promise<boolean>;
+    updatePhotoURLInContext: () => Promise<boolean>;
 }
 
 export const AuthContext = createContext<AuthContextValue>({

@@ -1,5 +1,5 @@
 
-import { Box, Heading, Text, VStack, List, Separator, Flex, For, Stack, Table } from "@chakra-ui/react";
+import { Box, Heading, Text, VStack, List, Flex, Stack, Table } from "@chakra-ui/react";
 
 export default function Page() {
   return (

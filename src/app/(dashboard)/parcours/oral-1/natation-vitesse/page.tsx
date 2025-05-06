@@ -1,5 +1,5 @@
 
-import { Box, Heading, Text, VStack, List, Separator, Flex, For, Stack, Table } from "@chakra-ui/react";
+import { Box, Heading, Text, VStack, List, Flex, Stack, Table } from "@chakra-ui/react";
 
 export default function Page() {
   return (
@@ -17,7 +17,7 @@ export default function Page() {
           <List.Item>2. Vocabulaire spécifique</List.Item>
           <List.Item>3. Observables et conduites typiques</List.Item>
           <List.Item>4. Organisation d’un cycle – exemple</List.Item>
-          <List.Item>5. Situation d'apprenstissage</List.Item>
+          <List.Item>5. Situation d&apos;apprenstissage</List.Item>
           <List.Item>6. Sécurité</List.Item>
           <List.Item>7. Biomécanique</List.Item>
           <List.Item>8. Bonus</List.Item>
@@ -256,7 +256,7 @@ export default function Page() {
 
 
         <Box bg="teal.500" p={3} borderRadius="lg" w="full">
-          <Heading size="md" color="white">5. Situations d'apprentissage</Heading>
+          <Heading size="md" color="white">5. Situations d&apos;apprentissage</Heading>
         </Box>
 
         <Heading size="xl" fontWeight={"bold"}>Passer d’un élève qui respire de face à un élève qui respire latéralement:

@@ -5,8 +5,9 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ["@chakra-ui/react"]
   },
   eslint: {
-    ignoreDuringBuilds: true
-  }
+    dirs: ['src'],
+    ignoreDuringBuilds: true,
+  },
 };
 
 export default nextConfig;

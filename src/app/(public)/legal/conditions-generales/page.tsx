@@ -14,9 +14,9 @@ export default function Page() {
                 <Text>
                     Les présentes Conditions Générales de Vente (ci-après « CGV ») sont proposées par
                     Corentin FELDER (ci-après l’<strong>“Editeur”</strong>), entrepreneur individuel immatriculé sous le
-                    numéro SIREN 940609894 (ci-après l’<strong>“Entreprise”</strong>), domicilié 21 rue des Griottes, 68420
-                    Voegtlinshoffen, France. Ces CGV régissent exclusivement la relation entre l’Editeur
-                    exploitant le site <strong>recapeps.fr</strong>(ci-après le <strong>"Site"</strong>), et toute personne physique ou morale
+                    numéro SIREN 940609894 (ci-après l’<strong>“Entreprise”</strong>), domicilié 21 rue des Griottes, 68420
+                    Voegtlinshoffen, France. Ces CGV régissent exclusivement la relation entre l&apos;Editeur
+                    exploitant le site <strong>recapeps.fr</strong>(ci-après le <strong>&quot;Site&quot;</strong>), et toute personne physique ou morale
                     procédant à un achat sur le Site, ci-après dénommée « le Client ».
                 </Text>
 
