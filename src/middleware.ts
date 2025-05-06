@@ -45,7 +45,6 @@ export async function middleware(request: NextRequest) {
         handleValidToken: async ({ decodedToken }, headers) => {
             const isPro = decodedToken.pro === true;
 
-
             // Handle redirection after login
             const redirectPath = searchParams.get('redirect');
 

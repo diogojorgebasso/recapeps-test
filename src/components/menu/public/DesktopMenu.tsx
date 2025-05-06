@@ -1,18 +1,13 @@
-"use client";
-
 import {
     Box,
     Flex,
-    HStack,
     Text,
     Button,
     Menu,
     SimpleGrid,
-    Portal,
 } from "@chakra-ui/react";
 import { LuChevronDown, LuSparkles } from "react-icons/lu";
 import NextLink from "next/link";
-
 import ContextualAvatar from "./ContextualAvatar";
 import { ColorModeButton } from "@/components/ui/color-mode";
 
@@ -29,12 +24,12 @@ const NAV = [
 export default function DesktopMenu() {
     return (
         <Box
+            display={{ base: "none", md: "flex" }}
             as="header"
             pos="sticky"
             top={0}
-            bg="bg.canvas"
-            borderBottom="1px solid"
-            borderColor="border.default"
+            bg="gray.100"
+            _dark={{ bg: "gray.950" }}
             px={4}
             py={2}
             zIndex="sticky"
@@ -46,7 +41,6 @@ export default function DesktopMenu() {
                     </Text>
                 </NextLink>
 
-                {/* mega dropdown */}
                 <Menu.Root>
                     <Menu.Trigger asChild>
                         <Button
@@ -57,26 +51,23 @@ export default function DesktopMenu() {
                             <LuChevronDown />
                         </Button>
                     </Menu.Trigger>
-
-                    <Portal>
-                        <Menu.Positioner>
-                            <Menu.Content p={4} shadow="lg" rounded="md" maxW="lg">
-                                <SimpleGrid columns={2} gap={4}>
-                                    {NAV.map((item) => (
-                                        <Menu.Item value={item.label} key={item.href} asChild>
-                                            <NextLink href={item.href}>
-                                                <Text fontWeight="semibold">{item.label}</Text>
-                                            </NextLink>
-                                        </Menu.Item>
-                                    ))}
-                                    <Menu.Item value="checkout" asChild>
-                                        <LuSparkles />
-                                        <NextLink href="/checkout">Passer Pro</NextLink>
+                    <Menu.Positioner>
+                        <Menu.Content p={4} shadow="lg" rounded="md" maxW="lg">
+                            <SimpleGrid columns={2} gap={4}>
+                                {NAV.map((item) => (
+                                    <Menu.Item value={item.label} key={item.href} asChild>
+                                        <NextLink href={item.href}>
+                                            <Text fontWeight="semibold">{item.label}</Text>
+                                        </NextLink>
                                     </Menu.Item>
-                                </SimpleGrid>
-                            </Menu.Content>
-                        </Menu.Positioner>
-                    </Portal>
+                                ))}
+                                <Menu.Item value="checkout" asChild>
+                                    <LuSparkles />
+                                    <NextLink href="/checkout">Passer Pro</NextLink>
+                                </Menu.Item>
+                            </SimpleGrid>
+                        </Menu.Content>
+                    </Menu.Positioner>
                 </Menu.Root>
 
                 <NextLink href="/contact">

@@ -1,7 +1,6 @@
-"use client";
+'use client';
 
 import { submitContactForm } from "./action";
-import { useEffect } from "react";
 import {
     Box,
     Button,
@@ -13,31 +12,12 @@ import {
     Field
 } from "@chakra-ui/react";
 import { useActionState } from 'react'
-import { Toaster, toaster } from "@/components/ui/toaster"
 
-export default function Contact() {
+export default function Page() {
     const [state, action, pending] = useActionState(submitContactForm, undefined)
-
-    // Effect to show toast messages based on the server action state
-    useEffect(() => {
-        if (state?.success) {
-            toaster.create({
-                title: "Message Sent.",
-                description: state.message,
-                type: "success",
-            });
-        } else if (state?.error) {
-            toaster.create({
-                title: "Error.",
-                description: state.error,
-                type: "error",
-            });
-        }
-    }, [state]); // Depend on state and toast
 
     return (
         <>
-            <Toaster></Toaster>
             <Box
                 display="flex"
                 alignItems="center"

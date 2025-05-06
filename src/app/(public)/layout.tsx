@@ -1,17 +1,16 @@
-import { ReactNode, Suspense } from "react";
-import { Spinner } from "@chakra-ui/react";
+import { ReactNode } from "react";
 import DesktopMenu from "@/components/menu/public/DesktopMenu";
 import MobileMenu from "@/components/menu/public/MobileMenu";
+import Footer from "@/components/menu/public/Footer";
 
 export default async function PublicLayout({ children }: { children: ReactNode }) {
 
   return (
     <>
-      <Suspense fallback={<Spinner position="fixed" top={4} left={4} />}>
-        <DesktopMenu />
-        <MobileMenu />
-      </Suspense>
+      <DesktopMenu />
+      <MobileMenu />
       <main>{children} </main>
+      <Footer />
     </>
   );
 }

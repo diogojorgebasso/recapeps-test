@@ -1,11 +1,15 @@
-"use client";
-
-import { Box, HStack, Text } from "@chakra-ui/react";
+import { Box, HStack } from "@chakra-ui/react";
 import Link from "next/link";
-
+import { FaHome } from "react-icons/fa"; //home
+import { FaPencilAlt } from "react-icons/fa"; //ecrit 1
+import { FaPencilRuler } from "react-icons/fa"; //ecrit 2
+import { RxChatBubble } from "react-icons/rx"; //oral 1
+import { SlSpeech } from "react-icons/sl"
+import { FaRegUserCircle } from "react-icons/fa";
 export default function MobileMenu() {
     return (
         <Box
+            display={{ base: "block", md: "none" }}
             as="footer"
             pos="fixed"
             bottom={0}
@@ -16,21 +20,24 @@ export default function MobileMenu() {
             zIndex="sticky"
         >
             <HStack justify="space-around" py={2}>
-                {[
-                    { href: "/dashboard", label: "Tableau de bord" },
-                    { href: "/ecrit-1", label: "Écrit 1" },
-                    { href: "/ecrit-2", label: "Écrit 2" },
-                    { href: "/oral-1", label: "Oral 1" },
-                    { href: "/oral-3", label: "Oral 3" },
-                    { href: "/profil", label: "Profil" },
-                    { href: "/contact", label: "Contact" },
-                ].map((item) => (
-                    <Link key={item.href} href={item.href}>
-                        <Text fontSize="xs" fontWeight="semibold">
-                            {item.label}
-                        </Text>
-                    </Link>
-                ))}
+                <Link href="/parcours/dashboard">
+                    <FaHome size={24} />
+                </Link>
+                <Link href="/parcours/ecrit-1">
+                    <FaPencilAlt size={24} />
+                </Link>
+                <Link href="/parcours/ecrit-2">
+                    <FaPencilRuler size={24} />
+                </Link>
+                <Link href="/parcours/oral-1">
+                    <RxChatBubble size={24} />
+                </Link>
+                <Link href="/parcours/oral-3">
+                    <SlSpeech size={24} />
+                </Link>
+                <Link href="/compte/profil">
+                    <FaRegUserCircle size={24} />
+                </Link>
             </HStack>
         </Box>
     );

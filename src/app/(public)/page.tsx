@@ -19,18 +19,17 @@ import { FiBookOpen } from "react-icons/fi"
 import Logo from "@/components/ui/logo-recapeps";
 
 export default function Home() {
-
   return (
     <Box >
       <VStack alignItems="center" width="100%" textAlign="center">
         <Logo />
         <Heading as="h1" size="5xl" letterSpacing="tight">
           <Highlight query="RECAP'EPS" styles={{ color: "orange.600" }}>
-            Bienvenue sur RECAP'EPS
+            Bienvenue sur RECAP&apos;EPS
           </Highlight>
         </Heading>
         <Heading size={{ base: "xl", md: "2xl" }} as="h2">
-          Réussir ce n'est qu'une question d'entraînement, avec Recap'eps, s'entraîner n'a jamais été aussi facile 😎
+          Réussir ce n&apos;est qu&apos;une question d&apos;entraînement, avec Recap&apos;eps, s&apos;entraîner n&apos;a jamais été aussi facile 😎
         </Heading>
         <Stack
           direction={{ base: "column", md: "row" }}
@@ -87,7 +86,7 @@ export default function Home() {
                   Fiches de révision
                 </Card.Title>
                 <Text fontSize="xl">
-                  Nous t'avons fait une synthèse de tous les grands thèmes que tu risques de rencontrer au concours.
+                  Nous t&apos;avons fait une synthèse de tous les grands thèmes que tu risques de rencontrer au concours.
                 </Text>
               </Card.Body>
             </Card.Root>
@@ -112,7 +111,6 @@ export default function Home() {
               </Card.Body>
             </Card.Root>
           </LinkBox>
-
         </SimpleGrid>
       </Box>
     </Box>
