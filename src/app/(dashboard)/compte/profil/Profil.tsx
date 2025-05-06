@@ -257,7 +257,7 @@ export default function Profil() {
                                 <Dialog.Header>Confirmation</Dialog.Header>
                                 <Dialog.Body>
                                     <Text>
-                                        Si'l vous plait, confirmez votre email.
+                                        Si&apos;l vous plait, confirmez votre email.
                                     </Text>
                                 </Dialog.Body>
                                 <Dialog.Footer>
@@ -302,7 +302,7 @@ export default function Profil() {
                 {user?.customToken === "pro" ? (
                     <VStack align="start">
                         <Text>
-                            Vous bénéficiez d'un abonnement Recape'ps pro.
+                            Vous bénéficiez d&apos;un abonnement Recape&apos;ps pro.
                         </Text>
                         <Button
                             mt={4}
@@ -315,7 +315,7 @@ export default function Profil() {
                     </VStack>
                 ) : (
                     <Button asChild>
-                        <Link href="/checkout">Passer à Recap'eps pro</Link>
+                        <Link href="/checkout">Passer à Recap&apos;eps pro</Link>
                     </Button>
                 )}
             </Box>
