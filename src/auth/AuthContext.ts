@@ -17,7 +17,7 @@ export interface AuthContextValue {
 export const AuthContext = createContext<AuthContextValue>({
     user: null,
     updatePhotoURLInContext: async () => {
-        return false; // Default implementation, can be overridden
+        return false;
     },
 });
 

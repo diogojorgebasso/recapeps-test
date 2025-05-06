@@ -1,7 +1,7 @@
 import {
     AppCheck,
     initializeAppCheck,
-    ReCaptchaEnterpriseProvider,
+    ReCaptchaV3Provider,
 } from "@firebase/app-check";
 import { getFirebaseApp } from "./firebase";
 import { FirebaseApp } from "@firebase/app";
@@ -22,7 +22,7 @@ export function getOrInitializeAppCheck(app: FirebaseApp): AppCheck {
     }
 
     return (appCheck = initializeAppCheck(app, {
-        provider: new ReCaptchaEnterpriseProvider(
+        provider: new ReCaptchaV3Provider(
             process.env.NEXT_PUBLIC_FIREBASE_APP_CHECK_KEY!
         ),
         isTokenAutoRefreshEnabled: true, // Set to true to allow auto-refresh.
