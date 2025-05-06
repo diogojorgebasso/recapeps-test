@@ -6,12 +6,12 @@ runConfig:
   memoryMiB: 1024
 
 env:
-  - variable: COOKIE_SECRET_CURRENT
+  - variable: AUTH_COOKIE_SIGNATURE_KEY_CURRENT
     secret: COOKIE_SECRET_CURRENT
     availability:
       - RUNTIME
       - BUILD
-  - variable: COOKIE_SECRET_PREVIOUS
+  - variable: AUTH_COOKIE_SIGNATURE_KEY_PREVIOUS
     secret: COOKIE_SECRET_PREVIOUS
     availability:
       - RUNTIME
