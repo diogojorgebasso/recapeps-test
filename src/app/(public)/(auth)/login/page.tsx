@@ -24,7 +24,7 @@ import { signInWithGoogle } from "@/lib/firebase/auth";
 export default function Page() {
     const [state, action, pending] = useActionState(login, undefined);
 
-    const handleGoogleLogin = (event) => {
+    const handleGoogleLogin = (event: { preventDefault: () => void; }) => {
         event.preventDefault();
         signInWithGoogle();
     };
