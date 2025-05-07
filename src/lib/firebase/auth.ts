@@ -7,16 +7,18 @@ import {
   signInWithEmailAndPassword, // Added
   createUserWithEmailAndPassword, // Added
   updateProfile, // Added
-  sendPasswordResetEmail as firebaseSendPasswordResetEmail // Added and aliased
+  sendPasswordResetEmail as firebaseSendPasswordResetEmail, // Added and aliased
+  NextOrObserver,
+  User
 } from "firebase/auth";
 
 import { auth } from "@/lib/firebase/clientApp";
 
-export function onAuthStateChanged(cb) {
+export function onAuthStateChanged(cb: NextOrObserver<User>) {
   return _onAuthStateChanged(auth, cb);
 }
 
-export function onIdTokenChanged(cb) {
+export function onIdTokenChanged(cb: NextOrObserver<User>) {
   return _onIdTokenChanged(auth, cb);
 }
 

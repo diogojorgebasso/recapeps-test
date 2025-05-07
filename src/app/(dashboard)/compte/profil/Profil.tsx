@@ -32,7 +32,7 @@ import { handleEmailChange, updateUserName, isEmailNotificationEnabled, updateEm
 
 export default function Profil() {
 
-    const { user, updatePhotoURLInContext } = useAuth();
+    const { user, updatePhotoURLInContext, pro } = useAuth();
     const [newEmailNotification, setNewEmailNotification] = useState<boolean>(false);
 
     useEffect(() => {
@@ -299,7 +299,7 @@ export default function Profil() {
                 <Heading as="h3" size="md" mb={4}>
                     Mon abonnement
                 </Heading>
-                {user?.customToken === "pro" ? (
+                {pro ? (
                     <VStack align="start">
                         <Text>
                             Vous bénéficiez d&apos;un abonnement Recape&apos;ps pro.
