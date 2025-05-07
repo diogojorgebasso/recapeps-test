@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { AttemptQuiz, Quiz } from "@/types/Quiz";
-import { useAuth } from "@/auth/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { saveQuizResultsAction, saveQuizProgressAction } from "./actions";
 
 import {

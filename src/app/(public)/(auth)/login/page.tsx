@@ -23,26 +23,12 @@ import { signInWithGoogle } from "@/lib/firebase/auth";
 
 export default function Page() {
     const [state, action, pending] = useActionState(login, undefined);
-    const [isGoogleLoading, setIsGoogleLoading] = useState(false);
-    const [googleError, setGoogleError] = useState<string | null>(null);
 
-    const handleGoogleLogin = async () => {
-        setIsGoogleLoading(true);
-        setGoogleError(null);
-
-        try {
-            const result = await signInWithGoogle();
-            if (!result?.success) {
-                setGoogleError("Échec de la connexion avec Google. Veuillez réessayer.");
-            }
-            // No need to manually redirect - the middleware will handle this
-        } catch (error) {
-            console.error("Erreur lors de la connexion avec Google :", error);
-            setGoogleError("Une erreur est survenue lors de la connexion avec Google.");
-        } finally {
-            setIsGoogleLoading(false);
-        }
+    const handleGoogleLogin = (event) => {
+        event.preventDefault();
+        signInWithGoogle();
     };
+
 
     return (
         <Flex
@@ -116,18 +102,10 @@ export default function Page() {
                         w="full"
                         mt={4}
                         onClick={handleGoogleLogin}
-                        loading={isGoogleLoading}
-                        disabled={isGoogleLoading}
                     >
                         <FaGoogle />
                         Se connecter avec Google
                     </Button>
-
-                    {googleError && (
-                        <Text color="red.500" fontSize="sm" mt={2} textAlign="center">
-                            {googleError}
-                        </Text>
-                    )}
 
                     <Text mt={4} fontSize="sm" textAlign="center">
                         Vous n&apos;avez pas de compte ?{" "}

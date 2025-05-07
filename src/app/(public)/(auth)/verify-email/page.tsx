@@ -1,89 +1,165 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { sendEmailVerification } from 'firebase/auth';
-import { VStack, Heading, Text, Button, Spinner } from '@chakra-ui/react'; // Import Chakra components
-import { checkEmailVerified } from './actions'; // Import the server action
-import { useAuth } from '@/auth/AuthContext';
-import { redirect } from 'next/navigation';
-import { auth } from '@/lib/firebase/clientApp'; // Import the auth instance
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { sendEmailVerification, User as FirebaseUser } from "firebase/auth"; // Import User as FirebaseUser
+import { auth } from "@/lib/firebase/clientApp";
+import {
+    Box,
+    Button,
+    Container,
+    Heading,
+    Text,
+    VStack,
+    HStack,
+    Alert,
+    AlertTitle,
+    AlertDescription,
+    Spinner,
+    List,
+} from "@chakra-ui/react";
 
-export default function VerifyEmailPage() {
-    const { user } = useAuth()
+export default function VerifyEmail() {
+    const [user, setUser] = useState<FirebaseUser | null>(null); // Typed user state
+    const [loading, setLoading] = useState(true);
+    const [message, setMessage] = useState('');
+    const [isSending, setIsSending] = useState(false);
+    const [isChecking, setIsChecking] = useState(false);
+    const router = useRouter();
 
-    const [sentAgain, setSentAgain] = useState(false);
-    const [checking, setChecking] = useState(false);
-    const [error, setError] = useState<string | null>(null); // Optional: add error state
+    useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+            setLoading(false);
 
-    async function handleCheckVerified() {
-        if (!user) return;
-        setChecking(true);
-        setError(null);
-
-        try {
-
-            const isServerVerified = await checkEmailVerified();
-
-            if (isServerVerified) {
-                await auth?.currentUser?.reload();
-                redirect('/'); // ✅ Rediriger
-            } else {
-                // Optional: Inform user if server says still not verified
-                setError("L'adresse e-mail n'est pas encore vérifiée. Veuillez vérifier votre boîte de réception ou réessayer.");
-                // Consider reloading client state here too in case of race conditions
-                await auth?.currentUser?.reload();
+            if (!currentUser) {
+                router.push('/');
+                return;
             }
-        } catch (err) {
-            console.error("Verification check failed:", err);
-            setError("Une erreur s'est produite lors de la vérification.");
+
+            if (currentUser.emailVerified) {
+                router.push('/');
+                return;
+            }
+
+            setUser(currentUser);
+        });
+
+        return () => unsubscribe();
+    }, [router]);
+
+    const handleSendVerificationEmail = async () => {
+        if (!user) return;
+        setIsSending(true);
+        setMessage('');
+        try {
+            await sendEmailVerification(user);
+            setMessage('Verification email sent! Please check your inbox.'); // Keep for non-toast display if needed
+        } catch (error: any) {
+            setMessage(`Error sending verification email: ${error.message}`);
         } finally {
-            setChecking(false);
+            setIsSending(false);
         }
+    };
+
+    const checkVerificationStatus = async () => {
+        if (!user) return;
+        setIsChecking(true);
+        setMessage('');
+        try {
+            await user.reload();
+            // It's important to get the fresh user instance from auth.currentUser
+            const refreshedUser = auth.currentUser;
+
+            if (refreshedUser && refreshedUser.emailVerified) {
+                setMessage('Email verified successfully! Redirecting...');
+                setTimeout(() => router.push('/'), 1500);
+            } else {
+                setMessage('Email not verified yet. Please check your inbox and click the verification link.');
+            }
+        } catch (error: any) {
+            setMessage(`Error checking verification status: ${error.message}`);
+        } finally {
+            setIsChecking(false);
+        }
+    };
+
+    if (loading) {
+        return (
+            <Container centerContent py={10}>
+                <Spinner size="xl" />
+                <Text mt={4}>Loading...</Text>
+            </Container>
+        );
     }
 
-    async function handleResendEmail() {
-        if (auth.currentUser) {
-            try {
-                await sendEmailVerification(auth.currentUser);
-                setSentAgain(true);
-                setError(null);
-            } catch (err) {
-                console.error("Failed to resend email:", err);
-                setError("Échec de l'envoi de l'e-mail.");
-            }
-        }
+    if (!user) {
+        // This case should ideally be handled by the redirect in useEffect,
+        // but as a fallback or if loading is very fast:
+        return (
+            <Container centerContent py={10}>
+                <Text>Redirecting...</Text>
+            </Container>
+        );
     }
 
     return (
-        <VStack as="main" gap={4} p={8} textAlign="center" align="center">
-            <Heading as="h1" size="lg" fontWeight="bold">
-                Vérifiez votre adresse e-mail
-            </Heading>
-            <Text>
-                Nous venons d'envoyer un lien à <strong>{auth?.currentUser?.email}</strong>. <br />
-                Cliquez dessus, puis revenez et appuyez sur le bouton ci-dessous.
-            </Text>
+        <Container maxW="container.md" py={10} textAlign="center">
+            <VStack gap={6} align="stretch">
+                <Heading as="h1" size="xl">
+                    Email Verification Required
+                </Heading>
+                <Text>
+                    Your email address needs to be verified before you can fully access our services.
+                </Text>
+                <Text>
+                    A verification email has been sent to: <Text as="strong">{user.email}</Text>
+                </Text>
 
-            {error && <Text color="red.500">{error}</Text>}
+                <HStack gap={4} justifyContent="center" my={8}>
+                    <Button
+                        onClick={handleSendVerificationEmail}
+                        colorScheme="blue"
+                        loading={isSending}
+                        loadingText="Sending..."
+                    >
+                        Resend Verification Email
+                    </Button>
+                    <Button
+                        onClick={checkVerificationStatus}
+                        colorScheme="green"
+                        loading={isChecking}
+                        loadingText="Checking..."
+                    >
+                        I've Verified My Email
+                    </Button>
+                </HStack>
 
-            <Button
-                onClick={handleCheckVerified}
-                colorScheme="blue"
-                loading={checking}
-                spinner={<Spinner size="sm" />}
-                loadingText="Vérification…"
-            >
-                J'ai vérifié mon adresse
-            </Button>
+                {message && (
+                    <Alert.Root status={message.toLowerCase().includes('error') ? 'error' : 'info'} borderRadius="md">
+                        <Alert.Indicator />
+                        <Box flex="1">
+                            <AlertTitle>
+                                {message.toLowerCase().includes('error') ? 'Error!' : 'Notification'}
+                            </AlertTitle>
+                            <AlertDescription display="block">
+                                {message}
+                            </AlertDescription>
+                        </Box>
+                    </Alert.Root>
+                )}
 
-            <Button
-                disabled={sentAgain}
-                onClick={handleResendEmail}
-                size="sm"
-                mt={2}
-            >
-                {sentAgain ? 'Lien renvoyé !' : 'Renvoyer l\'e-mail'}
-            </Button>
-        </VStack>
+                <Box textAlign="left" p={4} borderWidth="1px" borderRadius="md">
+                    <Heading as="h2" size="md" mb={3}>
+                        Instructions:
+                    </Heading>
+                    <List.Root gap={2}>
+                        <List.Item>Check your email inbox (and spam folder) for a verification link from us.</List.Item>
+                        <List.Item>Click on the verification link in the email.</List.Item>
+                        <List.Item>After verifying, return here and click the "I've Verified My Email" button above.</List.Item>
+                        <List.Item>If you don't receive an email or the link has expired, click "Resend Verification Email".</List.Item>
+                    </List.Root>
+                </Box>
+            </VStack>
+        </Container>
     );
 }

@@ -12,16 +12,24 @@ import {
     Text
 } from "@chakra-ui/react";
 import SkillTreeClient from "./SkillTreeClient";
-import { headers } from "next/headers";
 import { getProgressOverview } from "@/repositories/quizRepo";
 import { QuizTrail } from "@/types/Quiz";
 import { Suspense } from "react";
+import { getAuthenticatedAppForUser } from "@/lib/firebase/serverApp";
+import { getIdTokenResult } from "firebase/auth";
+import { redirect } from "next/navigation";
 
 export default async function Page() {
-    const isPro = (await headers()).get("X-User-Pro") === "true";
-    const userId = (await headers()).get("X-User-Id") || "";
-    const progressData = await getProgressOverview(userId, 1);
+    const { user } = await getAuthenticatedAppForUser();
+
+    if (!user) {
+        redirect("/login?redirect=/parcours/ecrit-1");
+    }
+
+    const progressData = await getProgressOverview(user.uid, 1);
     const quizNodesArray: QuizTrail[] = progressData ? Object.values(progressData) : [];
+    const idTokenResult = await getIdTokenResult(user);
+    const isPro = !idTokenResult.claims.pro
 
     return (
         <>

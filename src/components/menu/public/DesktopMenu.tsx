@@ -5,9 +5,11 @@ import {
     Button,
     Menu,
     SimpleGrid,
+    HStack,
+    Portal
 } from "@chakra-ui/react";
 import { LuChevronDown, LuSparkles } from "react-icons/lu";
-import NextLink from "next/link";
+import Link from "next/link";
 import ContextualAvatar from "./ContextualAvatar";
 import { ColorModeButton } from "@/components/ui/color-mode";
 
@@ -34,52 +36,56 @@ export default function DesktopMenu() {
             py={2}
             zIndex="sticky"
         >
-            <Flex align="center" gap={8}>
-                <NextLink href="/">
-                    <Text fontSize="lg" fontWeight="bold">
-                        Recap’eps
-                    </Text>
-                </NextLink>
+            <Flex justify="space-between" gap={8}>
+                <HStack>
+                    <Link href="/">
+                        <Text fontSize="lg" fontWeight="bold">
+                            Recap’eps
+                        </Text>
+                    </Link>
 
-                <Menu.Root>
-                    <Menu.Trigger asChild>
-                        <Button
-                            variant="ghost"
-                            fontWeight="bold"
-                        >
-                            Fonctionnalités
-                            <LuChevronDown />
-                        </Button>
-                    </Menu.Trigger>
-                    <Menu.Positioner>
-                        <Menu.Content p={4} shadow="lg" rounded="md" maxW="lg">
-                            <SimpleGrid columns={2} gap={4}>
-                                {NAV.map((item) => (
-                                    <Menu.Item value={item.label} key={item.href} asChild>
-                                        <NextLink href={item.href}>
-                                            <Text fontWeight="semibold">{item.label}</Text>
-                                        </NextLink>
-                                    </Menu.Item>
-                                ))}
-                                <Menu.Item value="checkout" asChild>
-                                    <LuSparkles />
-                                    <NextLink href="/checkout">Passer Pro</NextLink>
-                                </Menu.Item>
-                            </SimpleGrid>
-                        </Menu.Content>
-                    </Menu.Positioner>
-                </Menu.Root>
+                    <Menu.Root>
+                        <Menu.Trigger asChild>
+                            <Button
+                                variant="ghost"
+                                fontWeight="bold"
+                            >
+                                Fonctionnalités
+                                <LuChevronDown />
+                            </Button>
+                        </Menu.Trigger>
+                        <Portal>
+                            <Menu.Positioner>
+                                <Menu.Content p={4} shadow="lg" rounded="md" maxW="lg">
+                                    <SimpleGrid columns={2} gap={4}>
+                                        {NAV.map((item) => (
+                                            <Menu.Item value={item.label} key={item.href} asChild>
+                                                <Link href={item.href}>
+                                                    <Text fontWeight="semibold">{item.label}</Text>
+                                                </Link>
+                                            </Menu.Item>
+                                        ))}
+                                        <Menu.Item value="checkout" asChild>
+                                            <LuSparkles />
+                                            <Link href="/checkout">Passer Pro</Link>
+                                        </Menu.Item>
+                                    </SimpleGrid>
+                                </Menu.Content>
+                            </Menu.Positioner>
+                        </Portal>
+                    </Menu.Root>
 
-                <NextLink href="/contact">
-                    <Text fontSize="lg" fontWeight="bold">
-                        Contact
-                    </Text>
-                </NextLink>
+                    <Link href="/contact">
+                        <Text fontSize="lg" fontWeight="bold">
+                            Contact
+                        </Text>
+                    </Link>
+                </HStack>
 
-                <Flex ml="auto" align="center" gap={4}>
+                <HStack ml="auto" gap={4}>
                     <ContextualAvatar />
                     <ColorModeButton />
-                </Flex>
+                </HStack>
             </Flex>
         </Box>
     );

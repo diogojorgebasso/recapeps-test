@@ -19,7 +19,7 @@ import {
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { FaDownload } from "react-icons/fa";
 import { FaChevronLeft } from "react-icons/fa6";
-import { useAuth } from "@/auth/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { useRouter, useParams } from "next/navigation";
 
 interface TranscriptionData {

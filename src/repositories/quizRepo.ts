@@ -114,8 +114,8 @@ export async function createAttempt(
 }
 
 // Update return type and add type assertion
-export async function getProgressOverview(uid: string, numberOfEcrit: number): Promise<Record<string, QuizTrail> | null> {
-    const progressOverviewRef = doc(db, "users", uid, `ecrit-${numberOfEcrit}`, "progressOverview");
+export async function getProgressOverview(uid: string | undefined, numberOfEcrit: number): Promise<Record<string, QuizTrail> | null> {
+    const progressOverviewRef = doc(db, "users", `${uid}/ecrit-${numberOfEcrit}/progressOverview`);
     const progressOverviewSnapshot = await getDoc(progressOverviewRef);
     if (progressOverviewSnapshot.exists()) {
         // Assert the data type
@@ -131,7 +131,7 @@ export async function getProgressOverview(uid: string, numberOfEcrit: number): P
 export async function findCompletedAttempts(uid: string, numberOfEcrit: number, limitResult: number = 5): Promise<AttemptQuiz[]> {
     try {
         // Assuming attempts are stored per-subject (ecrit-X)
-        const userAttemptsRef = collection(db, "users", uid, `ecrit-${numberOfEcrit}`);
+        const userAttemptsRef = collection(db, "users", uid, `ecrit - ${numberOfEcrit}`);
 
         const completedQuizzesQuery = query(
             userAttemptsRef,

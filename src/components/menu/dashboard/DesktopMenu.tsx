@@ -26,7 +26,7 @@ import {
 } from "react-icons/lu";
 import { useState } from "react";
 import { signOut } from "@/lib/firebase/auth";
-import { useAuth } from "@/auth/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { SimpleColorModeButton } from "@/components/ui/color-mode";
 
 const ITEMS = [
@@ -221,7 +221,6 @@ export default function DesktopMenu() {
                 <SimpleColorModeButton my="5" />
             </VStack>
 
-            {/* render overlays */}
             <TourViewport />
         </>
     );

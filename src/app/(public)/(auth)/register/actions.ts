@@ -39,10 +39,6 @@ export async function register(state: SignUpState, formData: FormData) {
     }
 
     try {
-        await signUpWithEmailAndPassword(
-            validatedFields.data.email,
-            validatedFields.data.password
-        );
 
         // User created successfully, now attempt to login them in on the client
         // Or handle session creation server-side if preferred

@@ -1,17 +1,10 @@
 import { createContext, useContext } from 'react';
-import { UserInfo } from 'firebase/auth';
-import { Claims } from 'next-firebase-auth-edge/lib/auth/claims';
-
-export interface User extends UserInfo {
-    idToken: string;
-    customToken?: string;
-    emailVerified: boolean;
-    customClaims: Claims;
-}
+import { User } from 'firebase/auth';
 
 export interface AuthContextValue {
     user: User | null;
     updatePhotoURLInContext: (photoURL: string) => Promise<boolean>;
+    pro: boolean;
 }
 
 export const AuthContext = createContext<AuthContextValue>({
@@ -19,6 +12,8 @@ export const AuthContext = createContext<AuthContextValue>({
     updatePhotoURLInContext: async () => {
         return false;
     },
+    pro: false,
 });
 
 export const useAuth = () => useContext(AuthContext);
+
