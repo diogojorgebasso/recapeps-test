@@ -1,6 +1,6 @@
 "use server";
 
-import { signIn } from "@/lib/firebase/auth"; // Use the client-side helper
+import { signInWithEmail } from "@/lib/firebase/auth"; // Use the client-side helper
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
@@ -42,7 +42,7 @@ export async function login(state: LoginState, formData: FormData) {
         // For true server-side session management, you'd typically use the Admin SDK
         // to verify an ID token passed from the client after Firebase auth.
         // However, for simplicity matching the original structure, we use the helper.
-        const userCredential = await signIn(validatedFields.data.email, validatedFields.data.password);
+        const userCredential = await signInWithEmail(validatedFields.data.email, validatedFields.data.password);
 
         if (!userCredential) {
             // Handle case where signIn might return undefined/null based on its implementation

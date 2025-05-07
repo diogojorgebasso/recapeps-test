@@ -7,7 +7,7 @@ import {
   signInWithEmailAndPassword, // Added
   createUserWithEmailAndPassword, // Added
   updateProfile, // Added
-  User
+  sendPasswordResetEmail as firebaseSendPasswordResetEmail // Added and aliased
 } from "firebase/auth";
 
 import { auth } from "@/lib/firebase/clientApp";
@@ -100,6 +100,17 @@ export async function registerWithEmailAndPassword(
     return user;
   } catch (error) {
     console.error("Error registering user with email and password", error);
+    throw error; // Re-throw the error to be handled by the caller
+  }
+}
+
+// Function to send a password reset email
+export async function sendPasswordResetEmail(email: string): Promise<void> {
+  try {
+    await firebaseSendPasswordResetEmail(auth, email);
+    console.log("Password reset email sent to", email);
+  } catch (error) {
+    console.error("Error sending password reset email", error);
     throw error; // Re-throw the error to be handled by the caller
   }
 }

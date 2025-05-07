@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { signUpWithEmailAndPassword } from "@/lib/firebase/auth";
+import { signInWithEmail } from "@/lib/firebase/auth";
 
 const SignUpSchema = z.object({
     email: z.string().email({ message: "Email invalide." }),
@@ -39,9 +39,8 @@ export async function register(state: SignUpState, formData: FormData) {
     }
 
     try {
-
-        // User created successfully, now attempt to login them in on the client
-        // Or handle session creation server-side if preferred
+        const { email, password } = validatedFields.data;
+        await signInWithEmail(email, password);
 
     } catch (error: any) {
         console.error("Firebase Admin SDK error:", error);

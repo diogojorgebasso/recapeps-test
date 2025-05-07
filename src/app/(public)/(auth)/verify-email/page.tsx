@@ -130,7 +130,7 @@ export default function VerifyEmail() {
                         loading={isChecking}
                         loadingText="Checking..."
                     >
-                        I've Verified My Email
+                        I&apos;ve Verified My Email
                     </Button>
                 </HStack>
 
@@ -156,7 +156,7 @@ export default function VerifyEmail() {
                         <List.Item>Check your email inbox (and spam folder) for a verification link from us.</List.Item>
                         <List.Item>Click on the verification link in the email.</List.Item>
                         <List.Item>After verifying, return here and click the "I've Verified My Email" button above.</List.Item>
-                        <List.Item>If you don't receive an email or the link has expired, click "Resend Verification Email".</List.Item>
+                        <List.Item>If you don&apos;t receive an email or the link has expired, click "Resend Verification Email".</List.Item>
                     </List.Root>
                 </Box>
             </VStack>
