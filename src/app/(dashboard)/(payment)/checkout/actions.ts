@@ -1,22 +1,19 @@
-'use server'
-
 import { db } from '@/lib/firebase/clientApp';
 import { stripe } from '@/lib/stripe'
-import { headers } from 'next/headers';
 import { doc, getDoc } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 
 export async function fetchClientSecret(priceId: string) {
-    const userId = (await headers()).get('X-User-ID'); // Get the specific header value
-
-    if (!userId) {
-        throw new Error("User ID not found in headers.");
+    const user = getAuth().currentUser; // Get the current user from Firebase Auth
+    if (!user) {
+        throw new Error("User ID not found.");
     }
 
-    const userDocRef = doc(db, 'users', userId);
+    const userDocRef = doc(db, 'users', user.uid); // Reference to the user's document in Firestore
     const userSnapshot = await getDoc(userDocRef); // Fetch the document snapshot
 
-    if (!userSnapshot.exists) {
-        throw new Error(`User document with ID ${userId} not found.`);
+    if (!userSnapshot.exists()) {
+        throw new Error(`User document with ID ${user.uid} not found.`);
     }
 
     const userData = userSnapshot.data(); // Get the data from the snapshot
@@ -32,14 +29,14 @@ export async function fetchClientSecret(priceId: string) {
         customer = existingCustomers.data[0];
         // Optionally update customer metadata if needed
         await stripe.customers.update(customer.id, {
-            metadata: { firebaseUID: userId },
+            metadata: { firebaseUID: user.uid },
         });
     } else {
         // Create a new customer if not found
         customer = await stripe.customers.create({
             email: userData?.email,
             name: userData?.name,
-            metadata: { firebaseUID: userId },
+            metadata: { firebaseUID: user.uid },
         });
     }
 
@@ -55,7 +52,7 @@ export async function fetchClientSecret(priceId: string) {
         ],
         mode: "subscription",
         return_url: "https://recapeps.fr/return?session_id={CHECKOUT_SESSION_ID}",
-        metadata: { firebaseUID: userId },
+        metadata: { firebaseUID: user.uid },
     });
 
     return session.client_secret

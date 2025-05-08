@@ -1,8 +1,7 @@
 "use client";
 import React, { createContext, useEffect, useState } from "react";
 import { messaging } from "@/lib/firebase/clientApp";
-import { onMessage } from "firebase/messaging";
-import { Messaging } from "firebase/messaging";
+import { onMessage, Messaging } from "firebase/messaging";
 import { ReactNode } from "react";
 
 export const PushNotificationsContext = createContext<Messaging | null>(null);

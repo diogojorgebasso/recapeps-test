@@ -22,8 +22,11 @@ import { FiBookOpen } from "react-icons/fi"
 import Logo from "@/components/ui/logo-recapeps";
 import QuizComponent1 from "./quiz1";
 import QuizComponent2 from "./quiz2";
+import JsxParser from 'react-jsx-parser';
 
 export default function Home() {
+  const chakraString = "<Text color='red.500'>Alert!</Text>";
+
   return (
     <Box >
       <VStack alignItems="center" width="100%" textAlign="center">
@@ -139,6 +142,10 @@ export default function Home() {
         </SimpleGrid>
 
         <Box p={4}>
+          <JsxParser
+            components={{ Text: (props) => <Text {...props} /> }}
+            jsx={chakraString}
+          />
 
           <VStack align="stretch" mt={12} gap={12} padding={6}>
             <Text>
