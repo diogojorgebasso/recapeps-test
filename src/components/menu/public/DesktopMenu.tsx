@@ -15,11 +15,10 @@ import { ColorModeButton } from "@/components/ui/color-mode";
 
 /* route data lives right here for easy editing */
 const NAV = [
-    { href: "/dashboard", label: "Tableau de bord" },
-    { href: "/ecrit-1", label: "Écrit 1" },
-    { href: "/ecrit-2", label: "Écrit 2" },
-    { href: "/oral-1", label: "Oral 1" },
-    { href: "/oral-3", label: "Oral 3" },
+    { href: "parcours/ecrit-1", label: "Écrit 1" },
+    { href: "parcours/ecrit-2", label: "Écrit 2" },
+    { href: "parcours/oral-1", label: "Oral 1" },
+    { href: "parcours/oral-3", label: "Oral 3" },
 ] as const;
 
 /** sticky top-bar shown ≥ 768 px */
@@ -58,13 +57,13 @@ export default function DesktopMenu() {
                             <Menu.Positioner>
                                 <Menu.Content p={4} shadow="lg" rounded="md" maxW="lg">
                                     <SimpleGrid columns={2} gap={4}>
-                                        {NAV.map((item) => (
-                                            <Menu.Item value={item.label} key={item.href} asChild>
-                                                <Link href={item.href}>
-                                                    <Text fontWeight="semibold">{item.label}</Text>
-                                                </Link>
-                                            </Menu.Item>
-                                        ))}
+
+                                        <Menu.Item value="dashboard" asChild>
+                                            <Link href="/dashboard">
+                                                <Text fontWeight="semibold">Tableau de bord</Text>
+                                            </Link>
+                                        </Menu.Item>
+
                                         <Menu.Item value="checkout" asChild>
                                             <Link href="/checkout"><LuSparkles />Passer Pro</Link>
                                         </Menu.Item>
@@ -73,6 +72,12 @@ export default function DesktopMenu() {
                             </Menu.Positioner>
                         </Portal>
                     </Menu.Root>
+
+                    <Link href="/a-propos">
+                        <Text fontSize="lg" fontWeight="bold">
+                            À propos
+                        </Text>
+                    </Link>
 
                     <Link href="/contact">
                         <Text fontSize="lg" fontWeight="bold">

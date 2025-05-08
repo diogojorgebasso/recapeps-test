@@ -23,11 +23,6 @@ import { signInWithGoogle } from "@/lib/firebase/auth";
 export default function ClientComponent() {
     const [state, action, pending] = useActionState(login, undefined);
 
-    const handleGoogleLogin = (event: { preventDefault: () => void; }) => {
-        event.preventDefault();
-        signInWithGoogle();
-    };
-
     return (
         <Flex
             height="100vh"
@@ -99,7 +94,7 @@ export default function ClientComponent() {
                         variant="outline"
                         w="full"
                         mt={4}
-                        onClick={handleGoogleLogin}
+                        onClick={() => signInWithGoogle()}
                     >
                         <FaGoogle />
                         Se connecter avec Google

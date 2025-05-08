@@ -17,12 +17,12 @@ export default function Page() {
                 <Text>
                     La présente Politique de Confidentialité vise à informer les utilisateurs de <strong>recapeps.fr</strong>(ci -
                     après le <strong>&quot;Site&quot;</strong>) de la manière dont sont collectées, utilisées et protégées leurs données
-                    personnelles.Nous invitons l'Utilisateur à prendre connaissance de la présente politique de
+                    personnelles.Nous invitons l&apos;Utilisateur à prendre connaissance de la présente politique de
                     confidentialité de manière régulière, celle - ci pouvant être amenée à changer.Nous nous
                     engageons à respecter la confidentialité et la protection des données conformément
                     au <strong>Règlement Général sur la Protection des Données(RGPD)</strong>.<br />
                     Par la suite, sont considérées comme données personnelles toute information permettant
-                    d'identifier un Utilisateur.Il peut s'agir de ses noms et prénoms, âge, adresse postale ou
+                    d'identifier un Utilisateur.Il peut s&apos;agir de ses noms et prénoms, âge, adresse postale ou
                     électronique, de sa localisation ou encore de son adresse IP(liste non - exhaustive)
                     Toute personne physique se connectant ou utilisant le Site reconnaît expressément avoir pris
                     connaissance de notre politique de confidentialité et de protection des données
@@ -35,7 +35,7 @@ export default function Page() {
                     des données personnelles
                 </Heading>
                 <Text>
-                    Conformément à l'article 5 du Règlement européen 2016 / 679, les données à caractère
+                    Conformément à l&apos;article 5 du Règlement européen 2016 / 679, les données à caractère
                     personnel sont:<br /><br />
                     <List.Root ps="5">
                         <List.Item>
@@ -162,7 +162,7 @@ export default function Page() {
                 </Heading>
                 <Text>
                     Les données sont stockées sur les serveurs sécurisés de <strong>Google Firebase</strong>, qui peuvent être
-                    situés en dehors de l'Union européenne(ex : États - Unis).
+                    situés en dehors de l&apos;Union européenne(ex : États - Unis).
                     Google assure un niveau de protection conforme au RGPD, notamment via des clauses
                     contractuelles types et des mesures de sécurité avancées.
                     Des mesures techniques et organisationnelles sont en place pour protéger au mieux les

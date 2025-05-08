@@ -10,6 +10,7 @@ import { getAuthenticatedAppForUser } from "@/lib/firebase/serverApp";
 
 export default async function MobileMenu() {
     const { user } = await getAuthenticatedAppForUser();
+
     if (!user) {
         return null; // or redirect to login page
     }

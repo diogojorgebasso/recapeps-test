@@ -139,14 +139,6 @@ export default function Home() {
         </SimpleGrid>
 
         <Box p={4}>
-          <VStack gap={6} mb={8} textAlign="center">
-            <Heading as="h1" size="2xl" color="orange.600">
-              Démo
-            </Heading>
-            <Text fontSize="xl">
-              Voici un petit aperçu du type de contenu disponible sur Recapeps !
-            </Text>
-          </VStack>
 
           <VStack align="stretch" mt={12} gap={12} padding={6}>
             <Text>

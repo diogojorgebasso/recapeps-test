@@ -10,27 +10,21 @@ import {
     Fieldset,
     Field,
     Button,
-    Checkbox,
+    HStack,
+    Separator,
 } from "@chakra-ui/react";
+import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
 import { FaGoogle } from "react-icons/fa";
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { PasswordInput } from "@/components/ui/password-input";
 import { register } from "./actions";
-import { signInWithGoogle } from "@/lib/firebase/auth";
+import { signUpWithGoogle } from "@/lib/firebase/auth"; // Updated import
 import { useActionState } from "react";
 
 export default function Register() {
 
     const [state, action, pending] = useActionState(register, undefined)
-
-    const handleGoogleSignUp = async () => {
-        try {
-            await signInWithGoogle(); //two awaits.
-        } catch (error) {
-            console.error("Erreur lors de la connexion avec Google :", (error as Error).message);
-        }
-    };
 
     return (
         <Flex
@@ -82,12 +76,10 @@ export default function Register() {
                                 </Field.Root>
 
                                 <Field.Root required>
-                                    <Checkbox.Root defaultChecked>
-                                        <Checkbox.Indicator />
-                                        <Checkbox.Label>J’ai lu et j’accepte la <Link href="/legal/politique-confidentialite"> Politique de Confidentialité.</Link></Checkbox.Label>
-                                    </Checkbox.Root>
+                                    <Checkbox>J&apos;ai lu et j&apos;accept la<Link href="/legal/politique-confidentialite">Politique de Confidentialité</Link></Checkbox>
                                 </Field.Root>
                             </Fieldset.Root>
+
 
                             <Button
                                 type="submit"
@@ -101,24 +93,30 @@ export default function Register() {
                         </Stack>
                     </form>
 
+                    <HStack>
+                        <Separator flex="1" />
+                        <Text flexShrink="0">ou</Text>
+                        <Separator flex="1" />
+                    </HStack>
+
                     <Button
                         variant="outline"
                         w="full"
                         mt={4}
-                        onClick={handleGoogleSignUp}
+                        onClick={() => signUpWithGoogle()}
                     >
                         <FaGoogle />
                         S&apos;inscrire avec Google
                     </Button>
 
                     <Text mt={4} fontSize="sm" textAlign="center">
-                        Vous avez déjà un compte ?{" "}
+                        Vous avez déjà un compte ?
                         <Link href="/login">
                             Connectez-vous
                         </Link>
                     </Text>
                 </Card.Body>
             </Card.Root>
-        </Flex>
+        </Flex >
     );
 }

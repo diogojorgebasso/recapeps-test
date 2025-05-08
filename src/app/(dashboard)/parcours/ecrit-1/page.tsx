@@ -27,6 +27,9 @@ export default async function Page() {
         redirect("/login?redirect=/parcours/ecrit-1");
     }
 
+    console.log("user", user);
+    console.log("isPro", isPro);
+
     const progressData = await getProgressOverview(user.uid, 1);
     const quizNodesArray: QuizTrail[] = progressData ? Object.values(progressData) : [];
 

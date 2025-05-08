@@ -13,6 +13,7 @@ import {
 } from "firebase/auth";
 
 import { auth } from "@/lib/firebase/clientApp";
+import { redirect } from "next/navigation";
 
 export function onAuthStateChanged(cb: NextOrObserver<User>) {
   return _onAuthStateChanged(auth, cb);
@@ -35,9 +36,36 @@ export async function signInWithGoogle() {
       console.log("Verification email sent to", user.email);
     }
 
-    return user;
+    redirect("/parcours/dashboard");
   } catch (error) {
     console.error("Error signing in with Google", error);
+    throw error;
+  }
+}
+
+export async function signUpWithGoogle() {
+  const provider = new GoogleAuthProvider();
+
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+
+    // Always send a verification email during sign-up process
+    if (user) {
+      // For Google sign-up, email is typically already verified,
+      // but we can still check and send if needed
+      if (!user.emailVerified) {
+        await sendEmailVerification(user);
+        console.log("Verification email sent to", user.email);
+      }
+
+      // You could add additional registration-specific logic here
+      // For example, adding the user to a "new users" collection in Firestore
+    }
+
+    redirect("/parcours/dashboard");
+  } catch (error) {
+    console.error("Error signing up with Google", error);
     throw error;
   }
 }

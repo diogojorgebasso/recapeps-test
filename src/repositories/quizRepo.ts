@@ -115,7 +115,11 @@ export async function createAttempt(
 
 // Update return type and add type assertion
 export async function getProgressOverview(uid: string | undefined, numberOfEcrit: number): Promise<Record<string, QuizTrail> | null> {
-    const progressOverviewRef = doc(db, "users", `${uid}/ecrit-${numberOfEcrit}/progressOverview`);
+    if (!uid) {
+        return null; // Return early if uid is undefined
+    }
+
+    const progressOverviewRef = doc(db, "users", uid, `ecrit-${numberOfEcrit}`, "progressOverview");
     const progressOverviewSnapshot = await getDoc(progressOverviewRef);
     if (progressOverviewSnapshot.exists()) {
         // Assert the data type
