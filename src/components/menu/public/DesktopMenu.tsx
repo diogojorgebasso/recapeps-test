@@ -12,16 +12,11 @@ import { LuChevronDown, LuSparkles } from "react-icons/lu";
 import Link from "next/link";
 import ContextualAvatar from "./ContextualAvatar";
 import { ColorModeButton } from "@/components/ui/color-mode";
+import { FaPencilAlt, FaPencilRuler } from "react-icons/fa";
+import { RxChatBubble } from "react-icons/rx";
+import { SlSpeech } from "react-icons/sl";
+import Logo from "@/components/ui/logo-recapeps";
 
-/* route data lives right here for easy editing */
-const NAV = [
-    { href: "parcours/ecrit-1", label: "Écrit 1" },
-    { href: "parcours/ecrit-2", label: "Écrit 2" },
-    { href: "parcours/oral-1", label: "Oral 1" },
-    { href: "parcours/oral-3", label: "Oral 3" },
-] as const;
-
-/** sticky top-bar shown ≥ 768 px */
 export default function DesktopMenu() {
     return (
         <Box
@@ -35,12 +30,10 @@ export default function DesktopMenu() {
             py={2}
             zIndex="sticky"
         >
-            <Flex justify="space-between" gap={8}>
-                <HStack>
+            <Flex justify="space-between" width="100%" gap={8}>
+                <HStack gap={8}>
                     <Link href="/">
-                        <Text fontSize="lg" fontWeight="bold">
-                            Recap’eps
-                        </Text>
+                        <Logo />
                     </Link>
 
                     <Menu.Root>
@@ -57,13 +50,23 @@ export default function DesktopMenu() {
                             <Menu.Positioner>
                                 <Menu.Content p={4} shadow="lg" rounded="md" maxW="lg">
                                     <SimpleGrid columns={2} gap={4}>
-
                                         <Menu.Item value="dashboard" asChild>
-                                            <Link href="/dashboard">
+                                            <Link href="/parcours/dashboard">
                                                 <Text fontWeight="semibold">Tableau de bord</Text>
                                             </Link>
                                         </Menu.Item>
-
+                                        <Menu.Item value="ecrit-1" asChild>
+                                            <Link href="/parcours/ecrit-1"><FaPencilAlt />Écrit 1</Link>
+                                        </Menu.Item>
+                                        <Menu.Item value="ecrit-2" asChild>
+                                            <Link href="/parcours/ecrit-2"><FaPencilRuler />Écrit 2</Link>
+                                        </Menu.Item>
+                                        <Menu.Item value="oral-1" asChild>
+                                            <Link href="/parcours/oral-1"><RxChatBubble />Oral 1</Link>
+                                        </Menu.Item>
+                                        <Menu.Item value="oral-3" asChild>
+                                            <Link href="/parcours/oral-3"><SlSpeech />Oral 3</Link>
+                                        </Menu.Item>
                                         <Menu.Item value="checkout" asChild>
                                             <Link href="/checkout"><LuSparkles />Passer Pro</Link>
                                         </Menu.Item>
