@@ -1,328 +1,209 @@
-'use client'
+/*  QuizComponent.tsx  */
+"use client";
 
-import { useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
-import { AttemptQuiz, Quiz } from "@/types/Quiz";
-import { useAuth } from "@/contexts/Auth/useAuth";
-import { saveQuizResultsAction, saveQuizProgressAction } from "./actions";
-import { db } from "@/lib/firebase/clientApp";
 import {
-  Box,
-  Button,
-  Card,
-  CardBody,
-  Heading,
-  Text,
-  Stack,
-  Center,
-  Progress,
-  Flex,
+  Box, Button, Card, Heading, Text, Stack, Center,
+  Progress, Flex, Accordion,
 } from "@chakra-ui/react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
-import { Toaster, toaster } from "@/components/ui/toaster"
-import { doc } from "firebase/firestore";
+import { AttemptQuiz, AttemptedQuestion, QuizAttemptDonePayload } from "@/types/Quiz";
+import { useAuth } from "@/contexts/Auth/useAuth";
+import { saveQuizResultsAction } from "./actions";
+import { Toaster, toaster } from "@/components/ui/toaster";
 
+/* ──────────────────────────────────────────────────────────── *
+ *  1 ▸   STATE MACHINE ENUM
+ * ──────────────────────────────────────────────────────────── */
 enum QuizState {
   QUESTION_DISPLAY,
-  FEEDBACK_DISPLAY,
+  QUESTION_FEEDBACK,
   QUIZ_COMPLETED,
 }
 
-
-export default function QuizComponent({
-  quiz,
-}: { quiz: Quiz | AttemptQuiz }) {
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [score, setScore] = useState(0);
-  const [selectedAnswerIds, setSelectedAnswerIds] = useState<string[]>([]);
-  const [isSaving, setIsSaving] = useState(false);
-
-  // State machine
-  const [quizState, setQuizState] = useState<QuizState>(
-    quiz.questions.length > 0 ? QuizState.QUESTION_DISPLAY : QuizState.QUIZ_COMPLETED
-  );
-
-  // State for timing
-  const [questionStartTime, setQuestionStartTime] = useState<number>(Date.now());
-  const [quizResults, setQuizResults] = useState([]);
-
+/* ──────────────────────────────────────────────────────────── *
+ *  2 ▸   MAIN COMPONENT
+ * ──────────────────────────────────────────────────────────── */
+export default function QuizComponent({ quiz }: { quiz: AttemptQuiz }) {
   const { user } = useAuth();
   const router = useRouter();
 
-  const handleSaveResults = useCallback(async () => {
-    if (!quiz.id || !user) {
-      console.error("Missing subjectId or user for saving.");
-      toaster.create({
-        title: "Erreur: Impossible de sauvegarder les résultats.",
-        type: "error",
-      });
+  const [idx, setIdx] = useState(quiz.lastQuestion ?? 0);
+  const [score, setScore] = useState(quiz.score ?? 0);
+  const [sel, setSel] = useState<string[]>([]);
+  const [state, setState] = useState<QuizState>(
+    quiz.questions.length ? QuizState.QUESTION_DISPLAY : QuizState.QUIZ_COMPLETED,
+  );
+  const [start, setStart] = useState(Date.now());
+  const [results, setResults] = useState<AttemptedQuestion[]>([]);
+  const [saving, setSaving] = useState(false);
+
+  const currentQ = quiz.questions[idx];
+  const progress = ((idx + 1) / quiz.questions.length) * 100;
+
+  /* ───────────────────────────────────────────────────── *
+   *  3 ▸  HELPERS
+   * ───────────────────────────────────────────────────── */
+  const colour = (answerId: string, isCorrect: boolean) => {
+    /** Before feedback → blue for selected, gray otherwise                */
+    if (state === QuizState.QUESTION_DISPLAY) {
+      return sel.includes(answerId) ? "blue" : "gray";
+    }
+    /** After feedback → traffic-light palette                             */
+    if (isCorrect) return "green";
+    if (sel.includes(answerId) && !isCorrect) return "red";
+    return "gray";
+  };
+
+  const buildAttempt = (time: number): AttemptedQuestion => ({
+    ...currentQ,
+    userSelectedAnswerId: sel,
+    isSelectionCorrect: currentQ.answers
+      .filter(a => a.isCorrect)
+      .every(a => sel.includes(a.id)),
+    timeSpentOnQuestion: time,
+  });
+
+  /* ───────────────────────────────────────────────────── *
+   *  4 ▸  CHECK ANSWER  (first click)
+   * ───────────────────────────────────────────────────── */
+  const handleCheck = () => {
+    const time = Date.now() - start;
+    const attempt = buildAttempt(time);
+
+    setResults(prev => [...prev, attempt]);
+
+    if (attempt.isSelectionCorrect) setScore(s => s + 1);
+    setState(QuizState.QUESTION_FEEDBACK);
+  };
+
+  /* ───────────────────────────────────────────────────── *
+   *  5 ▸  NEXT QUESTION  (second click)
+   * ───────────────────────────────────────────────────── */
+  const handleNext = async () => {
+
+    if (idx + 1 < quiz.questions.length) {
+      setIdx(i => i + 1);
+      setSel([]);
+      setStart(Date.now());
+      setState(QuizState.QUESTION_DISPLAY);
       return;
     }
-    setIsSaving(true);
-    try {
-      const payload = {
-        id: quiz.id,
-        score: score,
-        totalQuestions: quiz.questions.length,
-        questions: quizResults,
-        quizRef: doc(db, "ecrit-1", quiz.id),
-      };
-      const result = await saveQuizResultsAction(payload);
 
-      if (result.success) {
-        console.log("Quiz results saved successfully via server action.", result);
-      } else {
-        toaster.create({
-          title: "Erreur lors de la sauvegarde du quiz.",
-          description: result.error,
-          type: "error",
-        });
-      }
-    } catch (error) {
-      toaster.create({
-        title: "Erreur technique lors de la sauvegarde.",
-        type: "error",
-      });
-    } finally {
-      setIsSaving(false);
-    }
-  }, [quiz.id, score, quiz.questions.length, quizResults, user]);
+    /* ─── All done → save once ───────────────────────── */
+    setState(QuizState.QUIZ_COMPLETED);
+    setSaving(true);
 
-  const handleSelectOption = (answerId: string) => {
-    if (quizState !== QuizState.QUESTION_DISPLAY) return;
-    setSelectedAnswerIds([answerId]);
-  };
-
-  const handleValidation = () => {
-    setQuizState(QuizState.FEEDBACK_DISPLAY);
-  };
-
-  const handleNextQuestion = () => {
-    const timeSpent = Date.now() - questionStartTime;
-    const currentQuestion = quiz.questions[currentQuestionIndex];
-
-    // Add result for the current question
-    const newResult = {
-      questionId: currentQuestion.id,
-      selectedAnswer: selectedAnswerIds.map(id => parseInt(id)), // Convert string IDs to numbers
-      timeSpent: timeSpent,
+    const payload: QuizAttemptDonePayload = {
+      id: quiz.id,
+      score,
+      questions: results as AttemptedQuestion[],
     };
-    setQuizResults(prevResults => [...prevResults, newResult]);
 
-    // Check if answer is correct
-    const isAnswerCorrect = currentQuestion.answers
-      .filter(answer => selectedAnswerIds.includes(answer.id))
-      .every(answer => answer.isCorrect);
+    const { success, error } = await saveQuizResultsAction(payload);
+    setSaving(false);
 
-    const areAllCorrectAnswersSelected = currentQuestion.answers
-      .filter(answer => answer.isCorrect)
-      .every(answer => selectedAnswerIds.includes(answer.id));
-
-    if (isAnswerCorrect && areAllCorrectAnswersSelected) {
-      setScore((prevScore) => prevScore + 1);
-    }
-
-    // Move to next question or finish
-    const nextQuestionIndex = currentQuestionIndex + 1;
-    if (nextQuestionIndex < quiz.questions.length) {
-      setCurrentQuestionIndex(nextQuestionIndex);
-      setSelectedAnswerIds([]);
-      setQuizState(QuizState.QUESTION_DISPLAY);
-      setQuestionStartTime(Date.now());
-    } else {
-      setQuizState(QuizState.QUIZ_COMPLETED);
-      handleSaveResults();
-    }
+    success
+      ? toaster.create({ title: "Résultats enregistrés !", type: "success" })
+      : toaster.create({ title: "Erreur d'enregistrement", description: error, type: "error" });
   };
 
-  const handleSaveForLater = async () => {
-    if (!quiz.id || !user) return;
-    setIsSaving(true);
-    toaster.create({
-      title: "Sauvegarde en cours...",
-      type: "info"
-    });
-
-    const timeSpentCurrent = Date.now() - questionStartTime;
-    const currentResultsSnapshot = [
-      ...quizResults,
-      // Include current question's partial result if needed
-    ];
-
-    try {
-      const result = await saveQuizProgressAction(
-        1,
-        quiz.id,
-        currentQuestionIndex,
-        score,
-        currentResultsSnapshot
-      );
-      if (result.success) {
-        toaster.create({
-          title: "Progrès sauvegardé (fonctionnalité à venir)!",
-          type: "success",
-        });
-      } else {
-        toaster.create({
-          title: "Erreur lors de la sauvegarde.",
-          description: result.error,
-          type: "error",
-        });
-      }
-    }
-    catch (error) {
-      toaster.create({
-        title: "Erreur technique lors de la sauvegarde.",
-        type: "error",
-      });
-    }
-    finally {
-      setIsSaving(false);
-    }
-  };
-
-  if (quiz.questions.length === 0) {
+  /* ───────────────────────────────────────────────────── *
+   *  6 ▸  RENDER END-OF-QUIZ CARD
+   * ───────────────────────────────────────────────────── */
+  if (state === QuizState.QUIZ_COMPLETED) {
     return (
-      <Center w={"100%"} h={"100vh"} >
-        <Text fontSize="lg" > Aucune question disponible pour ce quiz.</Text>
-        <Button ml={4} onClick={() =>
-          router.back()}> Retour
-        </Button>
-      </Center >
-    );
-  }
-
-  if (quizState === QuizState.QUIZ_COMPLETED) {
-    return (
-      <Center w="100%" h="100vh" p={4} >
-        <Card.Root maxW="md" w="full" boxShadow="lg" >
-          <CardBody p={4}>
-            <Heading size="md" mb={4} > Quiz terminé! </Heading>
-            <Text fontSize="lg" mb={2} >
-              Score: {score}/{quiz.questions.length}
-            </Text>
-            <Text mb={4} >
-              {score === quiz.questions.length
-                ? "Parfait! Vous avez répondu correctement à toutes les questions."
-                : `Vous avez obtenu ${(score / quiz.questions.length * 100).toFixed(0)}% de réponses correctes.`
-              }
-            </Text>
-            <Button
-              width="full"
-              mt={6}
-              colorPalette="blue"
-              onClick={() => router.push("/ecrit-1")}
-              loading={isSaving}
-            >
+      <Center h="100vh" p={4}>
+        <Card.Root maxW="md" w="full">
+          <Card.Body>
+            <Heading size="md" mb={4}>Quiz terminé !</Heading>
+            <Text mb={2}>Score&nbsp;: {score}/{quiz.questions.length}</Text>
+            <Button w="full" mt={6} onClick={() => router.back()} disabled={saving}>
               Retour aux sujets
             </Button>
-          </CardBody>
+          </Card.Body>
         </Card.Root>
       </Center>
     );
   }
 
-  // Active Quiz State
-  const currentQuestion = quiz.questions[currentQuestionIndex];
-  const progress = ((currentQuestionIndex + 1) / quiz.questions.length) * 100;
-  const showFeedback = quizState === QuizState.FEEDBACK_DISPLAY;
-
+  /* ───────────────────────────────────────────────────── *
+   *  7 ▸  QUESTION VIEW
+   * ───────────────────────────────────────────────────── */
   return (
     <>
       <Toaster />
-      <Box
-        minH="100vh"
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        p={4}
-      >
-        <Card.Root maxW="2xl" w="full" boxShadow="lg" position="relative" >
-          <CardBody>
-            <Heading size="md" mb={4} >{currentQuestion.question}</Heading>
-            <Stack gap={4} >
-              {currentQuestion.answers.map((answer) => {
-                const isCorrect = answer.isCorrect;
-                const isSelected = selectedAnswerIds.includes(answer.id);
+      <Box minH="100vh" display="flex" alignItems="center" justifyContent="center" p={4}>
+        <Card.Root maxW="2xl" w="full">
+          <Card.Body>
+            <Heading size="md" mb={4}>{currentQ.question}</Heading>
 
-                let colorPalette = "gray";
-                if (showFeedback) {
-                  if (isCorrect) colorPalette = "green";
-                  else if (isSelected && !isCorrect) colorPalette = "red";
-                } else if (isSelected) {
-                  colorPalette = "blue";
-                }
-
-                return (
-                  <Button
-                    key={answer.id}
-                    colorPalette={colorPalette}
-                    variant={isSelected || showFeedback ? "solid" : "outline"}
-                    onClick={() => handleSelectOption(answer.id)}
-                    textAlign="left"
-                    whiteSpace="normal"
-                    wordBreak="break-word"
-                    disabled={showFeedback || isSaving}
-                    width="100%"
-                    minH={16}
-                    p={4}
-                    justifyContent="flex-start"
-                    height="auto"
-                  >
-                    {answer.answer}
-                  </Button>
-                );
-              })}
+            <Stack gap={3}>
+              {currentQ.answers.map(a => (
+                <Button key={a.id}
+                  variant={sel.includes(a.id) ? "solid" : "outline"}
+                  colorScheme={colour(a.id, a.isCorrect)}
+                  justifyContent="flex-start"
+                  whiteSpace="normal"
+                  onClick={() => state === QuizState.QUESTION_DISPLAY && setSel([a.id])}
+                >
+                  {a.answer}
+                </Button>
+              ))}
             </Stack>
 
-            {/* Show explanation when in feedback mode */}
-            {showFeedback && currentQuestion.explanation && (
-              <Box mt={4} p={3} bg="blue.50" borderRadius="md">
-                <Text fontWeight="bold">Explication:</Text>
-                <Text>{currentQuestion.explanation}</Text>
-              </Box>
+            {/* Feedback accordion */}
+            {state === QuizState.QUESTION_FEEDBACK && currentQ.explanation && (
+              <Accordion.Root>
+                <Accordion.Item value="feedback">
+                  <Accordion.ItemTrigger>
+                    <h2>Explication</h2>
+                    <Accordion.ItemIndicator />
+                  </Accordion.ItemTrigger>
+                  <Accordion.ItemBody>
+                    {currentQ.explanation}
+                  </Accordion.ItemBody>
+                </Accordion.Item>
+              </Accordion.Root>
             )}
 
-            {/* Progress Bar */}
+            {/* Footer: progress + buttons */}
             <Box mt={6}>
-              <Flex justify="space-between" mb={1} >
-                <Text fontSize="xs" color="gray.600" >
-                  Question {currentQuestionIndex + 1} / {quiz.questions.length}
+              <Flex justify="space-between" mb={1}>
+                <Text fontSize="xs" color="gray.600">
+                  Question {idx + 1} / {quiz.questions.length}
                 </Text>
-                <Text fontSize="xs" color="gray.600" >
-                  {progress.toFixed(0)} %
-                </Text>
+                <Text fontSize="xs" color="gray.600">{progress.toFixed(0)} %</Text>
               </Flex>
-              <Progress.Root value={progress} size="sm" borderRadius="md" colorPalette="blue" >
+              <Progress.Root value={progress} size="sm" borderRadius="md" colorPalette="blue">
                 <Progress.Track />
               </Progress.Root>
             </Box>
 
-            {/* Action Buttons */}
-            <Flex mt={6} direction={{ base: "column", sm: "row" }} gap={3} >
-              <Button
-                flex={1}
-                colorPalette="gray"
-                variant="outline"
-                onClick={handleSaveForLater}
-                loading={isSaving}
-                disabled={isSaving || showFeedback}
-              >
-                Sauvegarder pour plus tard
-              </Button>
-              <Button
-                flex={2}
-                colorPalette="blue"
-                disabled={selectedAnswerIds.length === 0 || isSaving}
-                loading={isSaving && showFeedback}
-                onClick={showFeedback ? handleNextQuestion : handleValidation}
-              >
-                {showFeedback ? "Question Suivante" : "Valider"}
-              </Button>
+            <Flex mt={6} direction={{ base: "column", sm: "row" }} gap={3}>
+              {/* Left button is either “Vérifier” or “Continuer” */}
+              {state === QuizState.QUESTION_DISPLAY ? (
+                <Button
+                  flex={2} colorScheme="blue"
+                  onClick={handleCheck}
+                  disabled={sel.length === 0}
+                >
+                  Vérifier
+                </Button>
+              ) : (
+                <Button
+                  flex={2} colorScheme="blue"
+                  onClick={handleNext}
+                  loading={saving}
+                >
+                  {idx + 1 === quiz.questions.length ? "Terminer le quiz" : "Question suivante"}
+                </Button>
+              )}
             </Flex>
-          </CardBody>
+          </Card.Body>
         </Card.Root>
-      </Box>
+      </Box >
     </>
   );
 }

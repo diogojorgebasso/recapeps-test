@@ -1,6 +1,6 @@
 import { db } from "@/lib/firebase/clientApp";
 import { doc } from "firebase/firestore";
-import { AttemptQuiz, QuizState, Question } from "@/types/Quiz"; // Added Question
+import { AttemptQuiz, QuizState, Question, QuizDone } from "@/types/Quiz"; // Added Question
 import {
     findActiveAttempt, fetchBaseQuiz,
     createAttempt, findCompletedAttempts, fetchUserWrongQuestionIds
@@ -66,6 +66,7 @@ export async function getQuizForAttempt(numberOfEcrit: number, quizId: string, u
             state: "doing" as QuizState,
             questions: questionsForAttempt, // Use the carefully selected questions
             score: 0,
+            lastQuestion: 0,
             premium: baseQuiz.premium,
         };
 
@@ -82,7 +83,7 @@ export async function getQuizForAttempt(numberOfEcrit: number, quizId: string, u
 /**
  * Fetches the history of completed quiz attempts for a user.
  */
-export async function getQuizHistory(uid: string, numberOfEcrit: number, limit: number = 5): Promise<AttemptQuiz[]> {
+export async function getQuizHistory(uid: string, numberOfEcrit: number, limit: number = 5): Promise<QuizDone[]> {
     try {
         const history = await findCompletedAttempts(uid, numberOfEcrit, limit);
         return history;

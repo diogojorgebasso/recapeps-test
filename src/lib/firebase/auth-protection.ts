@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { getAuthenticatedAppForUser } from "@/lib/firebase/serverApp";
 
 export async function requireAuth() {
-    const { user } = await getAuthenticatedAppForUser();
+    const { user, isPro } = await getAuthenticatedAppForUser();
 
     if (!user) {
         redirect("/");
@@ -15,5 +15,5 @@ export async function requireAuth() {
         redirect("/verify-email");
     }
 
-    return user;
+    return { user, isPro };
 }

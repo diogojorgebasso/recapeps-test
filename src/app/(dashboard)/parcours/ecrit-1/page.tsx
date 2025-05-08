@@ -14,7 +14,7 @@ import {
 import SkillTreeClient from "./SkillTreeClient";
 import { getProgressOverview } from "@/repositories/quizRepo";
 
-import { QuizTrail } from "@/types/Quiz";
+import { QuizTrail } from "@/types/TreeSkill";
 import { Suspense } from "react";
 
 import { getAuthenticatedAppForUser } from "@/lib/firebase/serverApp";
@@ -28,7 +28,6 @@ export default async function Page() {
     }
 
     const progressData = await getProgressOverview(user.uid, 1);
-    console.log("progressData", progressData);
     const quizNodesArray: QuizTrail[] = progressData ? Object.values(progressData) : [];
 
     return (

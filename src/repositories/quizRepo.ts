@@ -1,6 +1,7 @@
 import { Timestamp } from "firebase-admin/firestore";
 
-import { Quiz, Question, AttemptQuiz, QuizTrail, QuizDone } from "@/types/Quiz";
+import { Quiz, Question, AttemptQuiz, QuizDone } from "@/types/Quiz";
+import { QuizTrail } from "@/types/TreeSkill";
 import { db } from "@/lib/firebase/serverApp";
 
 /**
@@ -65,8 +66,6 @@ export async function fetchBaseQuiz(numberOfEcrit: number, quizId: string): Prom
  */
 export async function fetchUserWrongQuestionIds(numberOfEcrit: number, quizId: string, uid: string): Promise<Set<string>> {
     try {
-
-
         const answeredQuestionsRef = db.collection("users").doc(uid).collection(`ecrit-${numberOfEcrit}`);
         const q = answeredQuestionsRef
             .where("state", "==", "completed")
@@ -79,13 +78,9 @@ export async function fetchUserWrongQuestionIds(numberOfEcrit: number, quizId: s
 
         querySnapshot.forEach((doc) => {
             const attemptData = doc.data();
-            if (attemptData && attemptData.questions && Array.isArray(attemptData.questions)) {
-                const questionsInAttempt = attemptData.questions as Array<{ id: string; isCorrect: boolean;[key: string]: any }>;
-                for (const question of questionsInAttempt) {
-                    if (typeof question.id === 'string' && typeof question.isCorrect === 'boolean') {
-                        latestQuestionCorrectness.set(question.id, question.isCorrect);
-                    }
-                }
+            const questionsInAttempt = attemptData.questions;
+            for (const question of questionsInAttempt) {
+                latestQuestionCorrectness.set(question.id, question.isSelectionCorrect);
             }
         });
 
