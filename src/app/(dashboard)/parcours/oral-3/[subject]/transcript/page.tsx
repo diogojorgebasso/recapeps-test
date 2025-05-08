@@ -194,6 +194,7 @@ export default function Transcription() {
                         )}
                     </CardBody>
                 </Card.Root>
+                <Text></Text>
             </VStack>
         </Container>
     );

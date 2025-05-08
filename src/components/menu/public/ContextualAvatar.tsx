@@ -7,9 +7,9 @@ import {
     Button,
     Portal,
 } from "@chakra-ui/react";
-import NextLink from "next/link";
+import Link from "next/link";
 import {
-    LuBadge, LuBell, LuSparkles, LuLogOut, LuLogIn,
+    LuBadge, LuSparkles, LuLogOut, LuLogIn,
 } from "react-icons/lu";
 import { signOut } from "@/lib/firebase/auth";
 import { useAuth } from "@/contexts/AuthContext";
@@ -21,12 +21,12 @@ const ring = defineStyle({
 });
 
 export default function ContextualAvatar() {
-    const { user } = useAuth();
+    const { user, pro } = useAuth();
 
     if (!user) {
         return (
             <Button asChild size="sm">
-                <NextLink href="/login">Se connecter</NextLink>
+                <Link href="/login">Se connecter</Link>
             </Button>
         );
     }
@@ -44,15 +44,14 @@ export default function ContextualAvatar() {
                 <Menu.Positioner>
                     <Menu.Content w="56">
                         <Menu.Item value="profil" asChild >
-                            <LuBadge />
-                            <NextLink href="/profil">Profil</NextLink>
+                            <Link href="/profil"><LuBadge />Profil</Link>
                         </Menu.Item>
                         <Menu.Separator />
-                        <Menu.Item value="checkout" asChild >
-                            <LuSparkles />
-                            <NextLink href="/checkout">Passer Pro</NextLink>
-                        </Menu.Item>
-                        <Menu.Separator />
+                        {!pro && (
+                            <Menu.Item value="checkout" asChild >
+                                <Link href="/checkout"><LuSparkles />Passer Pro</Link>
+                            </Menu.Item>)}
+                        < Menu.Separator />
                         <Menu.Item value="logout" onClick={signOut}>
                             <LuLogOut />
                             Déconnexion

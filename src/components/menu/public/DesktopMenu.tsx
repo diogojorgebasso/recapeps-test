@@ -66,8 +66,7 @@ export default function DesktopMenu() {
                                             </Menu.Item>
                                         ))}
                                         <Menu.Item value="checkout" asChild>
-                                            <LuSparkles />
-                                            <Link href="/checkout">Passer Pro</Link>
+                                            <Link href="/checkout"><LuSparkles />Passer Pro</Link>
                                         </Menu.Item>
                                     </SimpleGrid>
                                 </Menu.Content>
@@ -82,7 +81,7 @@ export default function DesktopMenu() {
                     </Link>
                 </HStack>
 
-                <HStack ml="auto" gap={4}>
+                <HStack gap={4}>
                     <ContextualAvatar />
                     <ColorModeButton />
                 </HStack>

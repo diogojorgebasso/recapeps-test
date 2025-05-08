@@ -28,7 +28,10 @@ import { httpsCallable } from "firebase/functions";
 import { functions } from "@/lib/firebase/clientApp";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
-import { handleEmailChange, updateUserName, isEmailNotificationEnabled, updateEmailNotificationPreference } from "./actions";
+import {
+    handleEmailChange, updateUserName,
+    isEmailNotificationEnabled, updateEmailNotificationPreference
+} from "./actions";
 
 export default function Profil() {
 
