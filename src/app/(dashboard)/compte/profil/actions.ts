@@ -1,4 +1,4 @@
-'use server'
+'use client'
 
 import { getAuth, } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';

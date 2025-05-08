@@ -52,10 +52,6 @@ export async function login(state: LoginState, formData: FormData) {
             };
         }
 
-        // Login successful - redirect happens client-side via AuthProvider usually,
-        // but we can redirect server-side too.
-        // The AuthProvider's onIdTokenChanged should handle setting cookies.
-
     } catch (error: any) {
         console.error("Firebase login error:", error);
         const errorMessage = "Identifiants incorrects ou erreur serveur.";
