@@ -1,4 +1,3 @@
-// app/docs/layout.tsx
 import { ReactNode } from "react";
 import { Box, Flex, VStack } from "@chakra-ui/react";
 import Link from "next/link";

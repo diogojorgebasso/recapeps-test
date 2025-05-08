@@ -13,9 +13,9 @@ import {
 import { requireAuth } from '@/lib/firebase/auth-protection';
 
 export default async function QuizHistoryPage() {
-    const user = await requireAuth();
+    const { user } = await requireAuth();
     let error: string | null = null;
-    const quizHistory = await findCompletedAttempts(user?.uid, 1, 10);
+    const quizHistory = await findCompletedAttempts(user.uid, 1, 10);
 
     return (
         <Container maxW="container.lg" p={4}>

@@ -6,7 +6,7 @@ import {
 } from '@chakra-ui/react';
 import Link from 'next/link';
 
-import { QuizTrail } from '@/types/Quiz';
+import { QuizTrail } from '@/types/TreeSkill';
 import { use } from 'react';
 
 const COLOUR: Record<QuizTrail['state'], string> = {
