@@ -5,30 +5,38 @@ import {
     EmbeddedCheckoutProvider
 } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
-
-import { fetchClientSecret } from './actions'
+import { httpsCallable } from 'firebase/functions'
+import { functions } from '@/lib/firebase/clientApp'
+import { useCallback } from 'react'
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '')
 
 export default function Checkout({ priceId }: { priceId: string }) {
 
-
     if (!priceId) {
         throw new Error('Please provide a valid priceId (`price_1...`)')
     }
 
-    async function fetchClientSecretFallback() {
-        const clientSecret = await fetchClientSecret(priceId)
-        if (!clientSecret) {
-            throw new Error('Failed to fetch client secret.')
+    const fetchClientSecret = useCallback(async () => {
+        const createSession = httpsCallable<
+            { priceId: string },
+            string
+        >(functions, 'createstripecheckoutsession');
+
+        try {
+            const { data: clientSecret } = await createSession({ priceId });
+            return clientSecret;
+        } catch (err: any) {
+            throw err;
         }
-        return clientSecret
-    }
+    }, [priceId]);
+
+
 
     return (
         <EmbeddedCheckoutProvider
             stripe={stripePromise}
-            options={{ fetchClientSecret: fetchClientSecretFallback }}
+            options={{ fetchClientSecret }}
         >
             <EmbeddedCheckout />
         </EmbeddedCheckoutProvider>

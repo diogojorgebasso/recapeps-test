@@ -2,7 +2,7 @@
 import { redirect } from 'next/navigation'
 import { Box, Text, Link } from '@chakra-ui/react' // Import Chakra UI components
 
-import { stripe } from '@/app/api/stripe/route'; // Adjust the import path as necessary
+import { stripe } from '@/lib/stripe'; // Adjust the import path as necessary
 
 export default async function Return({
     searchParams
@@ -32,7 +32,7 @@ export default async function Return({
                     We appreciate your business{customer_details?.name}! A confirmation email will be sent to{' '}
                     {customer_details?.email}. If you have any questions, please email{' '}
                 </Text>
-                <Link href="mailto:orders@example.com">orders@example.com</Link>. {/* Use Link for anchor */}
+                <Link href="mailto:suport@recapeps.fr">suport@recapeps.fr</Link>. {/* Use Link for anchor */}
             </Box>
         )
     }
