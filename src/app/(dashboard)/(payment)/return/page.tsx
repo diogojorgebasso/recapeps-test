@@ -1,7 +1,8 @@
+"use server";
 import { redirect } from 'next/navigation'
 import { Box, Text, Link } from '@chakra-ui/react' // Import Chakra UI components
 
-import { stripe } from '../stripe'
+import { stripe } from '@/app/api/stripe/route'; // Adjust the import path as necessary
 
 export default async function Return({
     searchParams
