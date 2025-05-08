@@ -22,12 +22,8 @@ import { FiBookOpen } from "react-icons/fi"
 import Logo from "@/components/ui/logo-recapeps";
 import QuizComponent1 from "./quiz1";
 import QuizComponent2 from "./quiz2";
-import JsxParser from 'react-jsx-parser';
 
 export default function Home() {
-  const MyText = (props: any) => <Text {...props} />;
-  const chakraString = "<MyText color='red.500'>Alert!</MyText>";
-
   return (
     <Box >
       <VStack alignItems="center" width="100%" textAlign="center">
