@@ -43,5 +43,5 @@ export async function getAuthenticatedAppForUser() {
             console.error("Error decoding JWT token:", error);
         }
 
-    return { firebaseServerApp, user };
+    return { firebaseServerApp, user, isPro };
 }
