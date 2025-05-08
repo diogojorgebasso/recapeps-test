@@ -73,7 +73,7 @@ export default function Page() {
 
                                 <Button
                                     type="submit"
-                                    colorScheme="orange"
+                                    colorPalette="orange"
                                     w="full"
                                     mt={4}
                                     loading={pending}

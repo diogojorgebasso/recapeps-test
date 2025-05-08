@@ -56,7 +56,7 @@ export function SubjectCard({ title, icon, progress, onClick }: SubjectCardProps
                 <Progress.Root
                     value={progress}
                     size="sm"
-                    colorScheme={
+                    colorPalette={
                         progress < 30 ? 'red' :
                             progress < 70 ? 'orange' :
                                 'green'

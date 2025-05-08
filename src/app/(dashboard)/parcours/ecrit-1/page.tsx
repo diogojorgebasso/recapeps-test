@@ -33,10 +33,10 @@ export default async function Page() {
     return (
         <Tabs.Root>
             <Tabs.List>
-                <Tabs.Trigger value="apprendre" colorScheme="blue" fontSize="2xl" fontWeight="bold">
+                <Tabs.Trigger value="apprendre" colorPalette="blue" fontSize="2xl" fontWeight="bold">
                     Apprendre
                 </Tabs.Trigger>
-                <Tabs.Trigger value="s-entraner" colorScheme="blue" fontSize="2xl" fontWeight="bold">
+                <Tabs.Trigger value="s-entraner" colorPalette="blue" fontSize="2xl" fontWeight="bold">
                     S&apos;entrâner
                 </Tabs.Trigger>
             </Tabs.List>

@@ -25,7 +25,7 @@ export default function SubscriptionSection({ pro }: { pro: boolean }) {
                     Mon abonnement
                 </Heading>
                 <Text>Vous êtes abonné Recap’eps Pro.</Text>
-                <Button onClick={openPortal} loading={loading} colorScheme="orange">
+                <Button onClick={openPortal} loading={loading} colorPalette="orange">
                     Gérer mon abonnement
                 </Button>
             </VStack>

@@ -6,7 +6,6 @@ import ProfilePhotoUploader from './components/ProfilePhotoUploader';
 import ProfileDetailsForm from './components/ProfileDetailsForm';
 import SubscriptionSection from './components/SubscriptionSection';
 import EmailNotificationToggle from './components/EmailNotificationToggle';
-import { Toaster } from '@/components/ui/toaster';
 
 export default function ProfilePage() {
     const { user, pro } = useAuth();
@@ -15,7 +14,6 @@ export default function ProfilePage() {
 
     return (
         <Box p={6}>
-            <Toaster />
             <Heading size="lg" mb={6}>
                 Ton profil
             </Heading>

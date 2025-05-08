@@ -46,7 +46,7 @@ export default function NotificationItem({ notification, userId }: NotificationI
                 <Button
                     size="sm"
                     mt={3}
-                    colorScheme="blue"
+                    colorPalette="blue"
                     onClick={handleMarkAsRead}
                 >
                     Marquer comme lu

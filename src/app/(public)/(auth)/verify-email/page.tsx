@@ -118,7 +118,7 @@ export default function VerifyEmail() {
                 <HStack gap={4} justifyContent="center" my={8}>
                     <Button
                         onClick={handleSendVerificationEmail}
-                        colorScheme="blue"
+                        colorPalette="blue"
                         loading={isSending}
                         loadingText="Sending..."
                     >
@@ -126,7 +126,7 @@ export default function VerifyEmail() {
                     </Button>
                     <Button
                         onClick={checkVerificationStatus}
-                        colorScheme="green"
+                        colorPalette="green"
                         loading={isChecking}
                         loadingText="Checking..."
                     >

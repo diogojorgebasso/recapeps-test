@@ -156,7 +156,7 @@ export default function Transcription() {
                     <Card.Header pb={0}>
                         <VStack align="start" gap={2}>
                             <HStack wrap="wrap" gap={3}>
-                                <Badge colorScheme="blue">
+                                <Badge colorPalette="blue">
                                     {transcription?.contentType || "Unknown format"}
                                 </Badge>
                                 <Text fontSize="sm" color="gray.500">

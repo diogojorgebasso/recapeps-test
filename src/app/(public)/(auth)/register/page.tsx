@@ -83,7 +83,7 @@ export default function Register() {
 
                             <Button
                                 type="submit"
-                                colorScheme="blue"
+                                colorPalette="blue"
                                 w="full"
                                 loading={pending}
                                 disabled={pending}

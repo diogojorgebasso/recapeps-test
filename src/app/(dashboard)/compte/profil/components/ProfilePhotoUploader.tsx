@@ -68,7 +68,7 @@ export default function ProfilePhotoUploader() {
                         {loading ? (
                             <Text>Enregistrement…</Text>
                         ) : (
-                            <Button colorScheme="green" onClick={onSave}>
+                            <Button colorPalette="green" onClick={onSave}>
                                 Enregistrer
                             </Button>
                         )}

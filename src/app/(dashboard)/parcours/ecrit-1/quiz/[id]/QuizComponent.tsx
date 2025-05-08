@@ -144,7 +144,7 @@ export default function QuizComponent({ quiz }: { quiz: AttemptQuiz }) {
               {currentQ.answers.map(a => (
                 <Button key={a.id}
                   variant={sel.includes(a.id) ? "solid" : "outline"}
-                  colorScheme={colour(a.id, a.isCorrect)}
+                  colorPalette={colour(a.id, a.isCorrect)}
                   justifyContent="flex-start"
                   whiteSpace="normal"
                   onClick={() => state === QuizState.QUESTION_DISPLAY && setSel([a.id])}
@@ -186,7 +186,7 @@ export default function QuizComponent({ quiz }: { quiz: AttemptQuiz }) {
               {/* Left button is either “Vérifier” or “Continuer” */}
               {state === QuizState.QUESTION_DISPLAY ? (
                 <Button
-                  flex={2} colorScheme="blue"
+                  flex={2} colorPalette="blue"
                   onClick={handleCheck}
                   disabled={sel.length === 0}
                 >
@@ -194,7 +194,7 @@ export default function QuizComponent({ quiz }: { quiz: AttemptQuiz }) {
                 </Button>
               ) : (
                 <Button
-                  flex={2} colorScheme="blue"
+                  flex={2} colorPalette="blue"
                   onClick={handleNext}
                   loading={saving}
                 >

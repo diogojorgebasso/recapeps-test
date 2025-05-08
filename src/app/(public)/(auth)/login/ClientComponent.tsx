@@ -80,7 +80,7 @@ export default function ClientComponent() {
 
                             <Button
                                 type="submit"
-                                colorScheme="blue"
+                                colorPalette="blue"
                                 w="full"
                                 loading={pending}
                                 disabled={pending}

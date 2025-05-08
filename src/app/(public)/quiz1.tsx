@@ -105,7 +105,7 @@ export default function QuizComponent1() {
         <Text mb={8}>
           Si tu souhaites accéder à plus de contenu et enregistrer ta progression, tu peux créer un compte juste ici 😎
         </Text>
-        <Button colorScheme="blue" onClick={() => window.location.href = '/quiz'}>
+        <Button colorPalette="blue" onClick={() => window.location.href = '/quiz'}>
           Créer un compte
         </Button>
       </Box>
@@ -171,7 +171,7 @@ export default function QuizComponent1() {
       <Box mt={6}>
         <Flex justify="space-between" fontSize="xs" mb={1}>
         </Flex>
-        <Progress.Root value={progress} size="sm" colorScheme="blue" borderRadius="md" >
+        <Progress.Root value={progress} size="sm" colorPalette="blue" borderRadius="md" >
           <Progress.Track>
             <Progress.Range />
           </Progress.Track>
@@ -181,7 +181,7 @@ export default function QuizComponent1() {
 
       <Button
         mt={6}
-        colorScheme={showAnswer ? 'green' : 'blue'}
+        colorPalette={showAnswer ? 'green' : 'blue'}
         width="100%"
         onClick={showAnswer ? handleNext : handleValidation}
         disabled={!selectedOption && !showAnswer}

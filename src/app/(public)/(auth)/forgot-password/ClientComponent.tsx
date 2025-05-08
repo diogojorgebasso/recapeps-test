@@ -55,7 +55,7 @@ export default function ForgotPassword() {
 
                     <Button
                         type="submit"
-                        colorScheme="blue"
+                        colorPalette="blue"
                         w="full"
                         loading={pending}
                         disabled={pending}
