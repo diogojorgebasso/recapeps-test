@@ -1,31 +1,24 @@
-import { Timestamp } from "firebase-admin/firestore";
-
 import { Quiz, Question, AttemptQuiz, QuizDone } from "@/types/Quiz";
 import { QuizTrail } from "@/types/TreeSkill";
-import { db } from "@/lib/firebase/serverApp";
-
+import { db } from "@/lib/firebase/clientApp";
+import { collection, getDocs, query, where, limit, doc, getDoc, orderBy, serverTimestamp, addDoc } from "firebase/firestore";
 /**
  * Finds an active (state === 'doing') quiz attempt for a user.
  */
 export async function findActiveAttempt(numberOfEcrit: number, quizId: string, uid: string): Promise<AttemptQuiz | null> {
     try {
-        const userQuizAttemptsRef = db.collection("users").doc(uid).collection(`ecrit-${numberOfEcrit}`);
-        const activeQuizQuery = userQuizAttemptsRef
-            .where("quizRef", "==", db.doc(`ecrit-${numberOfEcrit}/${quizId}`))
-            .where("state", "==", "doing")
-            .limit(1);
-
-        const activeQuizSnapshot = await activeQuizQuery.get();
-
-        if (!activeQuizSnapshot.empty) {
-            const quizDoc = activeQuizSnapshot.docs[0];
-            const data = quizDoc.data();
+        const userQuizAttemptsRef = collection(db, "users", uid, `ecrit-${numberOfEcrit}`);
+        const activeQuizQuery = query(userQuizAttemptsRef, where("quizRef", "==", doc(db, `ecrit-${numberOfEcrit}`, quizId)), where("state", "==", "doing"), limit(1))
+        const activeQuizSnapshot = await getDocs(activeQuizQuery);
+        activeQuizSnapshot.forEach((doc) => {
+            const data = doc.data();
             return {
-                id: quizDoc.id,
+                id: doc.id,
                 ...data,
             } as AttemptQuiz;
-        }
+        });
         return null;
+
     } catch (error) {
         console.error("Error finding active quiz attempt:", error);
         throw new Error(`Failed to find active quiz attempt: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -38,10 +31,10 @@ export async function findActiveAttempt(numberOfEcrit: number, quizId: string, u
 export async function fetchBaseQuiz(numberOfEcrit: number, quizId: string): Promise<Quiz | null> {
     try {
 
-        const quizDocRef = db.doc(`ecrit-${numberOfEcrit}/${quizId}`);
-        const quizSnapshot = await quizDocRef.get();
+        const quizDocRef = doc(db, `ecrit-${numberOfEcrit}/${quizId}`);
+        const quizSnapshot = await getDoc(quizDocRef);
 
-        if (quizSnapshot.exists) {
+        if (quizSnapshot.exists()) {
             const data = quizSnapshot.data();
             if (data) {
                 return {
@@ -66,13 +59,9 @@ export async function fetchBaseQuiz(numberOfEcrit: number, quizId: string): Prom
  */
 export async function fetchUserWrongQuestionIds(numberOfEcrit: number, quizId: string, uid: string): Promise<Set<string>> {
     try {
-        const answeredQuestionsRef = db.collection("users").doc(uid).collection(`ecrit-${numberOfEcrit}`);
-        const q = answeredQuestionsRef
-            .where("state", "==", "completed")
-            .where("quizRef", "==", db.doc(`ecrit-${numberOfEcrit}/${quizId}`))
-            .orderBy("createdAt", "asc");
-
-        const querySnapshot = await q.get();
+        const answeredQuestionsRef = collection(db, "users", uid, `ecrit-${numberOfEcrit}`);
+        const q = query(answeredQuestionsRef, where("state", "==", "completed"), where("quizRef", "==", doc(db, `ecrit-${numberOfEcrit}/${quizId}`)), orderBy("createdAt", "asc"))
+        const querySnapshot = await getDocs(q);
 
         const latestQuestionCorrectness = new Map<string, boolean>();
 
@@ -109,17 +98,16 @@ export async function createAttempt(
     attemptData: Omit<AttemptQuiz, "id" | "createdAt">
 ): Promise<AttemptQuiz> {
     try {
-        const now = Timestamp.now();
 
-        const userQuizAttemptsRef = db.collection("users").doc(uid).collection(`ecrit-${numberOfEcrit}`);
-        const newAttemptRef = await userQuizAttemptsRef.add({
+        const userQuizAttemptsRef = collection(db, "users", uid, `ecrit-${numberOfEcrit}`);
+        const newAttemptRef = await addDoc(userQuizAttemptsRef, {
             ...attemptData,
-            createdAt: now
+            createdAt: serverTimestamp()
         });
 
         return {
             id: newAttemptRef.id,
-            createdAt: now,
+            createdAt: serverTimestamp(),
             ...attemptData,
         } as AttemptQuiz;
 
@@ -135,10 +123,10 @@ export async function getProgressOverview(uid: string | undefined, numberOfEcrit
     }
     try {
 
-        const progressOverviewRef = db.collection("users").doc(uid).collection(`ecrit-${numberOfEcrit}`).doc("progressOverview");
-        const progressOverviewSnapshot = await progressOverviewRef.get();
+        const progressOverviewRef = doc(db, "users", uid, `ecrit-${numberOfEcrit}`, "progressOverview");
+        const progressOverviewSnapshot = await getDoc(progressOverviewRef)
 
-        if (progressOverviewSnapshot.exists) {
+        if (progressOverviewSnapshot.exists()) {
             return progressOverviewSnapshot.data() as Record<string, QuizTrail>;
         }
         return null;
@@ -154,13 +142,13 @@ export async function getProgressOverview(uid: string | undefined, numberOfEcrit
 export async function findCompletedAttempts(uid: string, numberOfEcrit: number, limitResult: number = 5): Promise<QuizDone[]> {
     try {
 
-        const userAttemptsRef = db.collection("users").doc(uid).collection(`ecrit-${numberOfEcrit}`);
-        const completedQuizzesQuery = userAttemptsRef
-            .where("state", "==", "completed")
-            .orderBy("completedAt", "desc")
-            .limit(limitResult);
+        const userAttemptsRef = collection(db, "users", uid, `ecrit-${numberOfEcrit}`);
+        const completedQuizzesQuery = query(userAttemptsRef
+            , where("state", "==", "completed")
+            , orderBy("completedAt", "desc")
+            , limit(limitResult))
 
-        const completedQuizzesSnapshot = await completedQuizzesQuery.get();
+        const completedQuizzesSnapshot = await getDocs(completedQuizzesQuery)
 
         const quizHistory = completedQuizzesSnapshot.docs.map(doc => {
             const data = doc.data();

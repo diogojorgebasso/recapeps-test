@@ -3,26 +3,19 @@
 import "server-only";
 
 import { cookies } from "next/headers";
-import { initializeServerApp, initializeApp, FirebaseServerApp } from "firebase/app";
-import { Auth, getAuth } from "firebase/auth";
-import { Firestore, getFirestore } from "firebase-admin/firestore";
-
-type FirebaseBundle = {
-    app: FirebaseServerApp;
-    auth: Auth;
-    db: Firestore;
-};
-
-let cached: FirebaseBundle | null = null;
+import { initializeServerApp, initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
 
 
-function initFirebase(authIdToken?: string): FirebaseBundle {
-    if (cached) return cached;
+// Returns an authenticated client SDK instance for use in Server Side Rendering
+// and Static Site Generation
+export async function getAuthenticatedAppForUser() {
+    const authIdToken = (await cookies()).get("__session")?.value;
 
     // Firebase Server App is a new feature in the JS SDK that allows you to
     // instantiate the SDK with credentials retrieved from the client & has
     // other affordances for use in server environments.
-    const app = initializeServerApp(
+    const firebaseServerApp = initializeServerApp(
         // https://github.com/firebase/firebase-js-sdk/issues/8863#issuecomment-2751401913
         initializeApp(),
         {
@@ -30,24 +23,9 @@ function initFirebase(authIdToken?: string): FirebaseBundle {
         }
     );
 
-    // 2) derive helpers
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    cached = { app, auth, db };
-    return cached;
-}
-
-export const db = initFirebase().db;
-export const auth = initFirebase().auth;
-
-// Returns an authenticated client SDK instance for use in Server Side Rendering
-// and Static Site Generation
-export async function getAuthenticatedAppForUser() {
-    const authIdToken = (await cookies()).get("__session")?.value;
-    const { auth } = initFirebase(authIdToken);
-
+    const auth = getAuth(firebaseServerApp);
     await auth.authStateReady();
+
     const user = auth.currentUser;
     let isPro = false;
 
@@ -65,5 +43,5 @@ export async function getAuthenticatedAppForUser() {
             console.error("Error decoding JWT token:", error);
         }
 
-    return { user, isPro };
+    return { firebaseServerApp, user };
 }

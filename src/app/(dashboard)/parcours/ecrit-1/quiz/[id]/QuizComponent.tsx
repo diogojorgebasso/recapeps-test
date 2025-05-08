@@ -38,6 +38,7 @@ export default function QuizComponent({ quiz }: { quiz: AttemptQuiz }) {
   const [start, setStart] = useState(Date.now());
   const [results, setResults] = useState<AttemptedQuestion[]>([]);
   const [saving, setSaving] = useState(false);
+  if (!user) return null; // TODO: handle this case better
 
   const currentQ = quiz.questions[idx];
   const progress = ((idx + 1) / quiz.questions.length) * 100;
@@ -101,7 +102,7 @@ export default function QuizComponent({ quiz }: { quiz: AttemptQuiz }) {
       questions: results as AttemptedQuestion[],
     };
 
-    const { success, error } = await saveQuizResultsAction(payload);
+    const { success, error } = await saveQuizResultsAction(payload, user?.uid);
     setSaving(false);
 
     success

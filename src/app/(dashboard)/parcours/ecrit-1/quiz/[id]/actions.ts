@@ -1,9 +1,6 @@
-'use server';
-
-import { db } from '@/lib/firebase/serverApp';
-import { getAuthenticatedAppForUser } from '@/lib/firebase/serverApp';
+import { db } from '@/lib/firebase/clientApp';
 import { AttemptedQuestion, QuizState, QuizAttemptDonePayload } from '@/types/Quiz';
-import { Timestamp } from 'firebase-admin/firestore';
+import { doc, serverTimestamp, setDoc, getDoc } from 'firebase/firestore';
 
 // Define the structure for streak data in Firestore
 interface StreakData {
@@ -17,24 +14,18 @@ interface StreakData {
 /**
  * Saves the completed quiz results and updates the user's streak.
  */
-export async function saveQuizResultsAction(payload: QuizAttemptDonePayload) {
+export async function saveQuizResultsAction(payload: QuizAttemptDonePayload, uid: string) {
     try {
-        const { user } = await getAuthenticatedAppForUser();
 
-        if (!user) {
-            throw new Error('User not authenticated');
-        }
-
-        const now = Timestamp.now()
         const resultsData = {
             state: 'completed' as QuizState,
-            completedAt: now,
+            completedAt: serverTimestamp(),
             ...payload
         };
-        await db.collection('users').doc(user.uid).collection('ecrit-1').doc(payload.id).set(resultsData);
+        await setDoc(doc(db, 'users', uid, 'ecrit-1', payload.id), resultsData);
 
         // outra lógica.
-        const streakUpdateResult = await updateUserStreak();
+        const streakUpdateResult = await updateUserStreak(uid);
         if (!streakUpdateResult.success) {
             console.error("Failed to update user streak:", streakUpdateResult.error);
         } else {
@@ -57,20 +48,17 @@ export async function saveQuizProgressAction(
     quizId: string,
     currentQuestionIndex: number,
     currentScore: number,
-    currentResults: AttemptedQuestion[]) {
+    currentResults: AttemptedQuestion[],
+    uid: string) {
     try {
-        const { user } = await getAuthenticatedAppForUser();
 
-        if (!user) {
-            throw new Error('User not authenticated');
-        }
-
-        const docRef = await db.collection('users').doc(user.uid).collection(`ecrit-${exam}`).add({
+        const docRef = doc(db, 'users', uid, `ecrit-${exam}`, quizId)
+        await setDoc(docRef, {
             quizId,
             currentQuestionIndex,
             currentScore,
             currentResults,
-            lastUpdated: Timestamp.now()
+            lastUpdated: serverTimestamp()
         });
 
         console.log("Quiz progress saved with ID: ", docRef.id);
@@ -85,15 +73,11 @@ export async function saveQuizProgressAction(
 /**
  * Update user streak
  */
-async function updateUserStreak() {
+async function updateUserStreak(uid: string) {
     try {
-        const { user } = await getAuthenticatedAppForUser();
-        if (!user) {
-            return { success: false, error: 'User not authenticated' };
-        }
 
-        const streakDocRef = db.collection('users').doc(user.uid).collection('stats').doc('streak');
-        const streakSnapshot = await streakDocRef.get();
+        const streakDocRef = doc(db, 'users', uid);
+        const streakSnapshot = await getDoc(streakDocRef);
 
         const now = new Date();
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -103,7 +87,7 @@ async function updateUserStreak() {
         let updateNeeded = false;
         let lastLoginDate: Date | null = null;
 
-        if (streakSnapshot.exists) {
+        if (streakSnapshot.exists()) {
             const streakData = streakSnapshot.data() as StreakData;
             currentStreak = streakData.currentStreak || 0;
             longestStreak = streakData.longestStreak || 0;
@@ -142,10 +126,10 @@ async function updateUserStreak() {
         }
 
         if (updateNeeded) {
-            await streakDocRef.set({
+            await setDoc(streakDocRef, {
                 currentStreak,
                 longestStreak,
-                lastLoginDate: Timestamp.now()
+                lastLoginDate: serverTimestamp()
             }, { merge: true });
         }
 

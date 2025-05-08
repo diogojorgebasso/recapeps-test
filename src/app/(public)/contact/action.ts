@@ -1,4 +1,3 @@
-'use server'
 import { collection, addDoc, Timestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase/clientApp";
 
