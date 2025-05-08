@@ -138,14 +138,6 @@ export default function Home() {
           </LinkBox>
         </SimpleGrid>
         <Box p={4}>
-          <JsxParser
-            components={{
-              MyText: MyText,
-            }}
-            jsx={chakraString}
-          />
-
-
           <VStack align="stretch" mt={12} gap={12} padding={6}>
             <Text>
               Pour réviser efficacement les écrits, tu as accès à des fiches de révisions ainsi qu&apos;à des quiz qui te permettent de retenir toutes les connaissances dont tu auras besoin le jour J ✍️ <br /><br />
