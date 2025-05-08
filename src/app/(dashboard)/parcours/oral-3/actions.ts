@@ -10,7 +10,6 @@ interface StreakData {
   longestStreak: number;
 }
 
-
 /**
  * Fetch user streak data
  */
