@@ -40,6 +40,18 @@ export interface Question {
 }
 
 // Omit the Fields that I already have in the Database.
-export interface QuizResult extends Omit<AttemptQuiz, 'createdAt' | 'state' | 'premium' | 'id' | 'quizRef'> {
+export interface ExportQuizResult {
     completedAt: Timestamp;
+}
+
+export interface QuizDone {
+    id: string;
+    name: string;
+    createdAt: Timestamp;
+    completedAt: Timestamp;
+    quizRef: DocumentReference;
+    questions: Array<Question>;
+    state: "completed";
+    score: number;
+    premium: boolean;
 }

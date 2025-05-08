@@ -9,7 +9,7 @@ import {
 
 import DesktopMenu from "@/components/menu/dashboard/DesktopMenu";   // ← client (tour + sidebar)
 import MobileMenu from "@/components/menu/dashboard/MobileMenu"; // optional
-import { requireAuth } from "@/lib/auth-protection";
+import { requireAuth } from "@/lib/firebase/auth-protection";
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
     const user = await requireAuth();

@@ -1,5 +1,4 @@
 import { findCompletedAttempts } from '@/repositories/quizRepo'; // Assuming fetchQuizHistory exists and returns AttemptQuiz[] or similar
-import { AttemptQuiz } from '@/types/Quiz'; // Import relevant types
 import Link from 'next/link';
 import {
     Heading,
@@ -8,15 +7,15 @@ import {
     List,
     Flex,
     Spacer,
-    Tag,
+    Badge,
     Container
 } from '@chakra-ui/react';
-import { getAuthenticatedAppForUser } from '@/lib/firebase/serverApp';
+import { requireAuth } from '@/lib/firebase/auth-protection';
 
 export default async function QuizHistoryPage() {
-    const { user } = await getAuthenticatedAppForUser();
+    const user = await requireAuth();
     let error: string | null = null;
-    const quizHistory: Array<AttemptQuiz> = await findCompletedAttempts(user?.uid, 1, 10);
+    const quizHistory = await findCompletedAttempts(user?.uid, 1, 10);
 
     return (
         <Container maxW="container.lg" p={4}>
@@ -30,31 +29,29 @@ export default async function QuizHistoryPage() {
             )}
 
             {quizHistory.length === 0 && !error && (
-                <Text>You haven't completed any quizzes yet.</Text>
+                <Text>Vous n&apos;avez pas fait un quiz.</Text>
             )}
 
             <List.Root gap={4}>
-                {quizHistory.map((item) => {
+                {quizHistory.map(({ id, name, score, completedAt }) => {
                     return (
-                        <List.Item key={displayData.id} borderWidth="1px" borderRadius="lg" p={4} boxShadow="sm" bg="white">
+                        <List.Item key={id} borderWidth="1px" borderRadius="lg" p={4} boxShadow="sm" bg="white">
                             <Flex alignItems="center"> {/* Use Chakra Flex for layout */}
-                                <Heading as="h2" size="md" fontWeight="semibold">{displayData.title}</Heading>
+                                <Heading as="h2" size="md" fontWeight="semibold">{name}</Heading>
                                 <Spacer /> {/* Use Chakra Spacer */}
-                                <Tag.Root
+                                <Badge
                                     size="lg"
                                     variant="subtle"
-                                    colorScheme={isGoodScore ? 'green' : 'red'} // Conditional color scheme
+                                    colorPalette={score > 4 ? 'green' : 'red'} // Conditional color scheme
                                     fontWeight="bold"
                                 >
-                                    <Tag.Label></Tag.Label>
-                                </Tag.Root>
+                                    {score} / 8
+                                </Badge>
                             </Flex>
-                            {displayData.date && (
-                                <Text fontSize="sm" color="gray.500" mt={1}>
-                                    Completed on: { }
-                                </Text>
-                            )}
-                            <Link href={`/ecrit-1/quiz/review/${displayData.id}`} color="blue.600" _hover={{ textDecoration: 'underline' }} fontSize="sm" mt={2} display="inline-block">
+                            <Text fontSize="sm" color="gray.500" mt={1}>
+                                Completed on: {completedAt.toDate().toLocaleDateString()}
+                            </Text>
+                            <Link href={`/ecrit-1/quiz/attempt/${id}`} color="blue.600">
                                 Review Attempt
                             </Link>
                         </List.Item>

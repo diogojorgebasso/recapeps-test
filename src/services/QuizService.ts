@@ -1,17 +1,27 @@
 import { db } from "@/lib/firebase/clientApp";
 import { doc } from "firebase/firestore";
-import { AttemptQuiz, QuizState } from "@/types/Quiz";
+import { AttemptQuiz, QuizState, Question } from "@/types/Quiz"; // Added Question
 import {
     findActiveAttempt, fetchBaseQuiz,
-    createAttempt, findCompletedAttempts
+    createAttempt, findCompletedAttempts, fetchUserWrongQuestionIds
 } from "@/repositories/quizRepo";
+
+// Helper function to shuffle an array
+function shuffleArray<T>(array: T[]): T[] {
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
+}
 
 /**
  * Fetches the appropriate quiz data for a user attempt.
  * It checks for an active attempt first. If none exists, it fetches the base quiz
- * definition and filters out already answered questions to start a new attempt.
+ * definition and selects questions based on prior performance to start a new attempt.
  */
-export async function getQuizForAttempt(numberOfEcrit: number, quizId: string, uid: string): Promise<AttemptQuiz | null> {
+export async function getQuizForAttempt(numberOfEcrit: number, quizId: string, uid: string, nQuestions: number = 8): Promise<AttemptQuiz> {
     try {
         // 1. Check for an active attempt
         let attempt = await findActiveAttempt(numberOfEcrit, quizId, uid);
@@ -23,40 +33,48 @@ export async function getQuizForAttempt(numberOfEcrit: number, quizId: string, u
         // 2. No active attempt, fetch the base quiz definition
         const baseQuiz = await fetchBaseQuiz(numberOfEcrit, quizId);
         if (!baseQuiz) {
-            console.error(`Base quiz not found for ecrit-${numberOfEcrit}, quizId: ${quizId}`);
-            return null; // Or throw an error if a quiz should always exist
+            throw new Error(`Base quiz not found for ecrit-${numberOfEcrit}, quizId: ${quizId}`);
         }
 
-        // 3. Fetch IDs of questions the user has already answered correctly for this quiz
-        //    (Assuming progress is stored elsewhere, e.g., user's progress subcollection)
-        //    This part might need adjustment based on how progress/answered questions are tracked.
-        //    For now, let's assume we start fresh or fetch from a specific progress doc.
-        //    const answeredQuestionIds = await quizRepo.fetchUserAnsweredQuestionIds(numberOfEcrit, quizId, uid);
+        // 3. Fetch IDs of questions the user previously got wrong for this quiz
+        const wrongQuestionIds = await fetchUserWrongQuestionIds(numberOfEcrit, quizId, uid);
 
-        // 4. Filter base quiz questions (if needed - e.g., remove already answered ones)
-        //    const filteredQuestions = baseQuiz.questions.filter(q => !answeredQuestionIds.has(q.id)); // Assuming Question has an 'id'
-        //    If no filtering is needed for a new attempt, use all questions:
-        const questionsForAttempt = baseQuiz.questions;
+        // 4. Select questions for the new attempt
+        let questionsForAttempt: Question[] = [];
+        const priorityPool = baseQuiz.questions.filter(q => wrongQuestionIds.has(q.id));
+        const shuffledPriority = shuffleArray(priorityPool);
+        questionsForAttempt.push(...shuffledPriority);
 
+        // If not enough questions, add from other pool (new or previously correct)
+        if (questionsForAttempt.length < nQuestions) {
+            const neededFromOther = nQuestions - questionsForAttempt.length;
+            const otherPool = baseQuiz.questions.filter(q => !wrongQuestionIds.has(q.id));
+            questionsForAttempt.push(...shuffleArray(otherPool).slice(0, neededFromOther));
+        }
 
-        // 5. Create a new attempt document in Firestore
+        // Ensure the total does not exceed nQuestions.
+        // If priority questions alone were more than nQuestions, this will trim them.
+        // The shuffle ensures fairness if trimming happens.
+        if (questionsForAttempt.length > nQuestions) {
+            questionsForAttempt = questionsForAttempt.slice(0, nQuestions);
+        }
+
+        // 5. If questions are available, create a new attempt document in Firestore
         const newAttemptData = {
-            quizRef: doc(db, `ecrit-${numberOfEcrit}`, quizId), // Reference to the base quiz
+            quizRef: doc(db, `ecrit-${numberOfEcrit}`, quizId),
             name: baseQuiz.name,
             state: "doing" as QuizState,
-            questions: questionsForAttempt,
+            questions: questionsForAttempt, // Use the carefully selected questions
             score: 0,
-            premium: baseQuiz.premium, // Assuming baseQuiz has a property indicating if it's Pro-only
+            premium: baseQuiz.premium,
         };
 
         attempt = await createAttempt(numberOfEcrit, uid, newAttemptData);
         console.log("Created new attempt:", attempt.id);
-
         return attempt;
-
-    } catch (error) {
+    }
+    catch (error) {
         console.error("Error in getQuizForAttempt service:", error);
-        // Depending on requirements, you might want to return null or re-throw
         throw new Error(`Failed to get or create quiz attempt: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
 }
