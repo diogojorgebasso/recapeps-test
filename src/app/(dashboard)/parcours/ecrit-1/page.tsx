@@ -23,56 +23,52 @@ import { redirect } from "next/navigation";
 export default async function Page() {
     const { user, isPro } = await getAuthenticatedAppForUser();
 
-    if (!user) {
+    if (!user) { // this will be resolved in the Layout.
         redirect("/login?redirect=/parcours/ecrit-1");
     }
 
-    console.log("user", user);
-    console.log("isPro", isPro);
-
     const progressData = await getProgressOverview(user.uid, 1);
+    console.log("progressData", progressData);
     const quizNodesArray: QuizTrail[] = progressData ? Object.values(progressData) : [];
 
     return (
-        <>
-            <Tabs.Root>
-                <Tabs.List>
-                    <Tabs.Trigger value="apprendre" colorScheme="blue" fontSize="2xl" fontWeight="bold">
-                        Apprendre
-                    </Tabs.Trigger>
-                    <Tabs.Trigger value="s-entraner" colorScheme="blue" fontSize="2xl" fontWeight="bold">
-                        S&apos;entrâner
-                    </Tabs.Trigger>
-                </Tabs.List>
-                <Tabs.Content value="apprendre">
-                    <Box>
-                        <Box mb="12">
-                            <Heading size="xl" mb="4" color="blue.600">
-                                Écrit 1
-                            </Heading>
-                            <SimpleGrid columns={[1, 2, 3]} gap="6">
-                                {subjects.map(({ id, name, image, premium }) => (
-                                    <ExamCard
-                                        key={id}
-                                        name={name}
-                                        image={image}
-                                        premium={premium}
-                                        isUserPremium={isPro}
-                                        vers={id}
-                                    />
-                                ))}
-                            </SimpleGrid>
-                        </Box>
-                    </Box >
-                </Tabs.Content>
-                <Tabs.Content value="s-entraner">
-                    <Suspense fallback={<div>Loading...</div>}>
-                        <SkillTreeClient QuizNode={Promise.resolve(quizNodesArray)} />
-                    </Suspense>
-                </Tabs.Content>
+        <Tabs.Root>
+            <Tabs.List>
+                <Tabs.Trigger value="apprendre" colorScheme="blue" fontSize="2xl" fontWeight="bold">
+                    Apprendre
+                </Tabs.Trigger>
+                <Tabs.Trigger value="s-entraner" colorScheme="blue" fontSize="2xl" fontWeight="bold">
+                    S&apos;entrâner
+                </Tabs.Trigger>
+            </Tabs.List>
+            <Tabs.Content value="apprendre">
+                <Box>
+                    <Box mb="12">
+                        <Heading size="xl" mb="4" color="blue.600">
+                            Écrit 1
+                        </Heading>
+                        <SimpleGrid columns={[1, 2, 3]} gap="6">
+                            {subjects.map(({ id, name, image, premium }) => (
+                                <ExamCard
+                                    key={id}
+                                    name={name}
+                                    image={image}
+                                    premium={premium}
+                                    isUserPremium={isPro}
+                                    vers={id}
+                                />
+                            ))}
+                        </SimpleGrid>
+                    </Box>
+                </Box >
+            </Tabs.Content>
+            <Tabs.Content value="s-entraner">
+                <Suspense fallback={<div>Loading...</div>}>
+                    <SkillTreeClient QuizNode={Promise.resolve(quizNodesArray)} />
+                </Suspense>
+            </Tabs.Content>
 
-            </Tabs.Root>
-        </>
+        </Tabs.Root>
     );
 }
 

@@ -43,13 +43,6 @@ service_accounts = {
       "roles/cloudfunctions.invoker"   # Triggered by user create
     ]
   }
-   "stripe-checkout-session-run" = {
-    display_name = "Service Account for createstripecheckoutsession"
-    roles = [
-      "roles/datastore.user",          # Check and update stripeCustomerId
-      "roles/cloudfunctions.invoker"
-    ]
-  }
 
   "stripe-webhook-test-run" = {
     display_name = "Service Account for stripewebhooktest"
