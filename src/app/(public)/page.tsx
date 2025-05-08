@@ -23,9 +23,10 @@ import Logo from "@/components/ui/logo-recapeps";
 import QuizComponent1 from "./quiz1";
 import QuizComponent2 from "./quiz2";
 import JsxParser from 'react-jsx-parser';
+const MyText = (props: any) => <Text {...props} />;
 
 export default function Home() {
-  const chakraString = "<Text color='red.500'>Alert!</Text>";
+  const chakraString = "<MyText color='red.500'>Alert!</MyText>";
 
   return (
     <Box >
@@ -140,12 +141,14 @@ export default function Home() {
             </Card.Root>
           </LinkBox>
         </SimpleGrid>
-
         <Box p={4}>
           <JsxParser
-            components={{ Text: (props) => <Text {...props} /> }}
+            components={{
+              MyText: MyText,
+            }}
             jsx={chakraString}
           />
+
 
           <VStack align="stretch" mt={12} gap={12} padding={6}>
             <Text>
