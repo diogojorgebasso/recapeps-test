@@ -39,8 +39,8 @@ export default async function DesktopMenu() {
         >
             <Flex justify="space-between" width="100%" gap={8}>
                 <HStack gap={8}>
-                    <Link href="/">
-                        <Logo />
+                    <Link href="/parcours/dashboard">
+                        Accueill
                     </Link>
 
                     <Menu.Root>
@@ -97,9 +97,10 @@ export default async function DesktopMenu() {
                 </HStack>
 
                 <HStack gap={4}>
-                    {isNotification && (
-                        <Icon>
-                            <FaBell />
+
+                    <Icon>
+                        <FaBell />
+                        {isNotification && (
                             <Float placement="top-end" offsetX="1" offsetY="1">
                                 <Circle
                                     bg="green.500"
@@ -107,9 +108,8 @@ export default async function DesktopMenu() {
                                     outline="0.2em solid"
                                     outlineColor="bg"
                                 />
-                            </Float>
-                        </Icon>
-                    )}
+                            </Float>)}
+                    </Icon>
                     <ContextualAvatar />
                     <ColorModeButton />
                 </HStack>

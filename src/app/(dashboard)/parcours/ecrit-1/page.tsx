@@ -28,7 +28,7 @@ export default async function Page() {
     }
 
     const progressData = await getProgressOverview(user.uid, 1);
-    const quizNodesArray: QuizTrail[] = progressData ? Object.values(progressData) : [];
+    const quizNodesArray: QuizTrail[] = progressData || [];
 
     return (
         <Tabs.Root>
@@ -66,7 +66,6 @@ export default async function Page() {
                     <SkillTreeClient QuizNode={Promise.resolve(quizNodesArray)} />
                 </Suspense>
             </Tabs.Content>
-
         </Tabs.Root>
     );
 }

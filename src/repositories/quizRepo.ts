@@ -117,19 +117,36 @@ export async function createAttempt(
     }
 }
 
-export async function getProgressOverview(uid: string | undefined, numberOfEcrit: number): Promise<Record<string, QuizTrail> | null> {
+export async function getProgressOverview(uid: string | undefined, numberOfEcrit: number): Promise<QuizTrail[]> {
     if (!uid) {
-        return null;
+        throw new Error("User ID is undefined. Cannot fetch progress overview.");
     }
-    try {
 
+    try {
         const progressOverviewRef = doc(db, "users", uid, `ecrit-${numberOfEcrit}`, "progressOverview");
-        const progressOverviewSnapshot = await getDoc(progressOverviewRef)
+        const progressOverviewSnapshot = await getDoc(progressOverviewRef);
 
         if (progressOverviewSnapshot.exists()) {
-            return progressOverviewSnapshot.data() as Record<string, QuizTrail>;
+            console.log("Progress overview data:", progressOverviewSnapshot.data());
+            const progressOverviewData = progressOverviewSnapshot.data();
+
+            // Create an array to store the QuizTrail objects
+            const quizTrails: QuizTrail[] = [];
+
+            // Iterate through each field in the document
+            Object.entries(progressOverviewData).forEach(([id, data]) => {
+                // Add the QuizTrail to the array
+                quizTrails.push({
+                    id,
+                    name: data.name,
+                    level: data.level,
+                    state: data.state
+                } as QuizTrail);
+            });
+
+            return quizTrails;
         }
-        return null;
+        return [];
     } catch (error) {
         console.error("Error fetching progress overview:", error);
         throw new Error(`Failed to fetch progress overview: ${error instanceof Error ? error.message : 'Unknown error'}`);

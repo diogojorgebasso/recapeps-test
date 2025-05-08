@@ -19,8 +19,7 @@ export default function DocsLayout({
                 h="100vh"
                 overflowY="auto"
             >
-                {/* Dynamic navigation injected by pages via custom anchor tags */}
-                {/* You can also pull dynamic metadata from MDX or a CMS if needed */}
+
                 <VStack align="start" gap={3} >
                     <Link href="#accroche" > Accroche </Link>
                     <Link href="#definitions" > Définitions </Link>
