@@ -24,6 +24,22 @@ export async function getAuthenticatedAppForUser() {
 
     const auth = getAuth(firebaseServerApp);
     await auth.authStateReady();
+    let isPro = false;
 
-    return { firebaseServerApp, user: auth.currentUser };
+    if (authIdToken)
+        try {
+            // Simple JWT decoding (tokens have 3 parts separated by dots)
+            const parts = authIdToken.split('.');
+            if (parts.length === 3) {
+                const payload = parts[1];
+                const decoded = Buffer.from(payload, 'base64').toString();
+                const claims = JSON.parse(decoded);
+                isPro = claims.pro === true;
+                return { firebaseServerApp, user: auth.currentUser, isPro };
+            }
+        } catch (error) {
+            console.error("Error decoding JWT token:", error);
+        }
+
+    return { firebaseServerApp, user: auth.currentUser, isPro };
 }
