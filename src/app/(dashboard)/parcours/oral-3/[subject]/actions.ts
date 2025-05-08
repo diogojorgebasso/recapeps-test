@@ -1,12 +1,11 @@
-'use server';
+'use client';
 
 import { ref, uploadBytes } from "firebase/storage";
-import { storage } from "@/lib/firebase/clientApp"; // Assuming clientApp initializes storage
-import { headers } from "next/headers";
+import { storage, auth } from "@/lib/firebase/clientApp"; // Assuming clientApp initializes storage
 
 export async function uploadRecordingAction(formData: FormData, subjectId: string): Promise<{ success: boolean; filePath?: string; error?: string }> {
     const file = formData.get('audioBlob') as File | null;
-    const userId = (await headers()).get('X-User-ID');
+    const userId = auth.currentUser?.uid; // Get the current user's ID from Firebase Auth
 
     if (!file) {
         return { success: false, error: "No audio file received." };

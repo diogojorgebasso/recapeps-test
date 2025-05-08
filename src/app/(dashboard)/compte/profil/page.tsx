@@ -27,23 +27,13 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { httpsCallable } from "firebase/functions";
 import { functions } from "@/lib/firebase/clientApp";
 import Link from "next/link";
-import { useAuth } from "@/contexts/AuthContext";
-import {
-    handleEmailChange, updateUserName,
-    isEmailNotificationEnabled, updateEmailNotificationPreference
-} from "./actions";
+import { useAuth } from "@/contexts/Auth/useAuth";
+import { handleEmailChange, updateUserName } from "./actions";
+import EmailNotificationToggle from "./EmailNotificationToggle";
 
 export default function Profil() {
 
     const { user, updatePhotoURLInContext, pro } = useAuth();
-    const [newEmailNotification, setNewEmailNotification] = useState<boolean>(false);
-
-    useEffect(() => {
-        (async () => {
-            const isEnabled = await isEmailNotificationEnabled();
-            setNewEmailNotification(isEnabled);
-        })();
-    }, []);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
     const [crop, setCrop] = useState({ x: 0, y: 0 });
@@ -276,15 +266,7 @@ export default function Profil() {
                     Préférences Email
                 </Heading>
                 <VStack align="start" gap={2}>
-                    <Checkbox.Root checked={newEmailNotification} onCheckedChange={() => {
-                        setNewEmailNotification(!newEmailNotification)
-                        updateEmailNotificationPreference(!newEmailNotification)
-                        toaster.create({
-                            title: "Préférence de notification mise à jour",
-                            type: "success",
-                            description: "Vos préférences de notification ont été mises à jour avec succès.",
-                        })
-                    }}>Recevoir des notifications</Checkbox.Root>
+                    <EmailNotificationToggle />
                 </VStack>
             </Box>
 

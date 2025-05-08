@@ -6,7 +6,10 @@ import {
     Menu,
     SimpleGrid,
     HStack,
-    Portal
+    Portal,
+    Icon,
+    Float,
+    Circle,
 } from "@chakra-ui/react";
 import { LuChevronDown, LuSparkles } from "react-icons/lu";
 import Link from "next/link";
@@ -16,8 +19,12 @@ import { FaPencilAlt, FaPencilRuler } from "react-icons/fa";
 import { RxChatBubble } from "react-icons/rx";
 import { SlSpeech } from "react-icons/sl";
 import Logo from "@/components/ui/logo-recapeps";
+import { getIsNotification } from "./action";
+import { FaBell } from "react-icons/fa";
 
-export default function DesktopMenu() {
+export default async function DesktopMenu() {
+    const isNotification = await getIsNotification(); // see if increase the time of load
+
     return (
         <Box
             display={{ base: "none", md: "flex" }}
@@ -90,6 +97,19 @@ export default function DesktopMenu() {
                 </HStack>
 
                 <HStack gap={4}>
+                    {isNotification && (
+                        <Icon>
+                            <FaBell />
+                            <Float placement="top-end" offsetX="1" offsetY="1">
+                                <Circle
+                                    bg="green.500"
+                                    size="8px"
+                                    outline="0.2em solid"
+                                    outlineColor="bg"
+                                />
+                            </Float>
+                        </Icon>
+                    )}
                     <ContextualAvatar />
                     <ColorModeButton />
                 </HStack>

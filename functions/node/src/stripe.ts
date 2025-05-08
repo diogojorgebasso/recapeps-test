@@ -2,7 +2,7 @@ import { onCall, onRequest, HttpsError } from "firebase-functions/v2/https";
 import { error, info, debug } from "firebase-functions/logger";
 import Stripe from "stripe";
 import { FieldValue, getFirestore } from "firebase-admin/firestore"; // Import FieldValue
-import * as admin from "firebase-admin"; // TODO : Remove this to auth library.
+import * as admin from "firebase-admin";
 
 const db = getFirestore();
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;

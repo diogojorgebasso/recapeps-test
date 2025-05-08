@@ -3,9 +3,9 @@
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { AttemptQuiz, Quiz } from "@/types/Quiz";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/Auth/useAuth";
 import { saveQuizResultsAction, saveQuizProgressAction } from "./actions";
-
+import { db } from "@/lib/firebase/clientApp";
 import {
   Box,
   Button,
@@ -20,17 +20,12 @@ import {
 } from "@chakra-ui/react";
 
 import { Toaster, toaster } from "@/components/ui/toaster"
+import { doc } from "firebase/firestore";
 
 enum QuizState {
   QUESTION_DISPLAY,
   FEEDBACK_DISPLAY,
   QUIZ_COMPLETED,
-}
-
-interface QuestionResult {
-  questionId: string;
-  selectedAnswer: number[]; // Changed to match the actions.ts interface
-  timeSpent: number; // Time in milliseconds
 }
 
 
@@ -49,7 +44,7 @@ export default function QuizComponent({
 
   // State for timing
   const [questionStartTime, setQuestionStartTime] = useState<number>(Date.now());
-  const [quizResults, setQuizResults] = useState<QuestionResult[]>([]);
+  const [quizResults, setQuizResults] = useState([]);
 
   const { user } = useAuth();
   const router = useRouter();
@@ -66,10 +61,11 @@ export default function QuizComponent({
     setIsSaving(true);
     try {
       const payload = {
-        subjectId: quiz.id,
+        id: quiz.id,
         score: score,
         totalQuestions: quiz.questions.length,
         questions: quizResults,
+        quizRef: doc(db, "ecrit-1", quiz.id),
       };
       const result = await saveQuizResultsAction(payload);
 
@@ -106,7 +102,7 @@ export default function QuizComponent({
     const currentQuestion = quiz.questions[currentQuestionIndex];
 
     // Add result for the current question
-    const newResult: QuestionResult = {
+    const newResult = {
       questionId: currentQuestion.id,
       selectedAnswer: selectedAnswerIds.map(id => parseInt(id)), // Convert string IDs to numbers
       timeSpent: timeSpent,
@@ -155,6 +151,7 @@ export default function QuizComponent({
 
     try {
       const result = await saveQuizProgressAction(
+        1,
         quiz.id,
         currentQuestionIndex,
         score,
@@ -231,99 +228,101 @@ export default function QuizComponent({
   const showFeedback = quizState === QuizState.FEEDBACK_DISPLAY;
 
   return (
-    <Box
-      minH="100vh"
-      display="flex"
-      alignItems="center"
-      justifyContent="center"
-      p={4}
-      bg="gray.50"
-    >
-      <Card.Root maxW="2xl" w="full" boxShadow="lg" position="relative" >
-        <CardBody>
-          <Heading size="md" mb={4} >{currentQuestion.question}</Heading>
-          <Stack gap={4} >
-            {currentQuestion.answers.map((answer) => {
-              const isCorrect = answer.isCorrect;
-              const isSelected = selectedAnswerIds.includes(answer.id);
+    <>
+      <Toaster />
+      <Box
+        minH="100vh"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        p={4}
+      >
+        <Card.Root maxW="2xl" w="full" boxShadow="lg" position="relative" >
+          <CardBody>
+            <Heading size="md" mb={4} >{currentQuestion.question}</Heading>
+            <Stack gap={4} >
+              {currentQuestion.answers.map((answer) => {
+                const isCorrect = answer.isCorrect;
+                const isSelected = selectedAnswerIds.includes(answer.id);
 
-              let colorPalette = "gray";
-              if (showFeedback) {
-                if (isCorrect) colorPalette = "green";
-                else if (isSelected && !isCorrect) colorPalette = "red";
-              } else if (isSelected) {
-                colorPalette = "blue";
-              }
+                let colorPalette = "gray";
+                if (showFeedback) {
+                  if (isCorrect) colorPalette = "green";
+                  else if (isSelected && !isCorrect) colorPalette = "red";
+                } else if (isSelected) {
+                  colorPalette = "blue";
+                }
 
-              return (
-                <Button
-                  key={answer.id}
-                  colorPalette={colorPalette}
-                  variant={isSelected || showFeedback ? "solid" : "outline"}
-                  onClick={() => handleSelectOption(answer.id)}
-                  textAlign="left"
-                  whiteSpace="normal"
-                  wordBreak="break-word"
-                  disabled={showFeedback || isSaving}
-                  width="100%"
-                  minH={16}
-                  p={4}
-                  justifyContent="flex-start"
-                  height="auto"
-                >
-                  {answer.answer}
-                </Button>
-              );
-            })}
-          </Stack>
+                return (
+                  <Button
+                    key={answer.id}
+                    colorPalette={colorPalette}
+                    variant={isSelected || showFeedback ? "solid" : "outline"}
+                    onClick={() => handleSelectOption(answer.id)}
+                    textAlign="left"
+                    whiteSpace="normal"
+                    wordBreak="break-word"
+                    disabled={showFeedback || isSaving}
+                    width="100%"
+                    minH={16}
+                    p={4}
+                    justifyContent="flex-start"
+                    height="auto"
+                  >
+                    {answer.answer}
+                  </Button>
+                );
+              })}
+            </Stack>
 
-          {/* Show explanation when in feedback mode */}
-          {showFeedback && currentQuestion.explanation && (
-            <Box mt={4} p={3} bg="blue.50" borderRadius="md">
-              <Text fontWeight="bold">Explication:</Text>
-              <Text>{currentQuestion.explanation}</Text>
+            {/* Show explanation when in feedback mode */}
+            {showFeedback && currentQuestion.explanation && (
+              <Box mt={4} p={3} bg="blue.50" borderRadius="md">
+                <Text fontWeight="bold">Explication:</Text>
+                <Text>{currentQuestion.explanation}</Text>
+              </Box>
+            )}
+
+            {/* Progress Bar */}
+            <Box mt={6}>
+              <Flex justify="space-between" mb={1} >
+                <Text fontSize="xs" color="gray.600" >
+                  Question {currentQuestionIndex + 1} / {quiz.questions.length}
+                </Text>
+                <Text fontSize="xs" color="gray.600" >
+                  {progress.toFixed(0)} %
+                </Text>
+              </Flex>
+              <Progress.Root value={progress} size="sm" borderRadius="md" colorPalette="blue" >
+                <Progress.Track />
+              </Progress.Root>
             </Box>
-          )}
 
-          {/* Progress Bar */}
-          <Box mt={6}>
-            <Flex justify="space-between" mb={1} >
-              <Text fontSize="xs" color="gray.600" >
-                Question {currentQuestionIndex + 1} / {quiz.questions.length}
-              </Text>
-              <Text fontSize="xs" color="gray.600" >
-                {progress.toFixed(0)} %
-              </Text>
+            {/* Action Buttons */}
+            <Flex mt={6} direction={{ base: "column", sm: "row" }} gap={3} >
+              <Button
+                flex={1}
+                colorPalette="gray"
+                variant="outline"
+                onClick={handleSaveForLater}
+                loading={isSaving}
+                disabled={isSaving || showFeedback}
+              >
+                Sauvegarder pour plus tard
+              </Button>
+              <Button
+                flex={2}
+                colorPalette="blue"
+                disabled={selectedAnswerIds.length === 0 || isSaving}
+                loading={isSaving && showFeedback}
+                onClick={showFeedback ? handleNextQuestion : handleValidation}
+              >
+                {showFeedback ? "Question Suivante" : "Valider"}
+              </Button>
             </Flex>
-            <Progress.Root value={progress} size="sm" borderRadius="md" colorPalette="blue" >
-              <Progress.Track />
-            </Progress.Root>
-          </Box>
-
-          {/* Action Buttons */}
-          <Flex mt={6} direction={{ base: "column", sm: "row" }} gap={3} >
-            <Button
-              flex={1}
-              colorPalette="gray"
-              variant="outline"
-              onClick={handleSaveForLater}
-              loading={isSaving}
-              disabled={isSaving || showFeedback}
-            >
-              Sauvegarder pour plus tard
-            </Button>
-            <Button
-              flex={2}
-              colorPalette="blue"
-              disabled={selectedAnswerIds.length === 0 || isSaving}
-              loading={isSaving && showFeedback}
-              onClick={showFeedback ? handleNextQuestion : handleValidation}
-            >
-              {showFeedback ? "Question Suivante" : "Valider"}
-            </Button>
-          </Flex>
-        </CardBody>
-      </Card.Root>
-    </Box>
+          </CardBody>
+        </Card.Root>
+      </Box>
+    </>
   );
 }

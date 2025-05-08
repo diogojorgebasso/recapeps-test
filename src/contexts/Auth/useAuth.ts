@@ -15,5 +15,6 @@ export const AuthContext = createContext<AuthContextValue>({
     pro: false,
 });
 
-export const useAuth = () => useContext(AuthContext);
-
+export const useAuth = () => {
+    return useContext(AuthContext);
+};

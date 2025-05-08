@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { useState, useEffect } from 'react';
-import { AuthContext } from '../contexts/AuthContext';
+import { AuthContext } from './useAuth';
 import { auth } from "@/lib/firebase/clientApp";
 import { updateProfile, User as FirebaseUser, getIdTokenResult } from 'firebase/auth';
 import { setCookie, deleteCookie } from "cookies-next";

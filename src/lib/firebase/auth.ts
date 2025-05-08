@@ -4,10 +4,10 @@ import {
   onAuthStateChanged as _onAuthStateChanged,
   onIdTokenChanged as _onIdTokenChanged,
   sendEmailVerification,
-  signInWithEmailAndPassword, // Added
-  createUserWithEmailAndPassword, // Added
-  updateProfile, // Added
-  sendPasswordResetEmail as firebaseSendPasswordResetEmail, // Added and aliased
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  updateProfile,
+  sendPasswordResetEmail as firebaseSendPasswordResetEmail,
   NextOrObserver,
   User
 } from "firebase/auth";
@@ -50,18 +50,11 @@ export async function signUpWithGoogle() {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
 
-    // Always send a verification email during sign-up process
-    if (user) {
-      // For Google sign-up, email is typically already verified,
-      // but we can still check and send if needed
-      if (!user.emailVerified) {
-        await sendEmailVerification(user);
-        console.log("Verification email sent to", user.email);
-      }
-
-      // You could add additional registration-specific logic here
-      // For example, adding the user to a "new users" collection in Firestore
+    if (!user.emailVerified) {
+      await sendEmailVerification(user);
+      console.log("Verification email sent to", user.email); // TODO : Better error handling.
     }
+
 
     redirect("/parcours/dashboard");
   } catch (error) {
@@ -126,8 +119,8 @@ export async function registerWithEmailAndPassword(
     // Send email verification
     await sendEmailVerification(user);
     console.log("Verification email sent to", user.email);
+    redirect("/verify-email");
 
-    return user;
   } catch (error) {
     console.error("Error registering user with email and password", error);
     throw error; // Re-throw the error to be handled by the caller

@@ -134,13 +134,12 @@ export async function getProgressOverview(uid: string | undefined, numberOfEcrit
  */
 export async function findCompletedAttempts(uid: string, numberOfEcrit: number, limitResult: number = 5): Promise<AttemptQuiz[]> {
     try {
-        // Assuming attempts are stored per-subject (ecrit-X)
         const userAttemptsRef = collection(db, "users", uid, `ecrit - ${numberOfEcrit}`);
 
         const completedQuizzesQuery = query(
             userAttemptsRef,
             where("state", "==", "completed"),
-            orderBy("createdAt", "desc"), // Assuming createdAt exists and is indexed
+            orderBy("completedAt", "desc"),
             limit(limitResult)
         );
 
@@ -148,20 +147,10 @@ export async function findCompletedAttempts(uid: string, numberOfEcrit: number, 
 
         const quizHistory = completedQuizzesSnapshot.docs.map(doc => {
             const data = doc.data();
-            // Map to AttemptQuiz, ensure all fields match the interface
             return {
                 id: doc.id,
-                quizRef: data.quizRef as DocumentReference<DocumentData>,
-                title: data.title,
-                level: data.level,
-                premium: data.premium,
-                state: data.state,
-                questions: data.questions as Question[],
-                createdAt: data.createdAt as Timestamp,
-                score: data.score, // Include score if available
-                completedAt: data.completedAt as Timestamp | undefined, // Include completion time if available
-                // Add other relevant fields from the attempt document
-            } as AttemptQuiz; // Cast carefully
+                ...data
+            } as AttemptQuiz;
         });
 
         return quizHistory;

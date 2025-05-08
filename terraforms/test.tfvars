@@ -1,6 +1,18 @@
 project_id = "recapeps-test"
 
 service_accounts = {
+
+  #AUTH
+
+  "save-user-to-firestore-run" = { 
+    display_name = "Service Account for saveroletofirestore"
+    roles = [
+      "roles/firebase.admin",          # Modify Firebase Auth (custom claims)
+      "roles/datastore.user",          # Write to Firestore
+      "roles/cloudfunctions.invoker"   # Triggered by user create
+    ]
+  }
+
   "delete-user-document-run" = {
     display_name = "Service Account for deleteuserdocument"
     roles = [
@@ -10,6 +22,8 @@ service_accounts = {
       "roles/cloudfunctions.invoker"   # Triggered by auth events
     ]
   }
+
+  # EMAIL
 
   "send-contact-email-run" = {
     display_name = "Service Account for sendcontactemail"
@@ -35,14 +49,6 @@ service_accounts = {
     ]
   }
 
-  "save-role-to-firestore-run" = {
-    display_name = "Service Account for saveroletofirestore"
-    roles = [
-      "roles/firebase.admin",          # Modify Firebase Auth (custom claims)
-      "roles/datastore.user",          # Write to Firestore
-      "roles/cloudfunctions.invoker"   # Triggered by user create
-    ]
-  }
 
   "stripe-webhook-test-run" = {
     display_name = "Service Account for stripewebhooktest"

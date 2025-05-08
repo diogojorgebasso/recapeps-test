@@ -12,7 +12,7 @@ import {
     LuBadge, LuSparkles, LuLogOut, LuLogIn,
 } from "react-icons/lu";
 import { signOut } from "@/lib/firebase/auth";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/Auth/useAuth";
 
 const ring = defineStyle({
     outline: "2px solid",

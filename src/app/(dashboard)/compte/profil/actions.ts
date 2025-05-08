@@ -1,27 +1,23 @@
 'use server'
 
-import { cookies } from 'next/headers';
 import { getAuth, } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
+import { getAuthenticatedAppForUser } from '@/lib/firebase/serverApp';
 
 /**
  * Updates a user's email address after verifying their current password
  */
 export async function handleEmailChange(password: string, newEmail: string) {
     try {
-        const sessionCookie = (await cookies()).get('AuthToken')?.value;
-        if (!sessionCookie) {
+        const { user } = await getAuthenticatedAppForUser(); // Assuming this function gets the authenticated user
+
+        if (!user) {
             throw new Error('Utilisateur non authentifié');
         }
 
-        // Verify session
-        const decodedToken = await getAuth().verifySessionCookie(sessionCookie);
-        const uid = decodedToken.uid;
-
-        // Update email in Firebase Auth
-        await getAuth().updateUser(uid, {
+        await getAuth().updateUser(user.uid, {
             email: newEmail,
-            emailVerified: false, // Reset verification status
+            emailVerified: false,
         });
 
         await getAuth().generateEmailVerificationLink(newEmail);
@@ -42,24 +38,18 @@ export async function handleEmailChange(password: string, newEmail: string) {
  */
 export async function updateUserName(firstName: string, lastName: string) {
     try {
-        const sessionCookie = (await cookies()).get('AuthToken')?.value;
-        if (!sessionCookie) {
-            throw new Error('Utilisateur non authentifié');
-        }
-
-        // Verify session
-        const decodedToken = await getAuth().verifySessionCookie(sessionCookie);
-        const uid = decodedToken.uid;
-
-        // Format the display name (firstName + lastName)
+        const { user } = await getAuthenticatedAppForUser(); // Assuming this function gets the authenticated user
         const displayName = `${firstName} ${lastName}`.trim();
 
+        if (!user) {
+            throw new Error('Utilisateur non authentifié');
+        }
         // Update user in Firebase Auth
-        await getAuth().updateUser(uid, { displayName });
+        await getAuth().updateUser(user.uid, { displayName });
 
         // Update in Firestore too if you keep user data there
         const db = getFirestore();
-        await db.collection('users').doc(uid).update({
+        await db.collection('users').doc(user.uid).update({
             displayName,
             firstName,
             lastName,
@@ -77,65 +67,3 @@ export async function updateUserName(firstName: string, lastName: string) {
     }
 }
 
-/**
- * Gets the current email notification preference for a user
- */
-export async function isEmailNotificationEnabled() {
-    try {
-        const sessionCookie = (await cookies()).get('AuthToken')?.value;
-        if (!sessionCookie) {
-            throw new Error('Utilisateur non authentifié');
-        }
-
-        // Verify session
-        const decodedToken = await getAuth().verifySessionCookie(sessionCookie);
-        const uid = decodedToken.uid;
-
-        // Get user preferences from Firestore
-        const db = getFirestore();
-        const userDoc = await db.collection('users').doc(uid).get();
-
-        if (!userDoc.exists) {
-            return false; // Default to false if no preferences found
-        }
-
-        const userData = userDoc.data();
-        return userData?.preferences?.emailNotifications ?? false;
-
-    } catch (error: any) {
-        console.error('Error checking email notifications status:', error);
-        // Default to false in case of error
-        return false;
-    }
-}
-
-/**
- * Updates a user's email notification preferences
- */
-export async function updateEmailNotificationPreference(enabled: boolean) {
-    try {
-        const sessionCookie = (await cookies()).get('AuthToken')?.value;
-        if (!sessionCookie) {
-            throw new Error('Utilisateur non authentifié');
-        }
-
-        // Verify session
-        const decodedToken = await getAuth().verifySessionCookie(sessionCookie);
-        const uid = decodedToken.uid;
-
-        const db = getFirestore();
-        await db.collection('users').doc(uid).update({
-            'preferences.emailNotifications': enabled,
-            updatedAt: new Date()
-        });
-
-        return { success: true, enabled };
-    } catch (error: any) {
-        console.error('Error updating email notification preference:', error);
-        return {
-            success: false,
-            error: error.message,
-            code: error.code || 'unknown-error'
-        };
-    }
-}

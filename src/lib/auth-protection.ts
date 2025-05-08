@@ -11,6 +11,7 @@ export async function requireAuth() {
     }
 
     if (!user.emailVerified) {
+        // TODO : Study more about the ActionCode.
         redirect("/verify-email");
     }
 

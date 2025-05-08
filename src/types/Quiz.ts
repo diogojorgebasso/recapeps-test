@@ -4,7 +4,7 @@ export type QuizState = 'completed' | 'retry' | 'doing' | 'unlocked' | 'locked';
 
 export interface QuizTrail {
     id: string;
-    name: string;
+    name: string; // Name of the Quiz
     level: number;
     state: QuizState;
 };
@@ -34,6 +34,12 @@ export interface Question {
         id: string;
         answer: string;
         isCorrect: boolean;
+        timeSpent?: number;
     }>;
     explanation?: string;
+}
+
+// Omit the Fields that I already have in the Database.
+export interface QuizResult extends Omit<AttemptQuiz, 'createdAt' | 'state' | 'premium' | 'id' | 'quizRef'> {
+    completedAt: Timestamp;
 }

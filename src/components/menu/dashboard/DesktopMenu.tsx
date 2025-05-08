@@ -26,7 +26,7 @@ import {
 } from "react-icons/lu";
 import { useState } from "react";
 import { signOut } from "@/lib/firebase/auth";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/Auth/useAuth";
 import { SimpleColorModeButton } from "@/components/ui/color-mode";
 
 const ITEMS = [
@@ -40,8 +40,6 @@ const ITEMS = [
 ] as const;
 
 type Step = (typeof ITEMS)[number];
-
-/* ─── 2 · OVERLAY – one definition, reused via .update() ─────────── */
 
 const TourOverlay = createOverlay<{
     anchor: HTMLElement;

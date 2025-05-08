@@ -1,18 +1,13 @@
 'use client';
 
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import { ReactNode, createContext, useState, useEffect, useContext } from 'react';
 import { firebaseApp } from '@/lib/firebase/clientApp';
 
-type ConsentCtx = { consentGiven: boolean | null; setConsent: (v: boolean) => void };
-const CookieContext = createContext<ConsentCtx | undefined>(undefined);
+type TrackingConsentCtx = { consentGiven: boolean | null; setConsent: (v: boolean) => void };
 
-export const useCookieConsent = () => {
-    const ctx = useContext(CookieContext);
-    if (!ctx) throw new Error('useCookieConsent must be used inside CookieProvider');
-    return ctx;
-};
+export const TrackingConsentContext = createContext<TrackingConsentCtx | undefined>(undefined);
 
-export const CookieProvider = ({ children }: { children: React.ReactNode }) => {
+export function TrackingConsentProvider({ children }: { children: ReactNode }) {
     const [consentGiven, setConsentGiven] = useState<boolean | null>(null);
 
     // read persisted choice
@@ -29,7 +24,7 @@ export const CookieProvider = ({ children }: { children: React.ReactNode }) => {
             setAnalyticsCollectionEnabled(analytics, consentGiven);
         });
         import('firebase/performance').then(({ getPerformance }) => {
-            const perf = getPerformance(firebaseApp);
+            getPerformance(firebaseApp);
         });
     }, [consentGiven]);
 
@@ -39,8 +34,8 @@ export const CookieProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     return (
-        <CookieContext.Provider value={{ consentGiven, setConsent }}>
+        <TrackingConsentContext.Provider value={{ consentGiven, setConsent }}>
             {children}
-        </CookieContext.Provider>
+        </TrackingConsentContext.Provider>
     );
 };

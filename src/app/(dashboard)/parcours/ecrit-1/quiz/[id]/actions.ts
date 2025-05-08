@@ -1,44 +1,30 @@
 'use server';
 
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { headers } from 'next/headers';
 import { updateUserStreak } from '../../../oral-3/actions';
 import { db } from '@/lib/firebase/clientApp';
-
-interface QuestionResult {
-    questionId: string;
-    selectedAnswer: number[];
-    timeSpent: number; // Time in milliseconds
-}
-
-interface QuizResultPayload {
-    subjectId: string;
-    score: number;
-    totalQuestions: number;
-    questions: QuestionResult[];
-}
+import { getAuthenticatedAppForUser } from '@/lib/firebase/serverApp';
+import { AttemptQuiz, Question } from '@/types/Quiz';
 
 /**
  * Saves the completed quiz results and updates the user's streak.
  */
-export async function saveQuizResultsAction(payload: QuizResultPayload) {
+export async function saveQuizResultsAction(payload: AttemptQuiz) {
     try {
 
-        const uid = (await headers()).get('X-User-ID'); // Get the specific header value
+        const { user } = await getAuthenticatedAppForUser();
 
-        if (!uid) {
+        if (!user) {
             throw new Error('User not authenticated');
         }
 
-
         const resultsData = {
             ...payload,
-            userId: uid,
-            date: serverTimestamp(), // Use server timestamp
+            completedAt: serverTimestamp(), // Use server timestamp
         };
 
         // Save the quiz results
-        const docRef = await addDoc(collection(db, 'users', uid, 'quizResults'), resultsData);
+        const docRef = await addDoc(collection(db, 'users', user.uid, 'quizResults'), resultsData);
         console.log("Quiz results saved with ID: ", docRef.id);
 
         // Update the user's streak after successfully saving results
@@ -62,28 +48,29 @@ export async function saveQuizResultsAction(payload: QuizResultPayload) {
  * Placeholder action for saving quiz progress to resume later.
  * Implementation details (what/how to save) depend on requirements.
  */
-export async function saveQuizProgressAction(subjectId: string, currentQuestionIndex: number, currentScore: number, currentResults: QuestionResult[]) {
+export async function saveQuizProgressAction(
+    exam: number,
+    quizId: string,
+    currentQuestionIndex: number,
+    currentScore: number,
+    currentResults: Question[]) {
     try {
-        const uid = (await headers()).get('X-User-ID'); // Get the specific header value
+        const { user } = await getAuthenticatedAppForUser(); // Assuming this function gets the authenticated user
 
-        if (!uid) {
+        if (!user) {
             throw new Error('User not authenticated');
         }
 
-        console.log("Attempting to save progress for later:", {
-            userId: uid,
-            subjectId,
+        const docRef = await addDoc(collection(db, 'users', user.uid, `ecrit-${exam}`), {
+            quizId,
             currentQuestionIndex,
             currentScore,
-            currentResultsCount: currentResults.length,
+            currentResults,
+            lastUpdated: serverTimestamp()
         });
 
-        // TODO: Implement actual saving logic to Firestore
-        // e.g., save to a specific 'inProgressQuizzes' collection or update user progress document
-
-        await new Promise(resolve => setTimeout(resolve, 500)); // Simulate async operation
-
-        return { success: true, message: "Progress saving initiated (placeholder)." };
+        console.log("Quiz progress saved with ID: ", docRef.id);
+        return { success: true, progressId: docRef.id };
 
     } catch (error) {
         console.error('Error saving quiz progress:', error);

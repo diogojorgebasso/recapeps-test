@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from 'next/navigation';
 import {
     Box,
@@ -18,9 +17,7 @@ import { uploadRecordingAction } from "./actions";
 
 // Client component - for interactive functionality
 export default function OralRecorder({ title, subjectId }: { title: string, subjectId: string }) {
-    const { user } = useAuth();
     const router = useRouter();
-
     const [isRecording, setIsRecording] = useState(false);
     const [timeLeft, setTimeLeft] = useState(180);
     const [open, setOpen] = useState(false);
