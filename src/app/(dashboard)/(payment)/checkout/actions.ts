@@ -1,5 +1,5 @@
 import { db } from '@/lib/firebase/clientApp';
-import { stripe } from '@/lib/stripe'
+import { stripe } from '../stripe'
 import { doc, getDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 

@@ -13,7 +13,6 @@ import {
 import { LuCircleCheck } from 'react-icons/lu';
 import { useState } from 'react';
 import Link from 'next/link';
-import { Toaster, toaster } from "@/components/ui/toaster";
 
 interface Plan {
     id: string;
@@ -66,7 +65,6 @@ export default function AbonnementPage() {
 
     return (
         <Box>
-            <Toaster />
             <Box py={10} px={4}>
                 <Heading as="h1" textAlign="center" mb={10}>
                     Choisissez votre formule
