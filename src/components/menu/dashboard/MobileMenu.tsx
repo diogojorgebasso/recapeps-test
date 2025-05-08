@@ -1,121 +1,46 @@
-'use client';
+import { Box, HStack } from "@chakra-ui/react";
+import Link from "next/link";
+import { FaHome } from "react-icons/fa"; //home
+import { FaPencilAlt } from "react-icons/fa"; //ecrit 1
+import { FaPencilRuler } from "react-icons/fa"; //ecrit 2
+import { RxChatBubble } from "react-icons/rx"; //oral 1
+import { SlSpeech } from "react-icons/sl"
+import { FaRegUserCircle } from "react-icons/fa";
 
-import { Box, Flex, Icon, Link, VisuallyHidden } from "@chakra-ui/react";
-import NextLink from 'next/link';
-import { FaPen, FaBook, FaMicrophone, FaChalkboardUser, FaUser } from "react-icons/fa6";
-import { usePathname } from 'next/navigation';
-
-export default function MobileMenu() {
-    const pathname = usePathname();
-
-    // Determine active state for each link manually
-    const isEcrit1Active = pathname?.startsWith("/ecrit-1");
-    const isEcrit2Active = pathname?.startsWith("/ecrit-2");
-    const isOral1Active = pathname?.startsWith("/oral-1");
-    const isOral3Active = pathname?.startsWith("/oral-3");
-    const isProfilActive = pathname?.startsWith("/profil");
+export default async function MobileMenu() {
 
     return (
         <Box
-            as="nav"
-            position="fixed"
-            bottom="0"
-            left="0"
-            right="0"
-            bg="white"
-            borderTop="1px solid"
-            borderColor="gray.200"
-            p={2}
-            display={{ base: 'block', md: 'none' }} // Show only on mobile
+            display={{ base: "block", md: "none" }}
+            as="footer"
+            pos="fixed"
+            bottom={0}
+            insetX={0}
             zIndex="sticky"
-            boxShadow="0 -2px 5px rgba(0,0,0,0.05)"
+            bg="gray.100"
+            _dark={{ bg: "gray.950" }}
         >
-            <Flex justify="space-around" align="center">
-                {/* Écrit 1 Link */}
-                <Link
-                    as={NextLink}
-                    href="/dashboard/ecrit-1"
-                    display="flex"
-                    flexDirection="column"
-                    alignItems="center"
-                    color={isEcrit1Active ? "blue.500" : "gray.600"}
-                    _hover={{ textDecoration: 'none', color: 'blue.400' }}
-                    fontSize="xs"
-                    textAlign="center"
-                    w="60px"
-                >
-                    <Icon as={FaPen} boxSize={5} mb={1} />
-                    <VisuallyHidden>Écrit 1</VisuallyHidden>
+            <HStack justify="space-around" py={2}>
+                <Link href="/parcours/dashboard">
+                    <FaHome size={26} />
                 </Link>
+                <Link href="/parcours/ecrit-1">
+                    <FaPencilAlt size={26} />
+                </Link>
+                <Link href="/parcours/ecrit-2">
+                    <FaPencilRuler size={26} />
+                </Link>
+                <Link href="/parcours/oral-1">
+                    <RxChatBubble size={26} />
+                </Link>
+                <Link href="/parcours/oral-3">
+                    <SlSpeech size={26} />
+                </Link>
+                <Link href="/compte/profil">
+                    <FaRegUserCircle size={26} />
+                </Link>
+            </HStack>
 
-                {/* Écrit 2 Link */}
-                <Link
-                    as={NextLink}
-                    href="/dashboard/ecrit-2"
-                    display="flex"
-                    flexDirection="column"
-                    alignItems="center"
-                    color={isEcrit2Active ? "blue.500" : "gray.600"}
-                    _hover={{ textDecoration: 'none', color: 'blue.400' }}
-                    fontSize="xs"
-                    textAlign="center"
-                    w="60px"
-                >
-                    <Icon as={FaBook} boxSize={5} mb={1} />
-                    <VisuallyHidden>Écrit 2</VisuallyHidden>
-                </Link>
-
-                {/* Oral 1 Link */}
-                <Link
-                    as={NextLink}
-                    href="/dashboard/oral-1"
-                    display="flex"
-                    flexDirection="column"
-                    alignItems="center"
-                    color={isOral1Active ? "blue.500" : "gray.600"}
-                    _hover={{ textDecoration: 'none', color: 'blue.400' }}
-                    fontSize="xs"
-                    textAlign="center"
-                    w="60px"
-                >
-                    <Icon as={FaMicrophone} boxSize={5} mb={1} />
-                    <VisuallyHidden>Oral 1</VisuallyHidden>
-                </Link>
-
-                {/* Oral 3 Link */}
-                <Link
-                    as={NextLink}
-                    href="/dashboard/oral-3"
-                    display="flex"
-                    flexDirection="column"
-                    alignItems="center"
-                    color={isOral3Active ? "blue.500" : "gray.600"}
-                    _hover={{ textDecoration: 'none', color: 'blue.400' }}
-                    fontSize="xs"
-                    textAlign="center"
-                    w="60px"
-                >
-                    <Icon as={FaChalkboardUser} boxSize={5} mb={1} />
-                    <VisuallyHidden>Oral 3</VisuallyHidden>
-                </Link>
-
-                {/* Profil Link */}
-                <Link
-                    as={NextLink}
-                    href="/dashboard/profil"
-                    display="flex"
-                    flexDirection="column"
-                    alignItems="center"
-                    color={isProfilActive ? "blue.500" : "gray.600"}
-                    _hover={{ textDecoration: 'none', color: 'blue.400' }}
-                    fontSize="xs"
-                    textAlign="center"
-                    w="60px"
-                >
-                    <Icon as={FaUser} boxSize={5} mb={1} />
-                    <VisuallyHidden>Profil</VisuallyHidden>
-                </Link>
-            </Flex>
         </Box>
     );
 }
