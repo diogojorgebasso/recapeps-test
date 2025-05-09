@@ -15,7 +15,7 @@ export function AuthProvider({ children, initialUser }: { children: ReactNode, i
         return onIdTokenChanged(async (user) => {
             console.log("User changed", user?.toJSON());
             if (user) {
-                const idToken = await user.getIdToken(true);
+                const idToken = await user.getIdToken();
                 await setCookie("__session", idToken);
             } else {
                 await deleteCookie("__session");
