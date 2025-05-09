@@ -12,7 +12,7 @@ function useUserSession(initialUser: any) {
         console.log("ENTREI NO USE EFFECT", initialUser);
         return onIdTokenChanged(async (user) => {
             if (user) {
-                const idToken = await user.getIdToken();
+                const idToken = await user.getIdToken(true);
                 await setCookie("__session", idToken);
             } else {
                 await deleteCookie("__session");
