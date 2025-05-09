@@ -8,6 +8,7 @@ import { getAuth } from "firebase/auth";
 
 export async function getAuthenticatedAppForUser() {
     const authIdToken = (await cookies()).get("__session")?.value;
+    if (!authIdToken) return { currentUser: null };
 
     // Firebase Server App is a new feature in the JS SDK that allows you to
     // instantiate the SDK with credentials retrieved from the client & has
@@ -26,19 +27,19 @@ export async function getAuthenticatedAppForUser() {
     const user = auth.currentUser;
     let isPro = false;
 
-    if (authIdToken)
-        try {
-            // Simple JWT decoding (tokens have 3 parts separated by dots)
-            const parts = authIdToken.split('.');
-            if (parts.length === 3) {
-                const payload = parts[1];
-                const decoded = Buffer.from(payload, 'base64').toString();
-                const claims = JSON.parse(decoded);
-                isPro = claims.pro === true;
-            }
-        } catch (error) {
-            console.error("Error decoding JWT token:", error);
+    try {
+        console.log("Im entering here.")
+        // Simple JWT decoding (tokens have 3 parts separated by dots)
+        const parts = authIdToken.split('.');
+        if (parts.length === 3) {
+            const payload = parts[1];
+            const decoded = Buffer.from(payload, 'base64').toString();
+            const claims = JSON.parse(decoded);
+            isPro = claims.pro === true;
         }
+    } catch (error) {
+        console.error("Error decoding JWT token:", error);
+    }
 
     return { firebaseServerApp, user, isPro };
 }
