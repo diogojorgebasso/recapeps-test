@@ -18,7 +18,7 @@ export async function getAuthenticatedAppForUser() {
         // https://github.com/firebase/firebase-js-sdk/issues/8863#issuecomment-2751401913
         initializeApp(),
         {
-            authIdToken,
+            appCheckToken: process.env.NEXT_PUBLIC_FIREBASE_APP_CHECK_KEY
         }
     );
 
