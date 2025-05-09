@@ -23,6 +23,8 @@ import Logo from "@/components/ui/logo-recapeps";
 import QuizComponent1 from "./quiz1";
 import QuizComponent2 from "./quiz2";
 
+export const dynamic = "force-dynamic";
+
 export default function Home() {
   return (
     <Box >
