@@ -20,11 +20,12 @@ export default async function RootLayout({
 }>) {
 
   const { user } = await getAuthenticatedAppForUser();
+  console.log("User Layout", user?.toJSON());
 
   return (
     <html suppressHydrationWarning lang="fr">
       <body>
-        <AuthProvider initialUser={user ? user.toJSON() as any : null}>
+        <AuthProvider initialUser={user?.toJSON()}>
           <PushNotificationsProvider>
             <TrackingConsentProvider>
               <Provider>

@@ -1,16 +1,30 @@
 'use client';
 
-import { Box, Flex, Heading, VStack } from '@chakra-ui/react';
+import { Box, Flex, Heading, VStack, Spinner, Alert } from '@chakra-ui/react';
 import { useAuth } from '@/contexts/Auth/useAuth';
 import ProfilePhotoUploader from './components/ProfilePhotoUploader';
 import ProfileDetailsForm from './components/ProfileDetailsForm';
 import SubscriptionSection from './components/SubscriptionSection';
 import EmailNotificationToggle from './components/EmailNotificationToggle';
+import { useEffect, useState } from 'react';
 
 export default function ProfilePage() {
-    const { user, pro } = useAuth();
+    const { user, pro, loading } = useAuth();
+    const [error, setError] = useState<string | null>(null);
 
-    if (!user) return null; // or a skeleton
+    useEffect(() => {
+        if (!loading && !user) {
+            setError("Unable to load user profile. Please try again later.");
+        }
+    }, [loading, user]);
+
+    if (loading) return <Spinner size="xl" />;
+    if (error || !user) return (
+        <Alert.Root status="error">
+            <Alert.Indicator />
+            {error || "Authentication error. Please refresh the page or sign in again."}
+        </Alert.Root>
+    );
 
     return (
         <Box p={6}>
@@ -18,7 +32,7 @@ export default function ProfilePage() {
                 Ton profil
             </Heading>
 
-            <Flex gap={10} align="flex-start">
+            <Flex gap={10} align="flex-start" direction={{ base: "column", md: "row" }}>
                 <VStack gap={4}>
                     <ProfilePhotoUploader />
                 </VStack>
