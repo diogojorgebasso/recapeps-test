@@ -13,6 +13,7 @@ export function AuthProvider({ children, initialUser }: { children: ReactNode, i
 
     useEffect(() => {
         return onIdTokenChanged(async (user) => {
+            console.log("User changed", user?.toJSON());
             if (user) {
                 const idToken = await user.getIdToken(true);
                 await setCookie("__session", idToken);
