@@ -5,6 +5,7 @@ export interface AuthContextValue {
     user: User | null;
     updatePhotoURLInContext: (photoURL: string) => Promise<boolean>;
     pro: boolean;
+    loading: boolean; // Add loading state
 }
 
 export const AuthContext = createContext<AuthContextValue>({
@@ -13,6 +14,7 @@ export const AuthContext = createContext<AuthContextValue>({
         return false;
     },
     pro: false,
+    loading: true, // Default to true
 });
 
 export const useAuth = () => {

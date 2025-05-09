@@ -9,11 +9,8 @@ import {
 
 import DesktopMenu from "@/components/menu/dashboard/DesktopMenu";   // ← client (tour + sidebar)
 import MobileMenu from "@/components/menu/dashboard/MobileMenu"; // optional
-import { requireAuth } from "@/lib/firebase/auth-protection";
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
-    const user = await requireAuth();
-
     return (
         <Flex minH="100vh">
             <Suspense fallback={<Spinner position="fixed" top={4} left={4} />}>
