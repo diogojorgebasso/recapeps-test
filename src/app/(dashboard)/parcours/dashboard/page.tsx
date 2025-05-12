@@ -8,12 +8,8 @@ import {
     HStack,
     Button,
     Text,
-    VStack,
     SimpleGrid,
     Card,
-    CardHeader,
-    CardBody,
-    CardFooter,
     Spinner,
     Center,
 } from "@chakra-ui/react";
@@ -35,7 +31,7 @@ import Link from "next/link";
 import { findCompletedAttempts } from "@/repositories/quizRepo";
 import { QuizDone } from "@/types/Quiz";
 
-export default function Dashboard() {
+export default function Page() {
     const { user } = useAuth();
     const [quizData, setQuizData] = useState<QuizDone[]>([]);
     const recommendedQuizzes = [
