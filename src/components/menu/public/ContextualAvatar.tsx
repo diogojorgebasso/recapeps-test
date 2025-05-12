@@ -45,7 +45,7 @@ export default function ContextualAvatar() {
                 <Menu.Positioner>
                     <Menu.Content w="56">
                         <Menu.Item value="profil" asChild >
-                            <Link href="/profil">
+                            <Link href="/compte/profil">
                                 <HStack gap={2}>
                                     <LuBadge />
                                     Profil
@@ -54,8 +54,8 @@ export default function ContextualAvatar() {
                         </Menu.Item>
                         <Menu.Separator />
                         {!pro && (
-                            <Menu.Item value="checkout" asChild >
-                                <Link href="/checkout">
+                            <Menu.Item value="abonnement" asChild >
+                                <Link href="/abonnement">
                                     <HStack gap={2}>
                                         <LuSparkles />
                                         Passer à Recap&apos;eps Pro

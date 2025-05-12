@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect, useState, Suspense } from "react"; // Import useEffect, useState
+import { useRouter } from "next/navigation"; // Import for client-side navigation
 import { subjects } from "./subjects";
 import {
     Box,
@@ -6,33 +10,55 @@ import {
     SimpleGrid,
     Image,
     Button,
-    Link,
     Dialog,
     Tabs,
-    Text
+    Text,
+    Spinner,
+    Center
 } from "@chakra-ui/react";
 import SkillTreeClient from "./SkillTreeClient";
 import { getProgressOverview } from "@/repositories/quizRepo";
-
 import { QuizTrail } from "@/types/TreeSkill";
-import { Suspense } from "react";
+import { useAuth } from "@/contexts/Auth"; // Import useAuth
+import Link from "next/link";
 
-import { getAuthenticatedAppForUser } from "@/lib/firebase/serverApp";
-import { redirect } from "next/navigation";
-import { getFirestore } from "firebase/firestore";
+export default function Page() {
+    const { user, pro } = useAuth();
+    const router = useRouter();
 
-export default async function Page() {
-    const { user, isPro, firebaseServerApp } = await getAuthenticatedAppForUser();
+    const [quizNodesArray, setQuizNodesArray] = useState<QuizTrail[]>([]);
 
-    if (!user) { // this will be resolved in the Layout.
-        redirect("/login?redirect=/parcours/ecrit-1");
+    useEffect(() => {
+        if (!user) {
+            router.push("/login?redirect=/parcours/ecrit-1");
+        } else {
+            const fetchData = async () => {
+                try {
+                    // getProgressOverview uses client 'db' by default
+                    const progressData = await getProgressOverview(undefined, user.uid, 1);
+                    setQuizNodesArray(progressData || []);
+                } catch (error) {
+                    console.error("Failed to fetch progress overview:", error);
+                    setQuizNodesArray([]); // Set to empty array on error
+                }
+            };
+            fetchData();
+        }
+    }, [user, router]);
+
+
+    if (!user) {
+        // This case should ideally be handled by the redirect,
+        // but as a fallback or if redirect hasn't completed.
+        return (
+            <Center h="80vh">
+                <Text>Redirection vers la page de connexion...</Text>
+            </Center>
+        );
     }
 
-    const progressData = await getProgressOverview(getFirestore(firebaseServerApp), user.uid, 1);
-    const quizNodesArray: QuizTrail[] = progressData || [];
-
     return (
-        <Tabs.Root>
+        <Tabs.Root defaultValue="apprendre">
             <Tabs.List>
                 <Tabs.Trigger value="apprendre" colorPalette="blue" fontSize="2xl" fontWeight="bold">
                     Apprendre
@@ -54,7 +80,7 @@ export default async function Page() {
                                     name={name}
                                     image={image}
                                     premium={premium}
-                                    isUserPremium={isPro}
+                                    isUserPremium={pro} // Use isPro from useAuth
                                     vers={id}
                                 />
                             ))}
@@ -63,7 +89,7 @@ export default async function Page() {
                 </Box >
             </Tabs.Content>
             <Tabs.Content value="s-entraner">
-                <Suspense fallback={<div>Chargement...</div>}>
+                <Suspense fallback={<Center h="50vh"><Spinner size="lg" /></Center>}>
                     <SkillTreeClient QuizNode={quizNodesArray} />
                 </Suspense>
             </Tabs.Content>
@@ -75,7 +101,7 @@ function ExamCard({
     name,
     image,
     premium,
-    isUserPremium,
+    isUserPremium, // This will now be the client-side isPro
     vers
 }: {
     name: string;
@@ -87,7 +113,7 @@ function ExamCard({
     if (isUserPremium) {
         return (
             <Card.Root maxW="sm" overflow="hidden" borderWidth="1px" borderRadius="lg" shadow="md">
-                <Image src={image} alt={name} maxH="200px" w="100%" />
+                <Image src={image} alt={name} maxH="200px" w="100%" objectFit="cover" />
                 <Card.Body gap="2" p="4">
                     <Card.Title>{name}</Card.Title>
                 </Card.Body>
@@ -102,7 +128,7 @@ function ExamCard({
     else {
         return (
             <Card.Root maxW="sm" overflow="hidden" borderWidth="1px" borderRadius="lg" shadow="md">
-                <Image src={image} alt={name} />
+                <Image src={image} alt={name} maxH="200px" w="100%" objectFit="cover" />
                 <Card.Body gap="2" p="4">
                     <Card.Title>{name} {premium ? "🔒" : ""}</Card.Title>
                 </Card.Body>
@@ -129,8 +155,10 @@ function ExamCard({
                                     <Dialog.ActionTrigger asChild>
                                         <Button variant="outline">Non, merci</Button>
                                     </Dialog.ActionTrigger>
-                                    <Button variant="solid">
-                                        <Link href="/checkout">Oui par pitié</Link>
+                                    <Button asChild variant="solid">
+                                        <Link href="/abbonnement">
+                                            Oui par pitié
+                                        </Link>
                                     </Button>
                                 </Dialog.Footer>
                                 <Dialog.CloseTrigger />
