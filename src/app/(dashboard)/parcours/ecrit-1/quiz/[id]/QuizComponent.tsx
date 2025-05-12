@@ -1,4 +1,3 @@
-/*  QuizComponent.tsx  */
 "use client";
 
 import {
@@ -10,12 +9,9 @@ import { useRouter } from "next/navigation";
 
 import { AttemptQuiz, AttemptedQuestion, QuizAttemptDonePayload } from "@/types/Quiz";
 import { useAuth } from "@/contexts/Auth/useAuth";
-import { saveQuizResultsAction } from "./actions";
+import { saveQuizResultsAction } from "./getData";
 import { Toaster, toaster } from "@/components/ui/toaster";
 
-/* ──────────────────────────────────────────────────────────── *
- *  1 ▸   STATE MACHINE ENUM
- * ──────────────────────────────────────────────────────────── */
 enum QuizState {
   QUESTION_DISPLAY,
   QUESTION_FEEDBACK,

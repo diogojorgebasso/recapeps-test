@@ -11,7 +11,6 @@ import {
     Fieldset,
     VStack,
     Field,
-    Alert,
 } from "@chakra-ui/react";
 import { z } from "zod";
 import { addDoc, collection } from "firebase/firestore";

@@ -7,7 +7,7 @@ import { RxChatBubble } from "react-icons/rx"; //oral 1
 import { SlSpeech } from "react-icons/sl"
 import { FaRegUserCircle } from "react-icons/fa";
 
-export default async function MobileMenu() {
+export default function MobileMenu() {
 
     return (
         <Box
