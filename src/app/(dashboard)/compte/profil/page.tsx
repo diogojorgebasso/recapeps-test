@@ -9,16 +9,15 @@ import EmailNotificationToggle from './components/EmailNotificationToggle';
 import { useEffect, useState } from 'react';
 
 export default function ProfilePage() {
-    const { user, pro, loading } = useAuth();
+    const { user, pro } = useAuth();
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        if (!loading && !user) {
+        if (!user) {
             setError("Unable to load user profile. Please try again later.");
         }
-    }, [loading, user]);
+    }, [user]);
 
-    if (loading) return <Spinner size="xl" />;
     if (error || !user) return (
         <Alert.Root status="error">
             <Alert.Indicator />

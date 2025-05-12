@@ -1,7 +1,5 @@
-'use client';
-
 import { ref, uploadBytes } from "firebase/storage";
-import { storage, auth } from "@/lib/firebase/clientApp"; // Assuming clientApp initializes storage
+import { storage, auth } from "@/lib/firebase/clientApp";
 
 export async function uploadRecordingAction(formData: FormData, subjectId: string): Promise<{ success: boolean; filePath?: string; error?: string }> {
     const file = formData.get('audioBlob') as File | null;

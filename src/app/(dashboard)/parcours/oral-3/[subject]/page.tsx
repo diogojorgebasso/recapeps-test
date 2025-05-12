@@ -1,16 +1,16 @@
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase/clientApp";
-import OralRecorder from "./OralRecorder";
+import ClientComponent from "./ClientComponent";
+import { getDoc, doc, getFirestore } from "firebase/firestore";
+import { getAuthenticatedAppForUser } from "@/lib/firebase/serverApp";
 
-// Server component for data fetching
-async function getOral(subjectId: string) {
+async function getOral(firebaseServerApp: any, subjectId: string) {
+    const db = getFirestore(firebaseServerApp);
     return await getDoc(doc(db, "oral-3", subjectId));
 }
-
 export default async function Page({ params }: { params: Promise<{ subject: string }> }) {
     const { subject } = await params;
-    const oralDoc = await getOral(subject);
+    const { firebaseServerApp } = await getAuthenticatedAppForUser();
+    const oralDoc = await getOral(firebaseServerApp, subject);
     const title = oralDoc.data()?.title || "Oral Exercise";
 
-    return <OralRecorder title={title} subjectId={subject} />;
+    return <ClientComponent title={title} subjectId={subject} />;
 }

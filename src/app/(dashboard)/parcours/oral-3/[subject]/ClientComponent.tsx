@@ -13,10 +13,10 @@ import {
     Container,
     CloseButton
 } from "@chakra-ui/react";
-import { uploadRecordingAction } from "./actions";
+import { uploadRecordingAction } from "./uploadRecordingAction";
 
-// Client component - for interactive functionality
-export default function OralRecorder({ title, subjectId }: { title: string, subjectId: string }) {
+
+export default function ClientComponent({ title, subjectId }: { title: string, subjectId: string }) {
     const router = useRouter();
     const [isRecording, setIsRecording] = useState(false);
     const [timeLeft, setTimeLeft] = useState(180);
@@ -34,18 +34,12 @@ export default function OralRecorder({ title, subjectId }: { title: string, subj
     const stopRecording = useCallback(() => {
         if (mediaRecorderRef.current && isRecording) {
             mediaRecorderRef.current.stop();
-
-            // Stop all audio tracks
             mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
-
             setIsRecording(false);
-
-            // Stop visualization
             if (animationRef.current) {
                 cancelAnimationFrame(animationRef.current);
                 animationRef.current = null;
             }
-
             // Clear canvas
             if (canvasRef.current) {
                 const ctx = canvasRef.current.getContext('2d');
