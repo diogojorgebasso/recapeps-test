@@ -99,7 +99,7 @@ export default async function DesktopMenu() {
                                             <Link href="/checkout">
                                                 <HStack gap={2}>
                                                     <LuSparkles />
-                                                    <Text as="span">Passer à Recap'eps Pro</Text>
+                                                    <Text as="span">Passer à Recap&apos;eps Pro</Text>
                                                 </HStack>
                                             </Link>
                                         </Menu.Item>

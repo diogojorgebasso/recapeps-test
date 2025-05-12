@@ -6,10 +6,11 @@ import {
     defineStyle,
     Button,
     Portal,
+    HStack,
 } from "@chakra-ui/react";
 import Link from "next/link";
 import {
-    LuBadge, LuSparkles, LuLogOut, LuLogIn,
+    LuBadge, LuSparkles, LuLogOut,
 } from "react-icons/lu";
 import { signOut } from "@/lib/firebase/auth";
 import { useAuth } from "@/contexts/Auth/useAuth";
@@ -25,9 +26,9 @@ export default function ContextualAvatar() {
 
     if (!user) {
         return (
-            <Button asChild size="sm">
-                <Link href="/login">Se connecter</Link>
-            </Button>
+            <Link href="/login" passHref>
+                <Button as="a" size="sm">Se connecter</Button>
+            </Link>
         );
     }
 
@@ -44,17 +45,29 @@ export default function ContextualAvatar() {
                 <Menu.Positioner>
                     <Menu.Content w="56">
                         <Menu.Item value="profil" asChild >
-                            <Link href="/profil"><LuBadge />Profil</Link>
+                            <Link href="/profil">
+                                <HStack gap={2}>
+                                    <LuBadge />
+                                    Profil
+                                </HStack>
+                            </Link>
                         </Menu.Item>
                         <Menu.Separator />
                         {!pro && (
                             <Menu.Item value="checkout" asChild >
-                                <Link href="/checkout"><LuSparkles />Passer à Recap'eps Pro</Link>
+                                <Link href="/checkout">
+                                    <HStack gap={2}>
+                                        <LuSparkles />
+                                        Passer à Recap&apos;eps Pro
+                                    </HStack>
+                                </Link>
                             </Menu.Item>)}
                         < Menu.Separator />
                         <Menu.Item value="logout" onClick={signOut}>
-                            <LuLogOut />
-                            Déconnexion
+                            <HStack gap={2}>
+                                <LuLogOut />
+                                Déconnexion
+                            </HStack>
                         </Menu.Item>
                     </Menu.Content>
                 </Menu.Positioner>

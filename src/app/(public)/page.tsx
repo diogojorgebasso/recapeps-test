@@ -200,7 +200,7 @@ export default function Home() {
             </Box>
 
             <Text>
-              Pour réviser efficacement les oraux, tu as accès à des fiches de révision ainsi qu'à des simulations d'entretien d'oral 3 <br /><br />
+              Pour réviser efficacement les oraux, tu as accès à des fiches de révision ainsi qu&apos;à des simulations d&apos;entretien d&apos;oral 3 <br /><br />
             </Text>
             {/* Oral 1 */}
             <Box id="oral1">
