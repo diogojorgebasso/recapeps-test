@@ -42,7 +42,7 @@ export default function ProfileDetailsForm({
                 <Field.Root>
                     <Field.Label>Email</Field.Label>
                     <Input value={email} onChange={(e) => setEmail(e.target.value)} />
-                    <Field.ErrorText>Entrez votre mot de passe plus bas</Field.ErrorText>
+                    <Field.ErrorText>Entrez votre mot de passe ci-dessous</Field.ErrorText>
                 </Field.Root>
             </Fieldset.Content>
 

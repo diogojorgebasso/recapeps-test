@@ -40,7 +40,7 @@ export default function Register() {
                         Inscription
                     </Heading>
                     <Text mt={2} fontSize="sm" color="gray.600">
-                        Créez un compte en remplissant les informations ci-dessous.
+                        Veuillez compléter les informations ci-dessous pour créer votre compte.
                     </Text>
                 </Card.Header>
 
@@ -88,7 +88,7 @@ export default function Register() {
                                 loading={pending}
                                 disabled={pending}
                             >
-                                S&apos;inscrire
+                                Créer un compte
                             </Button>
                         </Stack>
                     </form>
@@ -106,7 +106,7 @@ export default function Register() {
                         onClick={() => signUpWithGoogle()}
                     >
                         <FaGoogle />
-                        S&apos;inscrire avec Google
+                        Se connecter avec Google
                     </Button>
 
                     <Text mt={4} fontSize="sm" textAlign="center">

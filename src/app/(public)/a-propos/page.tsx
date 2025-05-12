@@ -22,7 +22,7 @@ export default function Page() {
                 mb="8"
             >
                 <Highlight query="Recap’eps" styles={{ color: "orange.600" }}>
-                    À propos de  Recap’eps
+                    À propos de Recap’eps
                 </Highlight>
             </Heading>
 
@@ -43,7 +43,7 @@ export default function Page() {
                 lineHeight="tall"
                 mb="6"
             >
-                Recap’eps est né d’un constat simple : accéder à du contenu de qualité, eh ben ça coûte cher et ce n’est pas forcément facile. Un étudiant lambda n’a pas toujours les moyens de débourser des centaines d’euros pour acheter des fiches de révision ou des formations en ligne.
+                Recap’eps est né d’un constat simple : accéder à du contenu de qualité, eh bien ça coûte cher et ce n’est pas forcément facile. Un étudiant lambda n’a pas toujours les moyens de débourser des centaines d’euros pour acheter des fiches de révision ou des formations en ligne.
 
 
             </Text>

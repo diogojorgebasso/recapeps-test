@@ -29,10 +29,13 @@ export default async function Return({
         return (
             <Box as="section" id="success">
                 <Text>
-                    We appreciate your business{customer_details?.name}! A confirmation email will be sent to{' '}
-                    {customer_details?.email}. If you have any questions, please email{' '}
+                    Merci pour votre confiance {customer_details?.name}! Un email de confirmation a été ennvoyé à {' '}
+                    {customer_details?.email}. Si vous avez des questions, n'hésitez pas à nous contacter à l'adresse suivante : {' '}
                 </Text>
                 <Link href="mailto:suport@recapeps.fr">suport@recapeps.fr</Link>. {/* Use Link for anchor */}
+                <Text>
+                    Bonnes révisions et à bientôt sur Recap'eps!
+                </Text>
             </Box>
         )
     }

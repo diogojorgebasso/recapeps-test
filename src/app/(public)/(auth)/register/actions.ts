@@ -49,12 +49,12 @@ export async function register(state: SignUpState, formData: FormData) {
         if (error.code === "auth/email-already-exists") {
             errorMessage = "Cet email est déjà utilisé.";
             return {
-                message: "Erreur d'inscription.",
+                message: "Une erreur est survenue lors de l'inscription.",
                 errors: { email: [errorMessage], _form: [errorMessage] },
             };
         }
         return {
-            message: "Erreur d'inscription.",
+            message: "Une erreur est survenue lors de l'inscription.",
             errors: { _form: [errorMessage] },
         };
     }

@@ -94,13 +94,13 @@ export const exportuserdata = onCall(
             const emailData = {
                 to: userEmail,
                 from: "no-reply@recapeps.fr",
-                subject: "Votre export de données RecapEPS",
-                text: "Veuillez trouver ci-joint l'export de vos données RecapEPS.",
+                subject: "Votre export de données Recap'eps",
+                text: "Veuillez trouver ci-joint l'export de vos données Recap'eps.",
                 html: `
                 <p>Bonjour ${userData.profile.name || ""},</p>
-                <p>Vous avez demandé un export de vos données personnelles sur RecapEPS.</p>
-                <p>Vos données sont disponibles en pièce jointe à cet email.</p>
-                <p>Cordialement,<br>L'équipe RecapEPS</p>`,
+                <p>Vous avez demandé un export de vos données personnelles sur Recap'eps.</p>
+                <p>Vos données sont disponibles en pièce jointe de cet email.</p>
+                <p>Cordialement,<br>L'équipe Recap'eps</p>`,
                 attachments: [
                     {
                         filename: 'recapeps-data-export.json',
@@ -134,13 +134,13 @@ export const sendwelcomeemail = functions.runWith({
       }
       
       const msg = {
-        to: email,
+        to: email, 
         from: 'no-reply@recapeps.fr',
-        subject: 'Bienvenue sur RecapEPS !',
-        text: `Bonjour,\n\nBienvenue sur RecapEPS ! Nous sommes ravis de vous compter parmi nos utilisateurs.\n\nN'hésitez pas à explorer toutes les fonctionnalités de notre plateforme.\n\nCordialement,\nL'équipe RecapEPS`,
+        subject: "Bienvenue sur Recap'eps! ",
+        text: `Bonjour,\n\nBienvenue sur Recap'eps ! Nous sommes ravis de vous compter parmi nos utilisateurs.\n\nN'hésitez pas à explorer toutes les fonctionnalités de notre plateforme.\n\nCordialement,\nL'équipe Recap'eps`,
         html: `
           <p>Bonjour,</p>
-          <p>Bienvenue sur <strong>RecapEPS</strong> !</p>
+          <p>Bienvenue sur <strong>Recap'eps</strong> !</p>
           <p>Nous sommes ravis de vous compter parmi nos utilisateurs.</p>
           <p>N'hésitez pas à explorer toutes les fonctionnalités de notre plateforme.</p>
           <p>Cordialement,<br>L'équipe RecapEPS</p>

@@ -19,7 +19,7 @@ export default async function QuizHistoryPage() {
 
     return (
         <Container maxW="container.lg" p={4}>
-            <Heading as="h1" size="lg" mb={6}>Quiz History</Heading>
+            <Heading as="h1" size="lg" mb={6}>Hitorique des quiz </Heading>
 
             {error && (
                 <Alert.Root status="error" mb={4} borderRadius="md">
@@ -29,7 +29,7 @@ export default async function QuizHistoryPage() {
             )}
 
             {quizHistory.length === 0 && !error && (
-                <Text>Vous n&apos;avez pas fait un quiz.</Text>
+                <Text>Vous n&apos;avez pas encore fait de quiz.</Text>
             )}
 
             <List.Root gap={4}>
@@ -49,10 +49,10 @@ export default async function QuizHistoryPage() {
                                 </Badge>
                             </Flex>
                             <Text fontSize="sm" color="gray.500" mt={1}>
-                                Completed on: {completedAt.toDate().toLocaleDateString()}
+                                Réalisé le: {completedAt.toDate().toLocaleDateString()}
                             </Text>
                             <Link href={`/ecrit-1/quiz/attempt/${id}`} color="blue.600">
-                                Review Attempt
+                                Revoir sa tentative
                             </Link>
                         </List.Item>
                     );

@@ -26,7 +26,7 @@ export async function forgotPasswordAction(state: FormState, formData: FormData)
 
     if (!validatedFields.success) {
         return {
-            message: "Erreur de validation.",
+            message: "Une erreur est survenue.",
             errors: validatedFields.error.flatten().fieldErrors,
             success: false,
         };

@@ -244,7 +244,7 @@ export default function OralRecorder({ title, subjectId }: { title: string, subj
                     transition="all 0.2s"
                     borderRadius="full"
                 >
-                    {isRecording ? 'Stop Recording' : 'Start Recording'}
+                    {isRecording ? "Arrêter l'enregistrement" : "Démarrer l'enregistrement"}
                 </Button>
             </VStack>
 

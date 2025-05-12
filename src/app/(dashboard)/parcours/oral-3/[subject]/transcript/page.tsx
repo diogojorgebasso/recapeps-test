@@ -105,7 +105,7 @@ export default function Transcription() {
         return (
             <Container centerContent py={20}>
                 <Spinner size="xl" />
-                <Text mt={4}>Loading transcription...</Text>
+                <Text mt={4}>Transcription en cours de chargement...</Text>
             </Container>
         );
     }
@@ -113,9 +113,9 @@ export default function Transcription() {
     if (error) {
         return (
             <Container centerContent py={20}>
-                <Heading size="md" color="red.500">Error</Heading>
+                <Heading size="md" color="red.500">Erreur</Heading>
                 <Text mt={4}>{error}</Text>
-                <Button mt={6} onClick={() => navigate.forward()}>Go Back</Button>
+                <Button mt={6} onClick={() => navigate.forward()}>Retour</Button>
             </Container>
         );
     }
@@ -136,7 +136,7 @@ export default function Transcription() {
                         <Link
                             href={`/api/download?file=${encodeURIComponent(transcription.originalFile)}`}>
                             <Button size="sm">
-                                <FaDownload />  Download Audio
+                                <FaDownload />  Télécharger le fichier audio
                             </Button>
                         </Link>
                     )}
@@ -190,7 +190,7 @@ export default function Transcription() {
                             </Box>
                         ) : (
                             <Text color="gray.500" fontStyle="italic">
-                                No transcription available
+                                Aucune transcription disponible.
                             </Text>
                         )}
                     </CardBody>

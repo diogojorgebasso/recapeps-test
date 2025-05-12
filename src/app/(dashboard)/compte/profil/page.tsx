@@ -29,7 +29,7 @@ export default function ProfilePage() {
     return (
         <Box p={6}>
             <Heading size="lg" mb={6}>
-                Ton profil
+                Mon profil
             </Heading>
 
             <Flex gap={10} align="flex-start" direction={{ base: "column", md: "row" }}>
@@ -46,7 +46,7 @@ export default function ProfilePage() {
 
             <Box mt={8}>
                 <Heading as="h3" size="md" mb={4}>
-                    Préférences Email
+                    Préférences email
                 </Heading>
                 <EmailNotificationToggle />
             </Box>
