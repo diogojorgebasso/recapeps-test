@@ -18,12 +18,13 @@ import { ColorModeButton } from "@/components/ui/color-mode";
 import { FaPencilAlt, FaPencilRuler } from "react-icons/fa";
 import { RxChatBubble } from "react-icons/rx";
 import { SlSpeech } from "react-icons/sl";
-import Logo from "@/components/ui/logo-recapeps";
-import { getIsNotification } from "./action";
+import { getIsNotification } from "./getIsNotification";
 import { FaBell } from "react-icons/fa";
+import { getAuthenticatedAppForUser } from "@/lib/firebase/serverApp";
 
 export default async function DesktopMenu() {
-    const isNotification = await getIsNotification(); // see if increase the time of load
+    const { user } = await getAuthenticatedAppForUser();
+    const isNotification = user ? await getIsNotification(user.uid) : false;
 
     return (
         <Box
