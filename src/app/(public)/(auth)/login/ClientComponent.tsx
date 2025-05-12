@@ -1,8 +1,7 @@
 "use client";
 
-import { useActionState } from 'react'
-import Link from 'next/link';
 import { useState } from 'react';
+import Link from 'next/link';
 import {
     Flex,
     Card,
@@ -17,11 +16,64 @@ import {
 import { FaGoogle } from "react-icons/fa";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useColorModeValue } from "@/components/ui/color-mode";
-import { login } from "./actions";
-import { signInWithGoogle } from "@/lib/firebase/auth";
+import { signInWithGoogle, signInWithEmail } from "@/lib/firebase/auth";
+import { z } from "zod";
+
+// Define the validation schema
+const loginSchema = z.object({
+    email: z.string().email("Adresse email invalide"),
+    password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères"),
+});
+
+type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function ClientComponent() {
-    const [state, action, pending] = useActionState(login, undefined);
+    const [formData, setFormData] = useState<LoginFormData>({
+        email: "",
+        password: "",
+    });
+    const [errors, setErrors] = useState<Partial<Record<keyof LoginFormData, string>>>({});
+    const [isLoading, setIsLoading] = useState(false);
+    const [generalError, setGeneralError] = useState<string | null>(null);
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
+        // Clear error when user types
+        if (errors[name as keyof LoginFormData]) {
+            setErrors((prev) => ({ ...prev, [name]: undefined }));
+        }
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setGeneralError(null);
+
+        try {
+            // Validate form data
+            const validatedData = loginSchema.parse(formData);
+            setIsLoading(true);
+
+            await signInWithEmail(validatedData.email, validatedData.password);
+        } catch (error) {
+            if (error instanceof z.ZodError) {
+                // Handle validation errors
+                const fieldErrors: Partial<Record<keyof LoginFormData, string>> = {};
+                error.errors.forEach(err => {
+                    if (err.path) {
+                        fieldErrors[err.path[0] as keyof LoginFormData] = err.message;
+                    }
+                });
+                setErrors(fieldErrors);
+            } else {
+                // Handle authentication errors
+                setGeneralError("Échec de connexion. Vérifiez vos identifiants.");
+                console.error("Login error:", error);
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return (
         <Flex
@@ -42,7 +94,7 @@ export default function ClientComponent() {
                 </Card.Header>
 
                 <Card.Body>
-                    <form action={action}>
+                    <form onSubmit={handleSubmit}>
                         <Stack gap={4}>
                             <Fieldset.Root>
                                 <Field.Root>
@@ -51,24 +103,32 @@ export default function ClientComponent() {
                                         type="email"
                                         name="email"
                                         placeholder="exemple@email.com"
+                                        value={formData.email}
+                                        onChange={handleChange}
                                         required
                                     />
-                                    {state?.errors && "email" in state.errors && Array.isArray(state.errors.email) && (
-                                        <Field.ErrorText>{state.errors.email[0]}</Field.ErrorText>
+                                    {errors.email && (
+                                        <Fieldset.ErrorText>{errors.email}</Fieldset.ErrorText>
                                     )}
                                 </Field.Root>
                                 <Field.Root>
                                     <Field.Label>Mot de passe</Field.Label>
                                     <PasswordInput
                                         name="password"
+                                        value={formData.password}
+                                        onChange={handleChange}
                                         placeholder="Entrez votre mot de passe"
                                         required
                                     />
-                                    {state?.errors && "password" in state.errors && state.errors.password && (
-                                        <Fieldset.ErrorText>{state.errors.password[0]}</Fieldset.ErrorText>
+                                    {errors.password && (
+                                        <Fieldset.ErrorText>{errors.password}</Fieldset.ErrorText>
                                     )}
                                 </Field.Root>
                             </Fieldset.Root>
+
+                            {generalError && (
+                                <Text color="red.500" fontSize="sm">{generalError}</Text>
+                            )}
 
                             <Link
                                 href="/forgot-password"
@@ -77,13 +137,12 @@ export default function ClientComponent() {
                                 Mot de passe oublié ?
                             </Link>
 
-
                             <Button
                                 type="submit"
                                 colorPalette="blue"
                                 w="full"
-                                loading={pending}
-                                disabled={pending}
+                                loading={isLoading}
+                                disabled={isLoading}
                             >
                                 Se connecter
                             </Button>
@@ -95,9 +154,10 @@ export default function ClientComponent() {
                         w="full"
                         mt={4}
                         onClick={() => signInWithGoogle()}
+                        disabled={isLoading}
                     >
                         <FaGoogle />
-                        Se connecter avec Google
+                        <Text ml={2}>Se connecter avec Google</Text>
                     </Button>
 
                     <Text mt={4} fontSize="sm" textAlign="center">

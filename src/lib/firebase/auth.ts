@@ -55,7 +55,6 @@ export async function signUpWithGoogle() {
       console.log("Verification email sent to", user.email); // TODO : Better error handling.
     }
 
-
     redirect("/parcours/dashboard");
   } catch (error) {
     console.error("Error signing up with Google", error);
@@ -93,8 +92,9 @@ export async function sendVerificationEmail(user: User | null) {
 // Function to sign in with email and password
 export async function signInWithEmail(email: string, password: string) {
   try {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    return userCredential.user;
+    await signInWithEmailAndPassword(auth, email, password);
+    redirect("/parcours/dashboard");
+
   } catch (error) {
     console.error("Error signing in with email and password", error);
     throw error; // Re-throw the error to be handled by the caller

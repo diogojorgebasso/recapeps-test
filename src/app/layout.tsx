@@ -18,9 +18,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
-
   const { user } = await getAuthenticatedAppForUser();
-  console.log("User Layout", user?.toJSON());
 
   return (
     <html suppressHydrationWarning lang="fr">
