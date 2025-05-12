@@ -22,6 +22,7 @@ import { FiBookOpen } from "react-icons/fi"
 import Logo from "@/components/ui/logo-recapeps";
 import QuizComponent1 from "./quiz1";
 import QuizComponent2 from "./quiz2";
+
 export default function Home() {
   return (
     <Box >
@@ -39,19 +40,7 @@ export default function Home() {
           direction={{ base: "column", md: "row" }}
           align="center"
         >
-          <Button
-            rounded="full"
-            asChild
-            size="2xl"
-            bg="orange.500"
-            color="white"
-            _hover={{
-              bg: "orange.600",
-              transform: "scale(1.1)"
-            }}
-          >
-            <Link href="/parcours/dashboard">COMMENCER MAINTENANT</Link>
-          </Button>
+          <Link href="/parcours/dashboard">COMMENCER MAINTENANT</Link>
           <Image alt="Avatar running" height="100px" width="100px" src="/avatar.svg" />
         </Stack>
       </VStack>
