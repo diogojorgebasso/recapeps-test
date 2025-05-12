@@ -72,11 +72,9 @@ export default function QuizComponent({ questions, title = "Quiz" }: {
                 <Text mb={8}>
                     Si tu souhaites accéder à plus de contenu et enregistrer ta progression, tu peux créer un compte juste ici 😎
                 </Text>
-                <Button colorPalette="blue" asChild>
-                    <Link href="/register">
-                        Créer un compte
-                    </Link>
-                </Button>
+                <Link href="/register">
+                    Créer un compte
+                </Link>
             </Box>
         );
     }

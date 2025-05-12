@@ -9,6 +9,9 @@ import { TrackingConsentProvider } from '@/contexts/TrackingConsent';
 export const metadata: Metadata = {
   title: "Recap'eps",
   description: "Recap'eps est un outil de révision imparable pour réussir les concours du CAPEPS externe. Que ce soit grâce à nos fiches de révisions thématiques, quiz ou flashcards, réviser n’a jamais été aussi facile.",
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export const dynamic = "force-dynamic"; // Force server component to be dynamic to avoid caching issues with Firebase auth
