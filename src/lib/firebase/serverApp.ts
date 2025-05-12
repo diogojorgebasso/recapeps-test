@@ -6,15 +6,21 @@ import { cookies } from "next/headers";
 import { initializeServerApp, initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
+const firebaseConfig = {
+    apiKey: "AIzaSyCQL9kH3r-y4Q4PtzQ_t9lBJl5J3zuty7k",
+    authDomain: "recapeps-test.firebaseapp.com",
+    projectId: "recapeps-test",
+    storageBucket: "recapeps-test.firebasestorage.app",
+    messagingSenderId: "298375526115",
+    appId: "1:298375526115:web:784cb51da316177ad637d6",
+    measurementId: "G-9PK8PPVBSE"
+};
+
 export async function getAuthenticatedAppForUser() {
     const authIdToken = (await cookies()).get("__session")?.value;
 
-    // Firebase Server App is a new feature in the JS SDK that allows you to
-    // instantiate the SDK with credentials retrieved from the client & has
-    // other affordances for use in server environments.
     const firebaseServerApp = initializeServerApp(
-        // https://github.com/firebase/firebase-js-sdk/issues/8863#issuecomment-2751401913
-        initializeApp(),
+        initializeApp(firebaseConfig),
         {
             authIdToken
         }
@@ -30,7 +36,6 @@ export async function getAuthenticatedAppForUser() {
 
     if (authIdToken)
         try {
-            console.log("Im entering here.")
             // Simple JWT decoding (tokens have 3 parts separated by dots)
             const parts = authIdToken.split('.');
             if (parts.length === 3) {

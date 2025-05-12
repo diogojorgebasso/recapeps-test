@@ -26,9 +26,9 @@ export default function ContextualAvatar() {
 
     if (!user) {
         return (
-            <Link href="/login" passHref>
-                <Button as="a" size="sm">Se connecter</Button>
-            </Link>
+            <Button as="a" size="sm" asChild>
+                <Link href="/login">Se connecter</Link>
+            </Button>
         );
     }
 

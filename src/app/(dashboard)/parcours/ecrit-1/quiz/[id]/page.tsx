@@ -14,7 +14,7 @@ export default async function QuizPage({ params }: { params: Promise<{ id: strin
     }
 
     if (attemptQuiz.premium && !isPro) {
-        return <div>Ce quiz est réservé aux utilisateurs Recape'eps Pro.</div>;
+        return <div>Ce quiz est réservé aux utilisateurs Recape&apos;eps Pro.</div>;
     }
 
     return (

@@ -123,18 +123,16 @@ export default async function DesktopMenu() {
                 </HStack>
 
                 <HStack gap={4}>
-                    <Icon>
-                        <FaBell />
-                        {isNotification && (
-                            <Float placement="top-end" offsetX="1" offsetY="1">
-                                <Circle
-                                    bg="green.500"
-                                    size="8px"
-                                    outline="0.2em solid"
-                                    outlineColor="bg"
-                                />
-                            </Float>)}
-                    </Icon>
+                    <FaBell />
+                    {isNotification && (
+                        <Float placement="top-end" offsetX="1" offsetY="1">
+                            <Circle
+                                bg="green.500"
+                                size="8px"
+                                outline="0.2em solid"
+                                outlineColor="bg"
+                            />
+                        </Float>)}
                     <ContextualAvatar />
                     <ColorModeButton />
                 </HStack>
