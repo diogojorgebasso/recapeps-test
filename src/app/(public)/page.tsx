@@ -20,9 +20,8 @@ import Link from "next/link";
 import { LuNotebookPen, LuListTodo } from "react-icons/lu";
 import { FiBookOpen } from "react-icons/fi"
 import Logo from "@/components/ui/logo-recapeps";
-import QuizComponent from "./QuizComponent";
-import quiz1Questions from "@/lib/questions/quiz1Questions";
-import quiz2Questions from "@/lib/questions/quiz2Questions";
+import QuizComponent1 from "./quiz1";
+import QuizComponent2 from "./quiz2";
 export default function Home() {
   return (
     <Box >
@@ -40,20 +39,19 @@ export default function Home() {
           direction={{ base: "column", md: "row" }}
           align="center"
         >
-          <Link href="/parcours/dashboard" passHref>
-            <Button
-              rounded="full"
-              size="2xl"
-              bg="orange.500"
-              color="white"
-              _hover={{
-                bg: "orange.600",
-                transform: "scale(1.1)"
-              }}
-            >
-              COMMENCER MAINTENANT
-            </Button>
-          </Link>
+          <Button
+            rounded="full"
+            asChild
+            size="2xl"
+            bg="orange.500"
+            color="white"
+            _hover={{
+              bg: "orange.600",
+              transform: "scale(1.1)"
+            }}
+          >
+            <Link href="/parcours/dashboard">COMMENCER MAINTENANT</Link>
+          </Button>
           <Image alt="Avatar running" height="100px" width="100px" src="/avatar.svg" />
         </Stack>
       </VStack>
@@ -170,7 +168,7 @@ export default function Home() {
                 <GridItem>
                   <VStack align="start" >
                     <Flex wrap="wrap" gap={4} justify="center" height="100%">
-                      <QuizComponent questions={quiz1Questions} title="Santé" />
+                      <QuizComponent1 />
                     </Flex>
                   </VStack>
                 </GridItem>
@@ -204,7 +202,7 @@ export default function Home() {
                 <GridItem>
                   <VStack align="start">
                     <Flex wrap="wrap" gap={4} justify="center" height="100%">
-                      <QuizComponent questions={quiz2Questions} title="Santé" />
+                      <QuizComponent2 />
                     </Flex>
                   </VStack>
                 </GridItem>
