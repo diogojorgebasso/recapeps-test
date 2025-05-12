@@ -23,7 +23,7 @@ export default async function RootLayout({
   return (
     <html suppressHydrationWarning lang="fr">
       <body>
-        <AuthProvider initialUser={user?.toJSON()}>
+        <AuthProvider initialUser={user}>
           <PushNotificationsProvider>
             <TrackingConsentProvider>
               <Provider>
