@@ -23,11 +23,6 @@ const firebaseConfig = {
 };
 
 export const firebaseApp = initializeApp(firebaseConfig);
-export const auth = getAuth(firebaseApp);
-export const db = getFirestore(firebaseApp);
-export const storage = getStorage(firebaseApp);
-export const functions = getFunctions(firebaseApp, "europe-west1");
-
 if (typeof window !== 'undefined' && typeof document !== 'undefined') {
     try {
         initializeAppCheck(firebaseApp, {
@@ -40,6 +35,10 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
         console.error("Error initializing Firebase App Check:", error);
     }
 }
+export const auth = getAuth(firebaseApp);
+export const db = getFirestore(firebaseApp);
+export const storage = getStorage(firebaseApp);
+export const functions = getFunctions(firebaseApp, "europe-west1");
 
 export const messaging = async () => {
     if (typeof window === 'undefined') return null;          // SSR guard
