@@ -36,17 +36,17 @@ export default function Page() {
     const [quizData, setQuizData] = useState<QuizDone[]>([]);
     const recommendedQuizzes = [
         {
-            id: "quiz1",
+            id: "BN0QbVdUQdMmwRvtbgxx",
             name: "Quiz de Mathématiques",
             level: "Débutant",
         },
         {
-            id: "quiz2",
+            id: "BkVp5agtGk5Aoq1zlxIg",
             name: "Quiz de Physique",
             level: "Intermédiaire",
         },
         {
-            id: "quiz3",
+            id: "g81h7u4B1kyQoYDSIClm",
             name: "Quiz de Chimie",
             level: "Avancé",
         },
@@ -196,7 +196,7 @@ export default function Page() {
                                     <Text>Niveau: {quiz.level}</Text>
                                 </Card.Body>
                                 <Card.Footer>
-                                    <Link href={`/parcours/quiz/${quiz.id}`} passHref>
+                                    <Link href={`/parcours/ecrit-${currentEcritNumber}/${quiz.id}`} passHref>
                                         <Button colorScheme="green" variant="solid" width="full">
                                             Commencer le quiz
                                         </Button>
