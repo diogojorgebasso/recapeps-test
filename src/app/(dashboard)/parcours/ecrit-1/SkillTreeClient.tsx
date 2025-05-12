@@ -7,7 +7,6 @@ import {
 import Link from 'next/link';
 
 import { QuizTrail } from '@/types/TreeSkill';
-import { use } from 'react';
 
 const COLOUR: Record<QuizTrail['state'], string> = {
     completed: 'green.400',
@@ -17,10 +16,9 @@ const COLOUR: Record<QuizTrail['state'], string> = {
     locked: 'gray.300',
 };
 
-export default function SkillTreeClient({ QuizNode }: { QuizNode: Promise<QuizTrail[]> }) {
-    const QuizNodes = use(QuizNode);
+export default function SkillTreeClient({ QuizNode }: { QuizNode: QuizTrail[] }) {
 
-    const grouped = QuizNodes.reduce<Record<string, QuizTrail[]>>((acc, q) => {
+    const grouped = QuizNode.reduce<Record<string, QuizTrail[]>>((acc, q) => {
         acc[q.name] ??= [];
         acc[q.name][q.level - 1] = q;
         return acc;

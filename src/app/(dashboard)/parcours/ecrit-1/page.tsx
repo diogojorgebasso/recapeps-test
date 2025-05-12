@@ -64,7 +64,7 @@ export default async function Page() {
             </Tabs.Content>
             <Tabs.Content value="s-entraner">
                 <Suspense fallback={<div>Chargement...</div>}>
-                    <SkillTreeClient QuizNode={Promise.resolve(quizNodesArray)} />
+                    <SkillTreeClient QuizNode={quizNodesArray} />
                 </Suspense>
             </Tabs.Content>
         </Tabs.Root>
