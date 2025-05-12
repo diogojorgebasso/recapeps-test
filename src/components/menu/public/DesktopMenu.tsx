@@ -1,3 +1,5 @@
+"use client";
+
 import {
     Box,
     Flex,
@@ -20,11 +22,27 @@ import { RxChatBubble } from "react-icons/rx";
 import { SlSpeech } from "react-icons/sl";
 import { getIsNotification } from "./getIsNotification";
 import { FaBell } from "react-icons/fa";
-import { getAuthenticatedAppForUser } from "@/lib/firebase/serverApp";
+import { useAuth } from "@/contexts/Auth";
+import { useEffect, useState } from "react";
 
-export default async function DesktopMenu() {
-    const { user } = await getAuthenticatedAppForUser();
-    const isNotification = user ? await getIsNotification(user.uid) : false;
+export default function DesktopMenu() {
+    const { user } = useAuth();
+    const [isNotification, setIsNotification] = useState(false);
+
+    useEffect(() => {
+        if (user) {
+            getIsNotification(user.uid)
+                .then(hasNotification => {
+                    setIsNotification(hasNotification);
+                })
+                .catch(error => {
+                    console.error("Failed to check notifications:", error);
+                    setIsNotification(false);
+                });
+        } else {
+            setIsNotification(false);
+        }
+    }, [user]);
 
     return (
         <Box
@@ -40,10 +58,6 @@ export default async function DesktopMenu() {
         >
             <Flex justify="space-between" width="100%" gap={8}>
                 <HStack gap={8}>
-                    <Link href="/parcours/dashboard">
-                        Accueil
-                    </Link>
-
                     <Menu.Root>
                         <Menu.Trigger asChild>
                             <Button
@@ -123,16 +137,18 @@ export default async function DesktopMenu() {
                 </HStack>
 
                 <HStack gap={4}>
-                    <FaBell />
-                    {isNotification && (
-                        <Float placement="top-end" offsetX="1" offsetY="1">
-                            <Circle
-                                bg="green.500"
-                                size="8px"
-                                outline="0.2em solid"
-                                outlineColor="bg"
-                            />
-                        </Float>)}
+                    <Link href="/compte/notifications">
+                        <FaBell />
+                        {isNotification && (
+                            <Float placement="top-end" offsetX="1" offsetY="1">
+                                <Circle
+                                    bg="green.500"
+                                    size="8px"
+                                    outline="0.2em solid"
+                                    outlineColor="bg"
+                                />
+                            </Float>)}
+                    </Link>
                     <ContextualAvatar />
                     <ColorModeButton />
                 </HStack>
