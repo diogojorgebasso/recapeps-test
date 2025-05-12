@@ -91,7 +91,6 @@ export default function AbonnementPage() {
                                 maxW={{ base: '100%', md: '400px' }}
                                 borderWidth="1px"
                                 rounded="lg"
-                                bg={plan.recommended ? 'blue.50' : 'white'}
                                 borderColor={
                                     isSelected ? 'blue.400' : plan.recommended ? 'blue.200' : 'gray.200'
                                 }
@@ -142,18 +141,19 @@ export default function AbonnementPage() {
                                         </List.Item>
                                     ))}
                                 </List.Root>
-                                <Link href={`/checkout?${plan.priceId}`} passHref>
-                                    <Button
-                                        w="full"
-                                        size="lg"
-                                        variant={isSelected ? 'solid' : 'outline'}
-                                        colorPalette={isSelected ? 'blue' : 'gray'}
-                                        loading={isLoading}
-                                        disabled={isLoading}
-                                    >
+                                <Button
+                                    w="full"
+                                    size="lg"
+                                    variant={isSelected ? 'solid' : 'outline'}
+                                    colorPalette={isSelected ? 'blue' : 'gray'}
+                                    loading={isLoading}
+                                    disabled={isLoading}
+                                    asChild
+                                >
+                                    <Link href={{ pathname: "/checkout", query: { priceId: plan.priceId } }}>
                                         {plan.buttonText}
-                                    </Button>
-                                </Link>
+                                    </Link>
+                                </Button>
                             </Card.Root>
                         );
                     })}
@@ -162,6 +162,6 @@ export default function AbonnementPage() {
                     Paiement sécurisé via Stripe. Vous pouvez résilier à tout moment.
                 </Text>
             </Box>
-        </Box>
+        </Box >
     );
 }

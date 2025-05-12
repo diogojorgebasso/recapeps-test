@@ -95,8 +95,8 @@ export default async function DesktopMenu() {
                                                 </HStack>
                                             </Link>
                                         </Menu.Item>
-                                        <Menu.Item value="checkout" asChild>
-                                            <Link href="/checkout">
+                                        <Menu.Item value="abonnement" asChild>
+                                            <Link href="/abonnement">
                                                 <HStack gap={2}>
                                                     <LuSparkles />
                                                     <Text as="span">Passer à Recap&apos;eps Pro</Text>

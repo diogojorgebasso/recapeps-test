@@ -8,10 +8,10 @@ import {
     Button,
     Portal,
     useDisclosure,
-    useMediaQuery,
     Dialog,
     createOverlay,
     Text,
+    HStack,
 } from "@chakra-ui/react";
 import Link from "next/link";
 import {
@@ -23,11 +23,13 @@ import {
     LuMicVocal,
     LuCircleUser,
     LuCircle,
+    LuSparkles,
 } from "react-icons/lu";
 import { useState } from "react";
 import { signOut } from "@/lib/firebase/auth";
 import { useAuth } from "@/contexts/Auth/useAuth";
 import { SimpleColorModeButton } from "@/components/ui/color-mode";
+import { usePathname } from "next/navigation";
 
 const ITEMS = [
     { href: "/dashboard", label: "Tableau de bord", icon: LuLayoutDashboard },
@@ -77,15 +79,13 @@ const TourOverlay = createOverlay<{
 
 export const TourViewport = TourOverlay.Viewport;
 
-/* ─── 3 · MAIN COMPONENT ─────────────────────────────────────────── */
-
 export default function DesktopMenu() {
-    const { user } = useAuth();
-    const [isDesktop] = useMediaQuery(["(min-width:768px)"], { ssr: false });
+    const { user, pro } = useAuth();
+    const pathname = usePathname();
 
     /* intro dialog: offer the tour once */
-    const intro = useDisclosure({ // && profile?.hasSeenTour
-        defaultOpen: isDesktop
+    const intro = useDisclosure({
+        defaultOpen: true,
     });
 
     /* current tour step (null = not running) */
@@ -151,7 +151,6 @@ export default function DesktopMenu() {
                 </Portal>
             </Dialog.Root>
 
-            {/* sidebar */}
             <VStack
                 as="nav"
                 position="fixed"
@@ -160,6 +159,7 @@ export default function DesktopMenu() {
                 p="2"
                 gap="6"
                 shadow="lg"
+                display={{ base: "none", md: "flex" }}
             >
                 {/* avatar menu */}
                 <Menu.Root>
@@ -172,24 +172,43 @@ export default function DesktopMenu() {
                     <Portal>
                         <Menu.Positioner>
                             <Menu.Content minW="56" rounded="lg">
-                                <Menu.Item value="checkout" asChild >
-                                    <Link href="/checkout">Passer à Recap'eps Pro</Link>
-                                </Menu.Item>
-                                <Menu.Separator />
+                                {pro && (
+                                    <>
+                                        <Menu.Item value="checkout" asChild >
+                                            <Link href="/checkout">
+                                                <HStack gap={2}>
+                                                    <LuSparkles />
+                                                    <span>Passer à Recap&apos;eps Pro</span>
+                                                </HStack>
+                                            </Link>
+                                        </Menu.Item>
+                                        <Menu.Separator />
+                                    </>
+                                )}
                                 <Menu.Item value="profil" asChild>
-                                    <LuBadge />
-                                    <Link href="/profil">Profil</Link>
+                                    <Link href="/compte/profil">
+                                        <HStack gap={2}>
+                                            <LuBadge />
+                                            <span>Profil</span>
+                                        </HStack>
+                                    </Link>
                                 </Menu.Item>
                                 <Menu.Separator />
                                 {user ? (
                                     <Menu.Item value="logout" onClick={signOut}>
-                                        <LuLogOut />
-                                        Déconnexion
+                                        <HStack gap={2}>
+                                            <LuLogOut />
+                                            <span>Déconnexion</span>
+                                        </HStack>
                                     </Menu.Item>
                                 ) : (
                                     <Menu.Item value="login" asChild>
-                                        <LuLogIn />
-                                        <Link href="/login">Se connecter</Link>
+                                        <Link href="/login">
+                                            <HStack gap={2}>
+                                                <LuLogIn />
+                                                <span>Se connecter</span>
+                                            </HStack>
+                                        </Link>
                                     </Menu.Item>
                                 )}
                             </Menu.Content>
@@ -198,23 +217,27 @@ export default function DesktopMenu() {
                 </Menu.Root>
 
                 {/* nav buttons (anchor refs created inline) */}
-                {ITEMS.map((item, idx) => (
-                    <Link key={item.href} href={item.href}>
-                        <IconButton
-                            aria-label={item.label}
-                            variant="ghost"
-                            size="2xl"
-                            color="white"
-                            _hover={{ bg: "orange.500" }}
-                            data-tour={idx}
-                            ref={(el) => {
-                                if (el && step === idx) openStep(idx, el);
-                            }}
-                        >
-                            <item.icon />
-                        </IconButton>
-                    </Link>
-                ))}
+                {ITEMS.map((item, idx) => {
+                    const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
+                    return (
+                        <Link key={item.href} href={item.href} passHref>
+                            <IconButton
+                                aria-label={item.label}
+                                variant={isActive ? "solid" : "ghost"}
+                                bg={isActive ? "orange.600" : undefined}
+                                size="2xl"
+                                color="white"
+                                _hover={{ bg: "orange.500" }}
+                                data-tour={idx}
+                                ref={(el) => {
+                                    if (el && step === idx) openStep(idx, el);
+                                }}
+                            >
+                                <item.icon />
+                            </IconButton>
+                        </Link>
+                    );
+                })}
 
                 <SimpleColorModeButton my="5" />
             </VStack>

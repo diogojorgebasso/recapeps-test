@@ -6,13 +6,13 @@ export default function manifest(): MetadataRoute.Manifest {
         short_name: 'Recapeps',
         description: "Recap'eps est un outil de révision imparable pour réussir les concours du CAPEPS.",
         start_url: '/',
-        scope: '/', // TODO : See if the scope is correct
+        scope: '/',
         display: 'standalone',
         background_color: '#fff',
         theme_color: '#ea580c',
         icons: [
             {
-                src: '/icon.ico',
+                src: '/favicon.ico',
                 sizes: 'any',
                 type: 'image/ico',
                 purpose: 'any',
