@@ -49,7 +49,7 @@ export default function ContextualAvatar() {
                         <Menu.Separator />
                         {!pro && (
                             <Menu.Item value="checkout" asChild >
-                                <Link href="/checkout"><LuSparkles />Passer Pro</Link>
+                                <Link href="/checkout"><LuSparkles />Passer à Recap'eps Pro</Link>
                             </Menu.Item>)}
                         < Menu.Separator />
                         <Menu.Item value="logout" onClick={signOut}>

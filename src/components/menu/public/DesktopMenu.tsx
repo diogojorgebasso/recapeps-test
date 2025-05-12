@@ -41,7 +41,7 @@ export default async function DesktopMenu() {
             <Flex justify="space-between" width="100%" gap={8}>
                 <HStack gap={8}>
                     <Link href="/parcours/dashboard">
-                        Accueill
+                        Accueil
                     </Link>
 
                     <Menu.Root>
@@ -99,7 +99,7 @@ export default async function DesktopMenu() {
                                             <Link href="/checkout">
                                                 <HStack gap={2}>
                                                     <LuSparkles />
-                                                    <Text as="span">Passer Pro</Text>
+                                                    <Text as="span">Passer à Recap'eps Pro</Text>
                                                 </HStack>
                                             </Link>
                                         </Menu.Item>

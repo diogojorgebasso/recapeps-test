@@ -114,7 +114,7 @@ export default function ForgotPassword() {
                     </form>
 
                     <Text mt={4} fontSize="sm" textAlign="center">
-                        Vous vous souvenez de votre mot de passe ?{" "}
+                        Vous vous rappelez de votre mot de passe ?{" "}
                         <Link
                             href="/login"
                             color="blue.500"

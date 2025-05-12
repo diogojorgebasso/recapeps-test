@@ -41,13 +41,13 @@ export default function NotificationsContainer() {
     if (!user) {
         return (
             <Box p={4}>
-                <Text>Please log in to see your notifications.</Text>
+                <Text>Veuillez vous connecter pour accéder à vos notifications.</Text>
             </Box>
         );
     }
 
     if (loading) {
-        return <Box p={4}><Text>Loading notifications...</Text></Box>;
+        return <Box p={4}><Text>Notifications en cours de chargement...</Text></Box>;
     }
 
     return notifications.length === 0 ?

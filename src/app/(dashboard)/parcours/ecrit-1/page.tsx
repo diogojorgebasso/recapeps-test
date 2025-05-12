@@ -38,7 +38,7 @@ export default async function Page() {
                     Apprendre
                 </Tabs.Trigger>
                 <Tabs.Trigger value="s-entraner" colorPalette="blue" fontSize="2xl" fontWeight="bold">
-                    S&apos;entrâner
+                    S&apos;entraîner
                 </Tabs.Trigger>
             </Tabs.List>
             <Tabs.Content value="apprendre">
@@ -63,7 +63,7 @@ export default async function Page() {
                 </Box >
             </Tabs.Content>
             <Tabs.Content value="s-entraner">
-                <Suspense fallback={<div>Loading...</div>}>
+                <Suspense fallback={<div>Chargement...</div>}>
                     <SkillTreeClient QuizNode={Promise.resolve(quizNodesArray)} />
                 </Suspense>
             </Tabs.Content>
@@ -116,13 +116,13 @@ function ExamCard({
                             </Dialog.Trigger>
                             <Dialog.Content>
                                 <Dialog.Header>
-                                    <Dialog.Title>Passer à Recap&apos;eps pro?
+                                    <Dialog.Title>Passer à Recap&apos;eps Pro?
                                     </Dialog.Title>
                                 </Dialog.Header>
                                 <Dialog.Body>
                                     <Text>
                                         Tu apprécies le contenu que nous te proposons mais tu restes sur ta faim? Tu aimerai accéder à tout le contenu que nous t&apos;avons concocté?
-                                        Alors n&apos;hésite plus et passe à Recap&apos;eps pro ! 🎯
+                                        Alors n&apos;hésite plus et passe à Recap&apos;eps Pro ! 🎯
                                     </Text>
                                 </Dialog.Body>
                                 <Dialog.Footer>

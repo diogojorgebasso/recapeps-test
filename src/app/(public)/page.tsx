@@ -99,7 +99,7 @@ export default function Home() {
                   Oral 1
                 </Card.Title>
                 <Text fontSize="xl">
-                  Après avoir lu une fiche, fais des quiz associés pour voir si tu as bien compris et assimilé le cours !
+                  Pour te préparer à l&apos;oral 1, nous avons mis à ta disposition des fiches spécifiques à chaque sport pour t&apos;aider à te préparer.
                 </Text>
               </Card.Body>
             </Card.Root>
@@ -119,7 +119,7 @@ export default function Home() {
                   Oral 3
                 </Card.Title>
                 <Text fontSize="xl">
-                  Enregistrer e transcription de ta voix.
+                  Afin de performer à l&apos;oral 3, tu trouveras ici des fiches de révisions et des simulations d&apos;épreuves accompagnées de corrigés.
                 </Text>
               </Card.Body>
             </Card.Root>
@@ -200,7 +200,7 @@ export default function Home() {
             </Box>
 
             <Text>
-              Pour réviser efficacement les oraux, <br /><br />
+              Pour réviser efficacement les oraux, tu as accès à des fiches de révision ainsi qu'à des simulations d'entretien d'oral 3 <br /><br />
             </Text>
             {/* Oral 1 */}
             <Box id="oral1">
@@ -219,9 +219,6 @@ export default function Home() {
               </Heading>
               <Text fontSize="lg" mb={4}>
                 Pour réviser l&apos;oral 3, tu as non seulement accès à des synthèses de connaissances utiles, mais tu peux aussi t&apos;entrainer sur de vrais sujets comme si tu étais à l&apos;examen
-              </Text>
-              <Text fontSize="lg">
-                Voici maintenant un court texte complémentaire à prendre en compte pour affiner ta réponse.
               </Text>
             </Box>
           </VStack>

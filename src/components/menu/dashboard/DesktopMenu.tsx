@@ -59,12 +59,12 @@ const TourOverlay = createOverlay<{
                     <Text fontWeight="semibold">{p.stepData.label}</Text>
                     <Text fontSize="sm">
                         {/* simple auto-description; replace with custom copy if needed */}
-                        Découvre la section « {p.stepData.label} ».
+                        Découvre la section «{p.stepData.label}».
                     </Text>
                 </Dialog.Body>
                 <Dialog.Footer gap="2">
                     <Button size="sm" variant="ghost" onClick={p.onPrev} disabled={p.step === 0}>
-                        Préc.
+                        Retour
                     </Button>
                     <Button size="sm" onClick={p.onNext}>
                         {p.step + 1 === p.total ? "Fin" : "Suiv."}
@@ -125,7 +125,7 @@ export default function DesktopMenu() {
                                 <Dialog.Title>Bienvenue !</Dialog.Title>
                             </Dialog.Header>
                             <Dialog.Body>
-                                Souhaites-tu un petit tour des fonctionnalités&nbsp;?
+                                Souhaites-tu faire un petit tour des fonctionnalités&nbsp;?
                             </Dialog.Body>
                             <Dialog.Footer gap="3">
                                 <Button size="sm" variant="ghost" onClick={intro.onClose}>
@@ -143,7 +143,7 @@ export default function DesktopMenu() {
                                         if (firstBtn) openStep(0, firstBtn);
                                     }}
                                 >
-                                    Oui !
+                                    Oui!
                                 </Button>
                             </Dialog.Footer>
                         </Dialog.Content>
@@ -173,7 +173,7 @@ export default function DesktopMenu() {
                         <Menu.Positioner>
                             <Menu.Content minW="56" rounded="lg">
                                 <Menu.Item value="checkout" asChild >
-                                    <Link href="/checkout">Passer à Pro</Link>
+                                    <Link href="/checkout">Passer à Recap'eps Pro</Link>
                                 </Menu.Item>
                                 <Menu.Separator />
                                 <Menu.Item value="profil" asChild>

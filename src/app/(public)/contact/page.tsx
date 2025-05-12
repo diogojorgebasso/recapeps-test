@@ -198,7 +198,7 @@ export default function Page() {
                                     loading={isLoading}
                                     disabled={isLoading}
                                 >
-                                    Envoyer le Message
+                                    Envoyer le message
                                 </Button>
                             </Fieldset.Content>
                         </Fieldset.Root>

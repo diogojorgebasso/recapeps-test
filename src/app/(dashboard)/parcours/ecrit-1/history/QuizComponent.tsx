@@ -16,7 +16,7 @@ export default function QuizComponent({ quizHistory }: { quizHistory: QuizDone[]
         <>
             {
                 quizHistory.length === 0 && (
-                    <Text>Vous n&apos;avez pas fait un quiz.</Text>
+                    <Text>Vous n&apos;avez pas encore fait de quiz.</Text>
                 )
             }
 
@@ -38,10 +38,10 @@ export default function QuizComponent({ quizHistory }: { quizHistory: QuizDone[]
                                     </Badge>
                                 </Flex>
                                 <Text fontSize="sm" color="gray.500" mt={1}>
-                                    Completed on: {completedAt.toDate().toLocaleDateString()}
+                                    Réalisé le: {completedAt.toDate().toLocaleDateString()}
                                 </Text>
                                 <Link href={`/ecrit-1/quiz/attempt/${id}`} color="blue.600">
-                                    Review Attempt
+                                    Revoir sa tentative
                                 </Link>
                             </List.Item>
                         );

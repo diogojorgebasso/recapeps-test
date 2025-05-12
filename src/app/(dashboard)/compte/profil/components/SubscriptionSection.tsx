@@ -24,7 +24,7 @@ export default function SubscriptionSection({ pro }: { pro: boolean }) {
                 <Heading as="h3" size="md">
                     Mon abonnement
                 </Heading>
-                <Text>Vous êtes abonné Recap’eps Pro.</Text>
+                <Text>Vous possédez un abonnement Recap’eps Pro.</Text>
                 <Button onClick={openPortal} loading={loading} colorPalette="orange">
                     Gérer mon abonnement
                 </Button>

@@ -128,8 +128,9 @@ export const stripewebhooktest = onRequest({
         const response = await admin.messaging().sendEachForMulticast({
           tokens,
           notification: {
-            title: 'Payment Failed',
-            body: 'We couldn’t process your subscription payment. Please update your card info.',
+            title: 'Echec du paiement',
+            body: 'Nous n\'avons pas pu traiter votre demande. Veuillez mettre à jour les informations de votre carte.',
+
           }
         });
 
@@ -165,8 +166,8 @@ export const stripewebhooktest = onRequest({
       // 2️⃣ Persist in-app notification
       await userRef.collection('notifications').add({
         type: 'payment_failed',
-        title: 'Payment Failed',
-        body: 'We couldn’t process your subscription payment. Please update your card info.',
+        title: 'Echec du paiement',
+        body: "Nous n'avons pas pu traiter votre demande. Veuillez mettre à jour les informations de votre carte.",
         isRead: false,
         createdAt: FieldValue.serverTimestamp()
       });
