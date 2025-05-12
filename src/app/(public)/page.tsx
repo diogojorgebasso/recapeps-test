@@ -40,19 +40,20 @@ export default function Home() {
           direction={{ base: "column", md: "row" }}
           align="center"
         >
-          <Button
-            rounded="full"
-            asChild
-            size="2xl"
-            bg="orange.500"
-            color="white"
-            _hover={{
-              bg: "orange.600",
-              transform: "scale(1.1)"
-            }}
-          >
-            <Link href="/parcours/dashboard">COMMENCER MAINTENANT</Link>
-          </Button>
+          <Link href="/parcours/dashboard" passHref>
+            <Button
+              rounded="full"
+              size="2xl"
+              bg="orange.500"
+              color="white"
+              _hover={{
+                bg: "orange.600",
+                transform: "scale(1.1)"
+              }}
+            >
+              COMMENCER MAINTENANT
+            </Button>
+          </Link>
           <Image alt="Avatar running" height="100px" width="100px" src="/avatar.svg" />
         </Stack>
       </VStack>

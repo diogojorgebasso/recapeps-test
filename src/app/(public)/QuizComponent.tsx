@@ -13,7 +13,6 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { Question } from "@/types/HomeQuiz";
 
-
 export default function QuizComponent({ questions, title = "Quiz" }: {
     questions: Question[];
     title: string;
