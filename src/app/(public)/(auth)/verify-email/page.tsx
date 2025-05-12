@@ -53,9 +53,9 @@ export default function VerifyEmail() {
         setMessage('');
         try {
             await sendEmailVerification(user);
-            setMessage('Verification email sent! Please check your inbox.'); // Keep for non-toast display if needed
+            setMessage("Un email de vérifiaction vient d'être envoyé! Vérifiez votre messagerie."); // Keep for non-toast display if needed
         } catch (error: any) {
-            setMessage(`Error sending verification email: ${error.message}`);
+            setMessage(`Une erreur est survenue lros de la verification de votre email: ${error.message}`);
         } finally {
             setIsSending(false);
         }
@@ -71,13 +71,13 @@ export default function VerifyEmail() {
             const refreshedUser = auth.currentUser;
 
             if (refreshedUser && refreshedUser.emailVerified) {
-                setMessage('Email verified successfully! Redirecting...');
+                setMessage('Votre email a bien été vérifié! Redirection...');
                 setTimeout(() => router.push('/'), 1500);
             } else {
-                setMessage('Email not verified yet. Please check your inbox and click the verification link.');
+                setMessage("Votre email n'a pas encore été vérifié. Veuillez cliquer sur le lien de vérification dans votre messagerie.");
             }
         } catch (error: any) {
-            setMessage(`Error checking verification status: ${error.message}`);
+            setMessage(`Une erreur est survenue lors de la vérification: ${error.message}`);
         } finally {
             setIsChecking(false);
         }
@@ -87,7 +87,7 @@ export default function VerifyEmail() {
         return (
             <Container centerContent py={10}>
                 <Spinner size="xl" />
-                <Text mt={4}>Loading...</Text>
+                <Text mt={4}>Chargement...</Text>
             </Container>
         );
     }
@@ -97,7 +97,7 @@ export default function VerifyEmail() {
         // but as a fallback or if loading is very fast:
         return (
             <Container centerContent py={10}>
-                <Text>Redirecting...</Text>
+                <Text>Redirection...</Text>
             </Container>
         );
     }
@@ -106,13 +106,13 @@ export default function VerifyEmail() {
         <Container maxW="container.md" py={10} textAlign="center">
             <VStack gap={6} align="stretch">
                 <Heading as="h1" size="xl">
-                    Email Verification Required
+                    Verification de votre email requise
                 </Heading>
                 <Text>
-                    Your email address needs to be verified before you can fully access our services.
+                    Votre adresse email doit être vérifiée pour pouvoir accéder librement à nos services.
                 </Text>
                 <Text>
-                    A verification email has been sent to: <Text as="strong">{user.email}</Text>
+                    Un email de confirmation a été envoyé à : <Text as="strong">{user.email}</Text>
                 </Text>
 
                 <HStack gap={4} justifyContent="center" my={8}>
@@ -120,17 +120,17 @@ export default function VerifyEmail() {
                         onClick={handleSendVerificationEmail}
                         colorPalette="blue"
                         loading={isSending}
-                        loadingText="Sending..."
+                        loadingText="Envoi en cours..."
                     >
-                        Resend Verification Email
+                        Renvoyer un email de confirmation
                     </Button>
                     <Button
                         onClick={checkVerificationStatus}
                         colorPalette="green"
                         loading={isChecking}
-                        loadingText="Checking..."
+                        loadingText="Verification..."
                     >
-                        I&apos;ve Verified My Email
+                        J'ai confirmé mon email
                     </Button>
                 </HStack>
 
@@ -153,10 +153,9 @@ export default function VerifyEmail() {
                         Instructions:
                     </Heading>
                     <List.Root gap={2}>
-                        <List.Item>Check your email inbox (and spam folder) for a verification link from us.</List.Item>
-                        <List.Item>Click on the verification link in the email.</List.Item>
-                        <List.Item>After verifying, return here and click the &rdquo;I've Verified My Email" button above.</List.Item>
-                        <List.Item>If you don&apos;t receive an email or the link has expired, click "Resend Verification Email".</List.Item>
+                        <List.Item>Cliquez sur le lien de confirmation dans votre messagerie (vérifiez vos spams).</List.Item>
+                        <List.Item>Après confirmation, revenez sur cette page et cliquez sur le bouton "J'ai confirmé mon email" ci-dessus.</List.Item>
+                        <List.Item>Si vous ne recevez pas d'email ou que le lien a expiré, cliquez sur "Renvoyer un email de confirmation".</List.Item>
                     </List.Root>
                 </Box>
             </VStack>

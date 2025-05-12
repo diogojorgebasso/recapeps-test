@@ -238,7 +238,7 @@ export default function ClientComponent({ title, subjectId }: { title: string, s
                     transition="all 0.2s"
                     borderRadius="full"
                 >
-                    {isRecording ? 'Stop Recording' : 'Start Recording'}
+                    {isRecording ? "Arrêter l'enregistrement" : "Démarrer l'enregistrement"}
                 </Button>
             </VStack>
 

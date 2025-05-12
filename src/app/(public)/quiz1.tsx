@@ -100,10 +100,10 @@ export default function QuizComponent1() {
             >
                 <Heading size="lg" mb={4}>Quiz terminé !</Heading>
                 <Text fontSize="xl" fontWeight="semibold" mb={4}>
-                    Votre score :{score} / {questions.length}
+                    Votre score : <Text as="span" fontWeight="bold">{score} / {questions.length}</Text>
                 </Text>
                 <Text mb={8}>
-                    Si tu souhaites accéder à plus de contenu et enregistrer ta progression, tu peux créer un compte juste ici 😎
+                    Si tu souhaites accéder à plus de contenu et suivre ta progression, tu peux créer ton compte juste ici 😎
                 </Text>
                 <Button colorPalette="blue" onClick={() => window.location.href = '/quiz'}>
                     Créer un compte

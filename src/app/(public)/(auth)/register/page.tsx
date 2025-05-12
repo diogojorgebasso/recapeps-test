@@ -134,7 +134,7 @@ export default function Register() {
                         Inscription
                     </Heading>
                     <Text mt={2} fontSize="sm" color="gray.600">
-                        Créez un compte en remplissant les informations ci-dessous.
+                        Veuillez compléter les informations ci-dessous pour créer votre compte.
                     </Text>
                 </Card.Header>
 
@@ -196,7 +196,7 @@ export default function Register() {
                                 loading={isLoading}
                                 disabled={isLoading}
                             >
-                                S&apos;inscrire
+                                Créer un compte
                             </Button>
                         </Stack>
                     </form>

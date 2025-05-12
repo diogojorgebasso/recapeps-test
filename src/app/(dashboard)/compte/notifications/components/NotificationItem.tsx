@@ -39,7 +39,7 @@ export default function NotificationItem({ notification, userId }: NotificationI
                 {body}
             </Text>
             <Text fontSize="xs" color="gray.500" mt={2}>
-                Received: {createdAt.toDate().toLocaleString()}
+                Reçu le {createdAt.toDate().toLocaleString()}
             </Text>
 
             {!read && (

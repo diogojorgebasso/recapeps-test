@@ -39,7 +39,7 @@ export default function ProfilePhotoUploader() {
         <>
             <FileUpload.Root onChange={onChoose}>
                 <FileUpload.Trigger>
-                    <Button><HiUpload />Changer la photo</Button>
+                    <Button><HiUpload />Changer de photo</Button>
                 </FileUpload.Trigger>
             </FileUpload.Root>
 

@@ -35,24 +35,27 @@ const PLANS: Plan[] = [
         period: 'par mois',
         features: [
             'Accès à tous les cours',
-            'Flashcards illimitées',
+            'Flashcards thématiques',
             'Quiz illimités',
-            'Notes illimitées',
-            "Préparation à l'oral",
+            'Fiches de révisions écrits et oraux',
+            "Préparation aux oraux",
+            'Résiliable à tout moment',
         ],
         buttonText: 'Commencer',
     },
     {
         id: 'yearly',
         name: 'Abonnement Annuel',
-        price: '149,99 €',
+        price: '50€',
         priceId: 'price_1OYSQnEfLSFXfvk1jcfRgO6C',
         period: 'par an',
         features: [
-            'Tout dans le mensuel',
-            'Économisez 30 € / an',
-            'Accès aux nouveautés en priorité',
-            'Support premium',
+            'Accès à tous les cours',
+            'Flashcards thématiques',
+            'Quiz illimités',
+            'Fiches de révisions écrits et oraux',
+            "Préparation aux oraux",
+            "Support premium prioritaire"
         ],
         buttonText: 'Commencer',
         recommended: true,
@@ -67,7 +70,7 @@ export default function AbonnementPage() {
         <Box>
             <Box py={10} px={4}>
                 <Heading as="h1" textAlign="center" mb={10}>
-                    Choisissez votre formule
+                    Choisissez votre formule :
                 </Heading>
                 <Flex
                     direction={{ base: 'column', md: 'row' }}
@@ -156,7 +159,7 @@ export default function AbonnementPage() {
                     })}
                 </Flex>
                 <Text textAlign="center" mt={8} fontSize="sm" color="fg.muted">
-                    Paiement sécurisé via Stripe. Vous pouvez annuler à tout moment.
+                    Paiement sécurisé via Stripe. Vous pouvez résilier à tout moment.
                 </Text>
             </Box>
         </Box>
