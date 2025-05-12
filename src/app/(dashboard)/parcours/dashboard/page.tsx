@@ -33,7 +33,7 @@ import { useAuth } from "@/contexts/Auth";
 import { EmptyState } from "@/components/ui/empty-state";
 import Link from "next/link";
 import { findCompletedAttempts } from "@/repositories/quizRepo";
-import { QuizDone, Quiz } from "@/types/Quiz";
+import { QuizDone } from "@/types/Quiz";
 
 export default function Dashboard() {
     const { user } = useAuth();
@@ -54,7 +54,7 @@ export default function Dashboard() {
             name: "Quiz de Chimie",
             level: "Avancé",
         },
-    ]
+    ];
     const [isLoading, setIsLoading] = useState(true);
     const currentEcritNumber = 1;
 
@@ -69,8 +69,6 @@ export default function Dashboard() {
             try {
                 const completedAttemptsData = await findCompletedAttempts({ uid: user.uid, numberOfEcrit: currentEcritNumber, limitResult: 10 });
                 setQuizData(completedAttemptsData);
-
-
             } catch (error) {
                 console.error("Erreur lors du chargement des données du tableau de bord:", error);
             } finally {
@@ -80,45 +78,16 @@ export default function Dashboard() {
 
         loadData();
     }, [user]);
+    console.log("Quiz Data:", quizData);
 
-    const groupedByQuiz = quizData.reduce((acc, attempt) => {
-        const { name, score, completedAt } = attempt;
-        if (!acc[name]) {
-            acc[name] = {
-                attempts: 0,
-                highestScore: -1,
-                lastAttemptDate: new Date(0),
-            };
-        }
-        acc[name].attempts += 1;
-        if (score > acc[name].highestScore) {
-            acc[name].highestScore = score;
-        }
-        const attemptDate = completedAt.toDate();
-        if (attemptDate > acc[name].lastAttemptDate) {
-            acc[name].lastAttemptDate = attemptDate;
-        }
-        return acc;
-    }, {} as Record<string, { attempts: number; highestScore: number; lastAttemptDate: Date }>);
 
-    const tableData = Object.entries(groupedByQuiz).map(([quizName, stats]) => ({
-        name: quizName,
-        attempts: stats.attempts,
-        highestScore: stats.highestScore,
-        lastAttemptDate: stats.lastAttemptDate.toISOString(),
-    }));
-
-    const chartData = quizData
-        .slice()
-        .reverse()
-        .map((quiz) => ({
-            name: quiz.name,
+    const chartData = quizData.map((quiz) => {
+        return {
+            name: quiz.name || "Inconnu",
             score: quiz.score,
-            timestamp: quiz.completedAt.toDate().toLocaleDateString("fr-FR", {
-                month: "short",
-                day: "numeric",
-            }),
-        }));
+            timestamp: quiz.completedAt.toDate(),
+        };
+    });
 
     if (isLoading) {
         return (
@@ -140,7 +109,7 @@ export default function Dashboard() {
                         <Button colorScheme="green">Explorer les quiz (Écrit {currentEcritNumber})</Button>
                     </Link>
                     <Link href="/parcours/oral-1">
-                        <Button variant="outline">Explorer les fiches de révision</Button>
+                        <Button variant="outline">Explorer les Oral 1</Button>
                     </Link>
                 </HStack>
             </EmptyState>
@@ -199,17 +168,12 @@ export default function Dashboard() {
                                 </Table.Row>
                             </Table.Header>
                             <Table.Body>
-                                {tableData.map((row, index) => (
+                                {chartData.map((row, index) => (
                                     <Table.Row key={index}>
                                         <Table.Cell fontWeight="medium">{row.name}</Table.Cell>
-                                        <Table.Cell>{row.attempts}</Table.Cell>
-                                        <Table.Cell>{row.highestScore}</Table.Cell>
+                                        <Table.Cell>{row.score}</Table.Cell>
                                         <Table.Cell>
-                                            {new Date(row.lastAttemptDate).toLocaleDateString("fr-FR", {
-                                                year: "numeric",
-                                                month: "long",
-                                                day: "numeric",
-                                            })}
+                                            {row.timestamp.toDateString()}
                                         </Table.Cell>
                                     </Table.Row>
                                 ))}

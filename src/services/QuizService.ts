@@ -85,7 +85,12 @@ export async function getQuizForAttempt(numberOfEcrit: number, quizId: string, u
  */
 export async function getQuizHistory(uid: string, numberOfEcrit: number, limit: number = 5): Promise<QuizDone[]> {
     try {
-        const history = await findCompletedAttempts(db, uid, numberOfEcrit, limit);
+        const history = await findCompletedAttempts({
+            database: db,
+            uid,
+            numberOfEcrit,
+            limitResult: limit
+        });
         return history;
     } catch (error) {
         console.error("Error fetching quiz history in service:", error);

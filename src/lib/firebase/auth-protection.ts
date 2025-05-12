@@ -7,7 +7,7 @@ export async function requireServerAuth() {
     const { user, isPro } = await getAuthenticatedAppForUser();
 
     if (!user) {
-        redirect("/");
+        redirect("/login");
     }
 
     if (!user.emailVerified) {

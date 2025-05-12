@@ -14,9 +14,14 @@ export default async function QuizHistoryPage() {
     if (!user) {
         return <div>Faire le login</div>;
     }
+    const db = getFirestore(firebaseServerApp);
 
-    const quizHistory = await findCompletedAttempts(
-        getFirestore(firebaseServerApp), user.uid, 1, 10);
+    const quizHistory = await findCompletedAttempts({
+        database: db,
+        uid: user.uid,
+        numberOfEcrit: 1,
+        limitResult: 10
+    });
 
     return (
         <Container maxW="container.lg" p={4}>
