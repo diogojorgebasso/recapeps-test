@@ -100,7 +100,7 @@ export default function QuizComponent1() {
             >
                 <Heading size="lg" mb={4}>Quiz terminé !</Heading>
                 <Text fontSize="xl" fontWeight="semibold" mb={4}>
-                    Votre score : <Text as="span" fontWeight="bold">{score} / {questions.length}</Text>
+                    Votre score :{score} / {questions.length}
                 </Text>
                 <Text mb={8}>
                     Si tu souhaites accéder à plus de contenu et enregistrer ta progression, tu peux créer un compte juste ici 😎
@@ -160,9 +160,7 @@ export default function QuizComponent1() {
                             fontSize="md"
                             fontWeight="medium"
                         >
-                            <Text whiteSpace="normal"
-                                wordBreak="break-word"
-                                overflowWrap="break-word"> {option}</Text>
+                            {option}
                         </Button>
                     );
                 })}

@@ -125,6 +125,7 @@ export default function Home() {
             </Card.Root>
           </LinkBox>
         </SimpleGrid>
+
         <Box p={4}>
           <VStack align="stretch" mt={12} gap={12} padding={6}>
             <Text>

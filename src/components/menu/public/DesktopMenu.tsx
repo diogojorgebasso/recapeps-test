@@ -64,19 +64,44 @@ export default async function DesktopMenu() {
                                             </Link>
                                         </Menu.Item>
                                         <Menu.Item value="ecrit-1" asChild>
-                                            <Link href="/parcours/ecrit-1"><FaPencilAlt />Écrit 1</Link>
+                                            <Link href="/parcours/ecrit-1">
+                                                <HStack gap={2}>
+                                                    <FaPencilAlt />
+                                                    <Text as="span">Écrit 1</Text>
+                                                </HStack>
+                                            </Link>
                                         </Menu.Item>
                                         <Menu.Item value="ecrit-2" asChild>
-                                            <Link href="/parcours/ecrit-2"><FaPencilRuler />Écrit 2</Link>
+                                            <Link href="/parcours/ecrit-2">
+                                                <HStack gap={2}>
+                                                    <FaPencilRuler />
+                                                    <Text as="span">Écrit 2</Text>
+                                                </HStack>
+                                            </Link>
                                         </Menu.Item>
                                         <Menu.Item value="oral-1" asChild>
-                                            <Link href="/parcours/oral-1"><RxChatBubble />Oral 1</Link>
+                                            <Link href="/parcours/oral-1">
+                                                <HStack gap={2}>
+                                                    <RxChatBubble />
+                                                    <Text as="span">Oral 1</Text>
+                                                </HStack>
+                                            </Link>
                                         </Menu.Item>
                                         <Menu.Item value="oral-3" asChild>
-                                            <Link href="/parcours/oral-3"><SlSpeech />Oral 3</Link>
+                                            <Link href="/parcours/oral-3">
+                                                <HStack gap={2}>
+                                                    <SlSpeech />
+                                                    <Text as="span">Oral 3</Text>
+                                                </HStack>
+                                            </Link>
                                         </Menu.Item>
                                         <Menu.Item value="checkout" asChild>
-                                            <Link href="/checkout"><LuSparkles />Passer Pro</Link>
+                                            <Link href="/checkout">
+                                                <HStack gap={2}>
+                                                    <LuSparkles />
+                                                    <Text as="span">Passer Pro</Text>
+                                                </HStack>
+                                            </Link>
                                         </Menu.Item>
                                     </SimpleGrid>
                                 </Menu.Content>
@@ -98,7 +123,6 @@ export default async function DesktopMenu() {
                 </HStack>
 
                 <HStack gap={4}>
-
                     <Icon>
                         <FaBell />
                         {isNotification && (
