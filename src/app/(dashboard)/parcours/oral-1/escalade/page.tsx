@@ -1,5 +1,10 @@
-
 import { Box, Heading, Text, VStack, List, Separator, Flex, For, Stack, Table } from "@chakra-ui/react";
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Fiche de révision de l’oral 1 du CAPEPS - Escalade',
+  description: "Révise efficacement l’oral 1 du CAPEPS avec notre fiche synthétique sur l'escalade' : Définition et enjeux de l’APSA, vocabulaire spécifique, observables et conduites typiques, exemple d’organisation d’un cycle, situation d’apprentissage et sécurité.",
+}
 
 export default function Page() {
   return (
@@ -17,22 +22,22 @@ export default function Page() {
           <List.Item>1. Définition et Enjeux de l’APSA</List.Item>
           <List.Item>2. Vocabulaire spécifique</List.Item>
           <List.Item>3. Observables et conduites typiques</List.Item>
-          <List.Item>4. Situation d'apprenstissage</List.Item>
+          <List.Item>4. Situation d&apos;apprenstissage</List.Item>
           <List.Item>5. Sécurité</List.Item>
-          <List.Item>6. Exemple d'évaluation</List.Item>
+          <List.Item>6. Exemple d&apos;évaluation</List.Item>
         </List.Root>
 
         <Box bg="teal.500" p={3} borderRadius="lg" w="full">
-          <Heading size="md" color="white">1. Définition et Enjeux de l’APSA</Heading>
+          <Heading size="md" color="white">1. Définition et Enjeux de l&apos;APSA</Heading>
         </Box>
         <Text>
           Grimper consiste à réaliser un itinéraire sur une paroi rocheuse ou artificielle, grâce à diverses prises, afin d’atteindre le sommet.
         </Text>
-        <Heading size="xl" fontWeight="bold">Enjeux :</Heading>
+        <Heading size="xl" fontWeight="bold" mb="4">Enjeux :</Heading>
         <List.Root gap={2} pl={4}>
           <List.Item>Apprendre à l’élève à se projeter</List.Item>
-          <List.Item>Permettre à l’élève de construire sa sécurité et celle des autres</List.Item>
-          <List.Item>Faire acquérir à l’élève un répertoire gestuel permettant le déplacement dans la verticalité</List.Item>
+          <List.Item>Permettre à l&apos;élève de construire sa sécurité et celle des autres</List.Item>
+          <List.Item>Faire acquérir à l&apos;élève un répertoire gestuel permettant le déplacement dans la verticalité</List.Item>
         </List.Root>
 
         <Box bg="teal.500" p={3} borderRadius="lg" w="full">
@@ -52,8 +57,8 @@ export default function Page() {
         </Box>
         <List.Root gap={2} pl={4}>
           <List.Item>Mise en oeuvre de la sécurité</List.Item>
-          <List.Item>Prise d’informations pour identifier les éléments pertinents </List.Item>
-          <List.Item>Prise de décisions pour choisir/Concevoir l’itinéraire </List.Item>
+          <List.Item>Prise d&apos;informations pour identifier les éléments pertinents </List.Item>
+          <List.Item>Prise de décisions pour choisir/Concevoir l&apos;itinéraire </List.Item>
           <List.Item>Organisation motrice pour réaliser l’action </List.Item>
           <List.Item>Connaissances sur soi </List.Item>
           <List.Item>Communication </List.Item>
@@ -378,25 +383,25 @@ export default function Page() {
         <Box bg="teal.500" p={3} borderRadius="lg" w="full">
           <Heading size="md" color="white">4. Situations d’apprentissage</Heading>
         </Box>
-        <Heading size="lg" fontWeight="bold">Passer d’un élève tracteur avec ses bras à pousseur avec ses jambes</Heading>
+        <Heading size="lg" fontWeight="bold">Passer d’un élève tracteur avec ses bras à pousseur avec ses jambes:</Heading>
         <List.Root gap={2} pl={4}>
           <List.Item>SA1 : 1 main 2 pieds (pas de mouvement de main sans bouger les 2 pieds)</List.Item>
           <List.Item>SA2 : Monter avec un minimum de prises main touchées</List.Item>
           <List.Item>SA3 : Monter avec les 2 mains attachées avec une corde passant dans le ponter / Main droite reliée main gauche / 2 mains reliées aux 2 pieds opposés</List.Item>
         </List.Root>
 
-        <Heading size="lg" fontWeight="bold">Passer d’un élève qui grimpe uniquement sur un axe vertical à un élève capable d’exploiter les différents axes pour progresser – mettre en place un projet de déplacement pour grimper efficacement avec des axes variés</Heading>
+        <Heading size="lg" fontWeight="bold">Passer d’un élève qui grimpe uniquement sur un axe vertical à un élève capable d’exploiter les différents axes pour progresser – mettre en place un projet de déplacement pour grimper efficacement avec des axes varié:</Heading>
         <List.Root gap={2} pl={4}>
           <List.Item>SA1 : Prises interdites (choix contraint)</List.Item>
           <List.Item>SA2 : réaliser une traversée sous la corde disposée par l’enseignant: adapter son déplacement et s’adapter à ≠ prises</List.Item>
           <List.Item>SA3 : PME – à chaque dégaine, les élèves doivent retirer au moins 1 ou 2 appuis et tenir 10 secondes</List.Item>
-          <List.Item>SA4 : 1 minute de lecture de voie – annoncer son projet de nombre de mouvements au juges – réaliser la voie – But d’atteindre son projet de mouvement prévu</List.Item>
+          <List.Item>SA4 : 1 minute de lecture de voie – annoncer son projet de nombre de mouvements au juges – réaliser la voie – But d&apos;atteindre son projet de mouvement prévu</List.Item>
         </List.Root>
 
-        <Heading size="lg" fontWeight="bold">Passer d’un élève qui exploite différents axes de progression à un élève qui utilise une gestuelle de façon efficiente</Heading>
+        <Heading size="lg" fontWeight="bold">Passer d’un élève qui exploite différents axes de progression à un élève qui utilise une gestuelle de façon efficiente:</Heading>
         <List.Root gap={2} pl={4}>
           <List.Item>SA1 : Lecture de voie : entourer sur une fiche ou numérique les prises que l’on souhaite prendre. Lors de la grimpe, 10 points par prise utilisée, et -1 par prise estimée mais non touchée</List.Item>
-          <List.Item>SA2 : Tournois de point technique. Avant chaque voie, l’élève choisi 3 points techniques qu’il devra réaliser à chaque dégaine (décolle toi, assis-talon, changement main/pieds, pied-main, grenouille, crochet-talon). Posture validée par le juge = 1 point</List.Item>
+          <List.Item>SA2 : Tournois de point technique. Avant chaque voie, l&apos;élève choisi 3 points techniques qu&apos;il devra réaliser à chaque dégaine (décolle toi, assis-talon, changement main/pieds, pied-main, grenouille, crochet-talon). Posture validée par le juge = 1 point</List.Item>
 
         </List.Root>
 
@@ -405,7 +410,7 @@ export default function Page() {
         </Box>
         <List.Root gap={2} pl={4}>
           <List.Item>
-            Les programmes des lycées sont guidés par des niveaux de compétence à atteindre. Ces niveaux font référence à une pratique en moulinette au niveau 3 et ouvrent la possibilité́ de pratiquer l'escalade en tête aux niveaux 4 et 5 de compétence.
+            Les programmes des lycées sont guidés par des niveaux de compétence à atteindre. Ces niveaux font référence à une pratique en moulinette au niveau 3 et ouvrent la possibilité́ de pratiquer l&apos;escalade en tête aux niveaux 4 et 5 de compétence.
           </List.Item>
           <List.Item>
             Les différentes zones de travail sont délimitées (échauffement, travail, observation, repos)
@@ -414,25 +419,24 @@ export default function Page() {
             Les encordements sur le ou les pontets du baudrier enfilé de façon conforme sont vérifiés systématiquement par le professeur pour démarrer la voie
           </List.Item>
           <List.Item>
-            Les vérifications mutuelles entre élèves (grimpeur / assureur) doivent être systématiques. À ce titre, l'usage d'un co-contrôle doit être installé dès la première leçon pour devenir systématique et permanent. Le professeur finalise cette première étape par une ultime vérification visuelle et tactile réalisée par ses soins avant toute autorisation de grimper.
+            Les vérifications mutuelles entre élèves (grimpeur / assureur) doivent être systématiques. À ce titre, l&apos;usage d&apos;un co-contrôle doit être installé dès la première leçon pour devenir systématique et permanent. Le professeur finalise cette première étape par une ultime vérification visuelle et tactile réalisée par ses soins avant toute autorisation de grimper.</List.Item>
+          <List.Item>
+            Double nœud de « huit » complété par un nœud d&apos;arrêt. Le nœud de « huit » doit être compacté et confectionné le plus près possible du ou des pontets
           </List.Item>
           <List.Item>
-            Double nœud de « huit » complété par un nœud d'arrêt. Le nœud de « huit » doit être compacté et confectionné le plus près possible du ou des pontets
-          </List.Item>
-          <List.Item>
-            Dans le cas d'un assurage en moulinette, la modalité d'ascension doit permettre d'éviter tout retour au sol. Ce dispositif peut être un nœud de sécurité (corde nouée en double par un nœud simple appelé « queue de vache ») en dessous du système frein de l'assureur et à proximité de celui-ci, dès que les mains du grimpeur dépassent 4 mètres environ. Ce dispositif ou tout autre dispositif mis en place empêchant le retour au sol doit être contrôlé par l'enseignant.
+            Dans le cas d&apos;un assurage en moulinette, la modalité d&apos;ascension doit permettre d&apos;éviter tout retour au sol. Ce dispositif peut être un nœud de sécurité (corde nouée en double par un nœud simple appelé « queue de vache ») en dessous du système frein de l&apos;assureur et à proximité de celui-ci, dès que les mains du grimpeur dépassent 4 mètres environ. Ce dispositif ou tout autre dispositif mis en place empêchant le retour au sol doit être contrôlé par l&apos;enseignant.
           </List.Item>
           <List.Item>
             La signalisation des couloirs de grimpe doit impliquer un code couleur (alternance de cordes de couleur différente par exemple) entre les différentes voies et cordes en place.
           </List.Item>
           <List.Item>
-            Le professeur doit porter un baudrier, équipé d'une longe, d'une ou deux dégaines, et d'un système frein afin de pouvoir intervenir rapidement en tout point du mur ou pour porter assistance à un élève.
+            Le professeur doit porter un baudrier, équipé d&apos;une longe, d&apos;une ou deux dégaines, et d&apos;un système frein afin de pouvoir intervenir rapidement en tout point du mur ou pour porter assistance à un élève.
           </List.Item>
           <List.Item>
-            Quand un différentiel de poids supérieur à dix kilogrammes subsiste, il convient de le neutraliser par une vrille de corde en moulinette (une vrille pour 10 kilogrammes d'écart). Pour l'escalade en tête, ce différentiel de poids ne peut être compensé et interdit donc la pratique en tête de cordée de l’élève le plus lourd.
+            Quand un différentiel de poids supérieur à dix kilogrammes subsiste, il convient de le neutraliser par une vrille de corde en moulinette (une vrille pour 10 kilogrammes d&apos;écart). Pour l&apos;escalade en tête, ce différentiel de poids ne peut être compensé et interdit donc la pratique en tête de cordée de l&apos;élève le plus lourd.
           </List.Item>
           <List.Item>
-            En tête, l'usage de départs de voies avec deux dégaines pré-mousquetonnées doit permettre d'éviter les retours au sol du grimpeur quand les premiers mousquetonnages s'avèrent délicats.
+            En tête, l&apos;usage de départs de voies avec deux dégaines pré-mousquetonnées doit permettre d&apos;éviter les retours au sol du grimpeur quand les premiers mousquetonnages s&apos;avèrent délicats.
           </List.Item>
 
         </List.Root>
@@ -444,7 +448,7 @@ export default function Page() {
           <List.Item>Motricité du grimpeur /5</List.Item>
           <List.Item>Cotation et difficulté de la voie /3</List.Item>
           <List.Item>Planifier et réaliser un projet adapté /2</List.Item>
-          <List.Item>S’équiper et assurer /4</List.Item>
+          <List.Item>S&apos;équiper et assurer /4</List.Item>
           <List.Item>Lecture de voie /2</List.Item>
           <List.Item>Coopérer /2 (conseil, vérification, communication)</List.Item>
           <List.Item>Investissement et progrès /2</List.Item>

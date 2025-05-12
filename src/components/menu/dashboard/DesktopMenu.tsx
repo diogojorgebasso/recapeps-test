@@ -21,23 +21,23 @@ import {
     LuLayoutDashboard,
     LuFileText,
     LuMicVocal,
-    LuCircleUser,
     LuCircle,
     LuSparkles,
 } from "react-icons/lu";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { signOut } from "@/lib/firebase/auth";
 import { useAuth } from "@/contexts/Auth/useAuth";
 import { SimpleColorModeButton } from "@/components/ui/color-mode";
 import { usePathname } from "next/navigation";
+import { FaRegUserCircle } from "react-icons/fa";
 
 const ITEMS = [
-    { href: "/dashboard", label: "Tableau de bord", icon: LuLayoutDashboard },
-    { href: "/ecrit-1", label: "Écrit 1", icon: LuFileText },
-    { href: "/ecrit-2", label: "Écrit 2", icon: LuFileText },
-    { href: "/oral-1", label: "Oral 1", icon: LuMicVocal },
-    { href: "/oral-3", label: "Oral 3", icon: LuMicVocal },
-    { href: "/profil", label: "Profil", icon: LuCircleUser },
+    { href: "/parcours/dashboard", label: "Tableau de bord", icon: LuLayoutDashboard },
+    { href: "/parcours/ecrit-1", label: "Écrit 1", icon: LuFileText },
+    { href: "/parcours/ecrit-2", label: "Écrit 2", icon: LuFileText },
+    { href: "/parcours/oral-1", label: "Oral 1", icon: LuMicVocal },
+    { href: "/parcours/oral-3", label: "Oral 3", icon: LuMicVocal },
+    { href: "/compte/profil", label: "Profil", icon: FaRegUserCircle },
     { href: "/contact", label: "Contact", icon: LuCircle },
 ] as const;
 
@@ -79,17 +79,34 @@ const TourOverlay = createOverlay<{
 
 export const TourViewport = TourOverlay.Viewport;
 
+const INTRO_TOUR_STORAGE_KEY = 'hasCompletedRecapepsIntroTour'; // Key for localStorage
+
 export default function DesktopMenu() {
     const { user, pro } = useAuth();
     const pathname = usePathname();
 
     /* intro dialog: offer the tour once */
-    const intro = useDisclosure({
-        defaultOpen: true,
-    });
+    const intro = useDisclosure({});
+
+    useEffect(() => {
+        // Check localStorage only on the client-side
+        if (typeof window !== 'undefined') {
+            const hasCompletedTour = localStorage.getItem(INTRO_TOUR_STORAGE_KEY);
+            if (!hasCompletedTour) {
+                intro.onOpen();
+            }
+        }
+    }, [intro]);
 
     /* current tour step (null = not running) */
     const [step, setStep] = useState<number | null>(null);
+
+    const markTourAsCompleted = () => {
+        if (typeof window !== 'undefined') {
+            localStorage.setItem(INTRO_TOUR_STORAGE_KEY, 'true');
+        }
+        intro.onClose();
+    };
 
     /* helper to show/update overlay */
     const openStep = (idx: number, anchor: HTMLElement) => {
@@ -103,7 +120,10 @@ export default function DesktopMenu() {
             onNext: () => {
                 const next = idx + 1;
                 if (next < ITEMS.length) openStep(next, anchor);
-                else TourOverlay.close("tour"); // finished
+                else {
+                    TourOverlay.close("tour");
+                    markTourAsCompleted(); // mark tour as completed
+                } // finished
             },
         };
 
@@ -218,7 +238,7 @@ export default function DesktopMenu() {
 
                 {/* nav buttons (anchor refs created inline) */}
                 {ITEMS.map((item, idx) => {
-                    const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
+                    const isActive = pathname === item.href || (item.href !== "/parcours/dashboard" && pathname.startsWith(item.href))
                     return (
                         <Link key={item.href} href={item.href} passHref>
                             <IconButton

@@ -1,11 +1,16 @@
+import { Box, Heading, Text, VStack, List, Separator, Flex, For, Stack, Table } from "@chakra-ui/react";
+import type { Metadata } from 'next'
 
-import { Box, Heading, Text, VStack, List, Flex, Stack, Table } from "@chakra-ui/react";
+export const metadata: Metadata = {
+  title: 'Fiche de révision de l’oral 1 du CAPEPS - Tennis de table',
+  description: "Révise efficacement l’oral 1 du CAPEPS avec notre fiche synthétique sur le tennis de table : Définition et enjeux de l’APSA, vocabulaire spécifique, observables et conduites typiques, exemple d’organisation d’un cycle, situation d’apprentissage et sécurité.",
+}
 
 export default function Page() {
   return (
     <Box p={5} maxW="3/4" mx="auto" boxShadow="md">
       <Flex bg="teal.500" p={4} borderRadius="lg" align="center" justify="center">
-        <Heading size="lg" color="white">Tennis de table</Heading>
+        <Heading size="lg">Tennis de table</Heading>
       </Flex>
 
       <VStack align="start" gap={4} mt={4} >
@@ -13,15 +18,15 @@ export default function Page() {
           <Heading size="md" color="white">Sommaire</Heading>
         </Box>
         <List.Root gap={2} pl={4} fontWeight="bold" maxW="600px" borderRadius="lg"  >
-          <List.Item>1. Définition et Enjeux de l’APSA</List.Item>
+          <List.Item>1. Définition et Enjeux de l&apos;APSA</List.Item>
           <List.Item>2. Observables et conduites typiques</List.Item>
-          <List.Item>3. Organisation d’un cycle – exemple</List.Item>
-          <List.Item>4. Situation d'apprenstissage</List.Item>
+          <List.Item>3. Organisation d&apos;un cycle – exemple</List.Item>
+          <List.Item>4. Situation d&apos;apprentissage</List.Item>
           <List.Item>5. Sécurité</List.Item>
         </List.Root>
 
         <Box bg="teal.500" p={3} borderRadius="lg" w="full">
-          <Heading size="md">1. Définition et Enjeux de l’APSA</Heading>
+          <Heading size="md">1. Définition et Enjeux de l&apos;APSA</Heading>
         </Box>
         <Text px={3}>
           Affrontement duel médié par une balle, qui se réalise dans un rapport de force où chaque individu doit, en une même frappe de balle, défendre son camp et attaquer le camp adverse.
@@ -190,25 +195,23 @@ export default function Page() {
                   <Text fontWeight={"bold"}> </Text>
                 </Table.Cell>
                 <Table.Cell>
-                  <Text >-	L’élève ne reconnaît pas une balle favorable <br />
-                    -	Élève dans la réaction plutôt que l’action <br />
-                    -	Prise d’information tardive : l’élève réagit après que la balle ait passé le filet (élève se précipite sur la table, se déséquilibre vers l’arrière)<br />
+                  <Text >-	L&apos;élève ne reconnaît pas une balle favorable <br />
+                    -	Élève dans la réaction plutôt que l&apos;action <br />
+                    -	Prise d&apos;information tardive : l&apos;élève réagit après que la balle ait passé le filet (élève se précipite sur la table, se déséquilibre vers l&apos;arrière)<br />
                     -	Difficulté à objectiver ses points forts et ses points faibles
+                  </Text>
+                </Table.Cell>
 
+                <Table.Cell>
+                  <Text>-	L&apos;élève reconnaît et prend l&apos;initiative sur une balle favorable <br />
+                    -	L&apos;élève connaît ses points forts et ses points faibles
 
                   </Text>
                 </Table.Cell>
 
                 <Table.Cell>
-                  <Text>-	L’élève reconnaît et prend l'initiative sur une balle favorable <br />
-                    -	L’élève connaît ses points forts et ses points faibles
-
-                  </Text>
-                </Table.Cell>
-
-                <Table.Cell>
-                  <Text >-	Prise d’information rapide, et reconnaissance des principes d’efficacité (balle haute, trajectoire…) pour fonder un schéma tactique efficace contre l’adversaire <br />
-                    -	L’élève identifie ses points forts et ses points faibles, mais aussi ceux de son adversaire
+                  <Text >-	Prise d&apos;information rapide, et reconnaissance des principes d&apos;efficacité (balle haute, trajectoire…) pour fonder un schéma tactique efficace contre l&apos;adversaire <br />
+                    -	L&apos;élève identifie ses points forts et ses points faibles, mais aussi ceux de son adversaire
 
 
                   </Text>
@@ -237,7 +240,7 @@ export default function Page() {
 
                 <Table.Cell>
                   <Text>-	Effectue des changements de rythme grâce à des frappes sur des balles faciles <br />
-                    -	Déséquilibrer l'adversaire (sur le plan spatial) afin d’obtenir une balle favorable sur laquelle l’élève conclura le point grâce à une frappe <br />
+                    -	Déséquilibrer l&apos;adversaire (sur le plan spatial) afin d’obtenir une balle favorable sur laquelle l’élève conclura le point grâce à une frappe <br />
                     -	Marquer des points en provoquant la faute adverse grâce à des balles frappées et/ou placées
 
 
@@ -245,9 +248,9 @@ export default function Page() {
                 </Table.Cell>
 
                 <Table.Cell>
-                  <Text >-	Intention de rompre l’échange dès le service <br />
-                    -	Prise d’initiative afin de pouvoir placer son coup fort <br />
-                    -	Lutte contre la prise d’initiative adverse
+                  <Text >-	Intention de rompre l&apos;échange dès le service <br />
+                    -	Prise d&apos;initiative afin de pouvoir placer son coup fort <br />
+                    -	Lutte contre la prise d&apos;initiative adverse
 
 
                   </Text>
@@ -284,20 +287,20 @@ export default function Page() {
 
 
         <Box bg="teal.500" p={3} borderRadius="lg" w="full">
-          <Heading size="md" color="white">4. Situations d'apprentissage</Heading>
+          <Heading size="md" color="white">4. Situations d&apos;apprentissage</Heading>
         </Box>
 
-        <Heading size="xl" fontWeight={"bold"}>Passer d’un élève qui construit son point tardivement à un élève qui construit son point dès le service:
+        <Heading size="xl" fontWeight={"bold"}>Passer d&apos;un élève qui construit son point tardivement à un élève qui construit son point dès le service:
 
         </Heading>
         <List.Root gap={2} pl={4}>
           <List.Item>SA1 : Viser une coupelle/feuille dans les coins au service, répétition. </List.Item>
           <List.Item>SA2 : Match à thème. 3 points si le point est marqué dans les deux première touches de celui qui sert. </List.Item>
-          <List.Item>SA3 : Service avec retard défensif (l’adversaire se place de l’un côté ou l’autre de la table, à 1m du bord de la table). </List.Item>
+          <List.Item>SA3 : Service avec retard défensif (l&apos;adversaire se place de l&apos;un côté ou l&apos;autre de la table, à 1m du bord de la table). </List.Item>
           <List.Item>SA4 : La balle à 6 points. Elle perd 1 point dès que le défenseur la touche. Le joueur gagne le nombre de points que possède la balle au moment ou le point est marqué. </List.Item>
         </List.Root>
 
-        <Heading size="xl" fontWeight={"bold"}>Passer d’un élève qui renvoie toutes les balles au centre de la table à un élève qui varie ses trajectoires:</Heading>
+        <Heading size="xl" fontWeight={"bold"}>Passer d&apos;un élève qui renvoie toutes les balles au centre de la table à un élève qui varie ses trajectoires:</Heading>
         <List.Root gap={2} pl={4}>
           <List.Item>SA1 : Plot à éviter, zone morte.</List.Item>
           <List.Item>SA2 : Feuille à viser, zone dangereuse. </List.Item>

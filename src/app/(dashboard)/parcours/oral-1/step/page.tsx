@@ -1,6 +1,10 @@
-
 import { Box, Heading, Text, VStack, List, Separator , Flex, For, Stack, Table} from "@chakra-ui/react";
-import { IncrementalCacheKind } from "next/dist/server/response-cache";
+import type { Metadata } from 'next' 
+export const metadata: Metadata = {
+  title: 'Fiche de révision de l’oral 1 du CAPEPS - Step',
+  description: "Révise efficacement l’oral 1 du CAPEPS avec notre fiche synthétique sur le step : Définition et enjeux de l’APSA, vocabulaire spécifique, observables et conduites typiques, exemple d’organisation d’un cycle, situation d’apprentissage et sécurité.",
+}
+
 export default function Page() {
   return (
     <Box p={5} maxW="3/4" mx="auto"  boxShadow="md">
@@ -13,17 +17,17 @@ export default function Page() {
           <Heading size="md" color="white">Sommaire</Heading>
         </Box>
         <List.Root gap={2} pl={4} fontWeight="bold" maxW="600px"  borderRadius="lg"  >
-          <List.Item>1. Définition et Enjeux de l’APSA</List.Item>
+          <List.Item>1. Définition et Enjeux de l&apos;APSA</List.Item>
           <List.Item>2. Vocabulaire spécifique</List.Item>
           <List.Item>3. Observables et conduites typiques</List.Item>
           <List.Item>4. Organisation d’un cycle – exemple</List.Item>
-          <List.Item>5. Situation d'apprenstissage</List.Item>
+          <List.Item>5. Situation d&apos;apprenstissage</List.Item>
           <List.Item>6. Sécurité</List.Item>
           <List.Item>7. Autre</List.Item>
         </List.Root>
         
         <Box bg="teal.500" p={3} borderRadius="lg" w="full">
-          <Heading size="md">1. Définition et Enjeux de l’APSA</Heading>
+          <Heading size="md">1. Définition et Enjeux de l&apos;APSA</Heading>
         </Box>
         <Text px={3}>
         Activité de production de forme dont le but est de produire un enchaînement de pas et de mouvements de bras, codifiés ou non à une intensité et un niveau de coordination que l’élève doit gérer au regard de son projet et de ses ressources personnelles. (Formation Professionnelle Continu, Académie de la Réunion, CA5) 
@@ -31,10 +35,10 @@ export default function Page() {
 
         
         <Box>
-          <Heading size="xl" fontWeight={"bold"}>Enjeux:</Heading>
+          <Heading size="xl" fontWeight={"bold"} mb="4">Enjeux:</Heading>
           <List.Root gap={2} pl={4}>
             <List.Item>Pratiquer en toute sécurité</List.Item>
-            <List.Item>Savoir s’entrainer</List.Item>
+            <List.Item>Savoir s&apos;entrainer</List.Item>
             <List.Item>Se connaitre</List.Item>
             <List.Item>Développer la coordination, synchronisation  </List.Item>
           </List.Root>
@@ -46,7 +50,7 @@ export default function Page() {
 
         <List.Root gap={2} pl={4}>
           <List.Item><strong>Amplitude :</strong> flexion et extension complète dans les mouvements de bras ou jambes, grandissement du corps </List.Item>
-          <List.Item><strong>Bloc :</strong> 4 phrases = 4x8 temps = 32 tempse</List.Item>
+          <List.Item><strong>Bloc :</strong> 4 phrases = 4x8 temps = 32 temps</List.Item>
           <List.Item><strong>Phrase :</strong> 8 temps </List.Item>
           <List.Item><strong>BPM :</strong> tempo de la musique</List.Item>
           <List.Item><strong>Continuité :</strong> enchainement sans hésitation, rupture de rythme ou arrêt </List.Item>
@@ -114,7 +118,7 @@ export default function Page() {
                     </Table.Cell>
 
                     <Table.Cell>
-                      <Text>-	Réalise des séries complètes avec respect de la séquence d'entraînement (séries, récup)<br/>
+                      <Text>-	Réalise des séries complètes avec respect de la séquence d&apos;entraînement (séries, récup)<br/>
 -	Enchaînement de plusieurs blocs<br/>
 -	Impulsions
 
@@ -163,7 +167,7 @@ export default function Page() {
                     </Table.Cell>
                     <Table.Cell>
                     <Text >-	Centré sur la reproduction des pas. <br/>
--	Difficulté de mémorisation pour l'enchaînement des pas.<br/>
+-	Difficulté de mémorisation pour l&apos;enchaînement des pas.<br/>
 -	Décalage avec le tempo de la musique<br/>
 -	Suit ses camarades, retard
 </Text>
@@ -177,7 +181,7 @@ export default function Page() {
                     </Table.Cell>
 
                     <Table.Cell>
-                    <Text >-	Connaît les blocs, les temps d’effort et de récupération (savoir s’entrainer) <br/>
+                    <Text >-	Connaît les blocs, les temps d&apos;effort et de récupération (savoir s&apos;entrainer) <br/>
 -	Pratiquement aucun arrêt.<br/>
 -	Mouvements calés sur le tempo de la musique<br/>
 -	Paramètres utilisés : Hauteur du step, utilisation des bras, Relevé de la FC, impulsions, pas complexes
@@ -208,10 +212,10 @@ export default function Page() {
                     </Table.Cell>
 
                     <Table.Cell>
-                    <Text >-	Le thème choisi est justifié de façon personnelle et prend appui sur le carnet d'entraînement <br/>
+                    <Text >-	Le thème choisi est justifié de façon personnelle et prend appui sur le carnet d&apos;entraînement <br/>
 -	Les modalités des séquences sont adaptées et justifiées<br/>
 -	Le choix des paramètres se fait en fonction du vécu du candidat. <br/>
--	Le carnet d'entraînement est présent et cohérent.
+-	Le carnet d&apos;entraînement est présent et cohérent.
 
 
  </Text>
@@ -270,7 +274,7 @@ export default function Page() {
                     </Table.Cell>
 
                     <Table.Cell>
-                    <Text >-	S’engage dans son rôle de partenaire d'entraînement et de coach. <br/>
+                    <Text >-	S’engage dans son rôle de partenaire d&apos;entraînement et de coach. <br/>
 -	Observe avec attention et dans l’intention d’apporter des conseils.
 </Text>
                     </Table.Cell>
@@ -311,7 +315,7 @@ export default function Page() {
 
 
         <Box bg="teal.500" p={3} borderRadius="lg" w="full">
-          <Heading size="md" color="white">5. Situations d'apprentissage</Heading>
+          <Heading size="md" color="white">5. Situations d&apos;apprentissage</Heading>
         </Box>
         
         <Heading size="xl" fontWeight={"bold"}>Échauffement:</Heading>
@@ -321,7 +325,7 @@ export default function Page() {
             <List.Item>Suivre un enchainement simple sur musique qui varie  </List.Item>
             <List.Item>Synchronisation musique - Marche sur 8 temps / arrêt sur 8 temps</List.Item>
           </List.Root>
-        <Heading size="xl" fontWeight={"bold"}>Passer d’un élève qui se perd dans l’enchainement à un élève capable d’exécuter un enchainement mémorisé:
+        <Heading size="xl" fontWeight={"bold"}>Passer d&apos;un élève qui se perd dans l&apos;enchainement à un élève capable d&apos;exécuter un enchainement mémorisé:
           
         </Heading>
         <List.Root gap={2} pl={4}>
@@ -329,7 +333,7 @@ export default function Page() {
             <List.Item>Chacun apprend 1 pas à son partenaire parmi 4 pas déjà appris. A prends le pas 1. 4 répétitions. B apprend le pas 1+2. 4 répétitions…jusqu’à ce que les 4 pas soient appris. Puis les élèves exécutent l’enchainement, avec un observateur chacun. Fiche d’observation. 1 maitre du tempo désigné parmi les 4 élèves. </List.Item>
           </List.Root>
 
-          <Heading size="xl" fontWeight={"bold"}>Passer d’un élève qui est décalé du tempo/camarades à un élève synchronisé avec la musique et les autres:</Heading>
+          <Heading size="xl" fontWeight={"bold"}>Passer d&apos;un élève qui est décalé du tempo/camarades à un élève synchronisé avec la musique et les autres:</Heading>
           <List.Root gap={2} pl={4}>
         <List.Item>
         Taper dans ses mains les temps
@@ -338,7 +342,7 @@ export default function Page() {
         <List.Item>Le cercle des pas (aussi pour mémorisation)</List.Item>
         </List.Root>
 
-         <Heading size="xl" fontWeight="bold">Passer d’un élève qui a une FC en décalage avec son mobile, à un élève qui se régule pour que sa FC soit dans la fourchette attendue / Passer d’un élève qui a peu de repères sur lui-même à un élève qui sait construire et analyser son entrainement selon ses capacités:</Heading>
+         <Heading size="xl" fontWeight="bold">Passer d&apos;un élève qui a une FC en décalage avec son mobile, à un élève qui se régule pour que sa FC soit dans la fourchette attendue / Passer d&apos;un élève qui a peu de repères sur lui-même à un élève qui sait construire et analyser son entrainement selon ses capacités:</Heading>
               <List.Root gap={2} pl={4}>
                 <List.Item>Série 1 : ajouter 1 paramètre. Série 2 : 2 paramètres Série 3, 3 paramètres. Analyse de la FC entre chaque série. </List.Item>
                 </List.Root>
@@ -347,7 +351,7 @@ export default function Page() {
         <Box bg="teal.500" p={3} borderRadius="lg" w="full">
           <Heading size="md" color="white">6. Sécurité</Heading>
         </Box>
-        <Heading size="xl" fontWeight={"bold"}>Sécurité active</Heading>
+        <Heading size="xl" fontWeight={"bold"}>Sécurité active:</Heading>
           <List.Root gap={2} pl={4}>
               <List.Item>Pied entier sur le step </List.Item>
               <List.Item>Pas de descente vers l’avant (25% en + du poids)</List.Item>
@@ -396,11 +400,11 @@ export default function Page() {
           <Heading size="xl" fontWeight={"bold"}>Si problème de mémorisation:</Heading>
             <List.Root gap={2} pl={4}>
               <List.Item>Diminuer le nombre de blocs</List.Item>
-              <List.Item>Réchappe = revenir aux pas de base jusqu’à ce qu’on raccroche à la chorée</List.Item>
+              <List.Item>Réchappe = revenir aux pas de base jusqu&apos;à ce qu&apos;on raccroche à la chorée</List.Item>
             </List.Root>
 
             <Heading size="xl" fontWeight={"bold"}>Si problème de latéralisation (souvent pour élèves à BEP):</Heading>
-            <Text>Foulard à une cheville permet qu’il se repère plus facilement</Text>
+            <Text>Foulard à une cheville permet qu&apos;il se repère plus facilement</Text>
         
         </VStack>
     </Box>

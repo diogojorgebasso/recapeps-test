@@ -9,6 +9,7 @@ import { getMessaging, isSupported } from "firebase/messaging";
 import {
     initializeAppCheck,
     ReCaptchaEnterpriseProvider,
+    CustomProvider,
 } from 'firebase/app-check'
 
 const firebaseConfig = {
@@ -33,6 +34,7 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
             provider: new ReCaptchaEnterpriseProvider('6Lco8f4qAAAAAPFNsctWY6ASBbDBnWZ50v5jF9eP'),
             isTokenAutoRefreshEnabled: true
         });
+
         console.log("Firebase App Check initialized.");
     } catch (error) {
         console.error("Error initializing Firebase App Check:", error);

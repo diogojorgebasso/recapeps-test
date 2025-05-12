@@ -1,0 +1,252 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import {
+    Box,
+    Heading,
+    Table,
+    HStack,
+    Button,
+    Text,
+    VStack,
+    SimpleGrid,
+    Card,
+    CardHeader,
+    CardBody,
+    CardFooter,
+    Spinner,
+    Center,
+} from "@chakra-ui/react";
+
+import { HiOutlineClipboardList, HiOutlineSparkles } from "react-icons/hi";
+import {
+    LineChart,
+    Line,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    ResponsiveContainer,
+    Legend,
+} from "recharts";
+import { useAuth } from "@/contexts/Auth";
+import { EmptyState } from "@/components/ui/empty-state";
+import Link from "next/link";
+import { findCompletedAttempts } from "@/repositories/quizRepo";
+import { QuizDone, Quiz } from "@/types/Quiz";
+
+export default function Dashboard() {
+    const { user } = useAuth();
+    const [quizData, setQuizData] = useState<QuizDone[]>([]);
+    const recommendedQuizzes = [
+        {
+            id: "quiz1",
+            name: "Quiz de Mathématiques",
+            level: "Débutant",
+        },
+        {
+            id: "quiz2",
+            name: "Quiz de Physique",
+            level: "Intermédiaire",
+        },
+        {
+            id: "quiz3",
+            name: "Quiz de Chimie",
+            level: "Avancé",
+        },
+    ]
+    const [isLoading, setIsLoading] = useState(true);
+    const currentEcritNumber = 1;
+
+    useEffect(() => {
+        const loadData = async () => {
+            if (!user) {
+                setIsLoading(false);
+                return;
+            }
+
+            setIsLoading(true);
+            try {
+                const completedAttemptsData = await findCompletedAttempts({ uid: user.uid, numberOfEcrit: currentEcritNumber, limitResult: 10 });
+                setQuizData(completedAttemptsData);
+
+
+            } catch (error) {
+                console.error("Erreur lors du chargement des données du tableau de bord:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        loadData();
+    }, [user]);
+
+    const groupedByQuiz = quizData.reduce((acc, attempt) => {
+        const { name, score, completedAt } = attempt;
+        if (!acc[name]) {
+            acc[name] = {
+                attempts: 0,
+                highestScore: -1,
+                lastAttemptDate: new Date(0),
+            };
+        }
+        acc[name].attempts += 1;
+        if (score > acc[name].highestScore) {
+            acc[name].highestScore = score;
+        }
+        const attemptDate = completedAt.toDate();
+        if (attemptDate > acc[name].lastAttemptDate) {
+            acc[name].lastAttemptDate = attemptDate;
+        }
+        return acc;
+    }, {} as Record<string, { attempts: number; highestScore: number; lastAttemptDate: Date }>);
+
+    const tableData = Object.entries(groupedByQuiz).map(([quizName, stats]) => ({
+        name: quizName,
+        attempts: stats.attempts,
+        highestScore: stats.highestScore,
+        lastAttemptDate: stats.lastAttemptDate.toISOString(),
+    }));
+
+    const chartData = quizData
+        .slice()
+        .reverse()
+        .map((quiz) => ({
+            name: quiz.name,
+            score: quiz.score,
+            timestamp: quiz.completedAt.toDate().toLocaleDateString("fr-FR", {
+                month: "short",
+                day: "numeric",
+            }),
+        }));
+
+    if (isLoading) {
+        return (
+            <Center h="100vh">
+                <Spinner size="xl" />
+            </Center>
+        );
+    }
+
+    if (quizData.length === 0 && recommendedQuizzes.length === 0 && !isLoading) {
+        return (
+            <EmptyState
+                icon={<HiOutlineClipboardList size="48px" />}
+                title="Aucun résultat ou recommandation pour le moment"
+                description="Commencez par faire des quiz pour voir vos résultats et obtenir des recommandations personnalisées."
+            >
+                <HStack gap={4} mt={4}>
+                    <Link href={`/parcours/ecrit-${currentEcritNumber}`}>
+                        <Button colorScheme="green">Explorer les quiz (Écrit {currentEcritNumber})</Button>
+                    </Link>
+                    <Link href="/parcours/oral-1">
+                        <Button variant="outline">Explorer les fiches de révision</Button>
+                    </Link>
+                </HStack>
+            </EmptyState>
+        );
+    }
+
+    return (
+        <Box p={4}>
+            {quizData.length > 0 && (
+                <>
+                    <Heading size="lg" textAlign="center" mb={6}>
+                        Vos derniers résultats (Écrit {currentEcritNumber})
+                    </Heading>
+                    <Box display="flex" justifyContent="center" mb={10} p={4} shadow="md" borderWidth="1px" borderRadius="md">
+                        <ResponsiveContainer width="100%" height={400}>
+                            <LineChart data={chartData}>
+                                <CartesianGrid strokeDasharray="3 3" />
+                                <XAxis
+                                    dataKey="name"
+                                    angle={-30}
+                                    textAnchor="end"
+                                    height={70}
+                                    interval={0}
+                                    label={{ value: "Quiz (Tentatives récentes)", position: "insideBottom", offset: -5 }}
+                                />
+                                <YAxis label={{ value: "Score (%)", angle: -90, position: "insideLeft" }} domain={[0, 100]} />
+                                <Tooltip
+                                    contentStyle={{ borderRadius: "5px" }}
+                                    formatter={(value: number, name: string) => [value, name === "score" ? "Score" : name]}
+                                />
+                                <Legend verticalAlign="top" />
+                                <Line
+                                    type="monotone"
+                                    dataKey="score"
+                                    stroke="#4caf50"
+                                    strokeWidth={2}
+                                    dot={{ r: 5 }}
+                                    activeDot={{ r: 7 }}
+                                    name="Score"
+                                />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </Box>
+
+                    <Box maxWidth="1000px" mx="auto" py={8}>
+                        <Heading size="lg" textAlign="center" mb={6}>
+                            Récapitulatif par matière
+                        </Heading>
+                        <Table.Root variant="outline" size="md">
+                            <Table.Header>
+                                <Table.Row>
+                                    <Table.ColumnHeader>Matière</Table.ColumnHeader>
+                                    <Table.ColumnHeader>Tentatives</Table.ColumnHeader>
+                                    <Table.ColumnHeader>Meilleure Note (%)</Table.ColumnHeader>
+                                    <Table.ColumnHeader>Dernière Tentative</Table.ColumnHeader>
+                                </Table.Row>
+                            </Table.Header>
+                            <Table.Body>
+                                {tableData.map((row, index) => (
+                                    <Table.Row key={index}>
+                                        <Table.Cell fontWeight="medium">{row.name}</Table.Cell>
+                                        <Table.Cell>{row.attempts}</Table.Cell>
+                                        <Table.Cell>{row.highestScore}</Table.Cell>
+                                        <Table.Cell>
+                                            {new Date(row.lastAttemptDate).toLocaleDateString("fr-FR", {
+                                                year: "numeric",
+                                                month: "long",
+                                                day: "numeric",
+                                            })}
+                                        </Table.Cell>
+                                    </Table.Row>
+                                ))}
+                            </Table.Body>
+                        </Table.Root>
+                    </Box>
+                </>
+            )}
+
+            {recommendedQuizzes.length > 0 && (
+                <Box maxWidth="1000px" mx="auto" py={8} mt={8}>
+                    <Heading size="lg" textAlign="center" mb={6}>
+                        <HStack justifyContent="center">
+                            <HiOutlineSparkles /> <Text>Quiz recommandés pour vous</Text>
+                        </HStack>
+                    </Heading>
+                    <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={6}>
+                        {recommendedQuizzes.map((quiz) => (
+                            <Card.Root key={quiz.id} borderWidth="1px" borderRadius="md" shadow="sm" _hover={{ shadow: "md" }}>
+                                <Card.Header>
+                                    <Heading size="md">{quiz.name}</Heading>
+                                </Card.Header>
+                                <Card.Body>
+                                    <Text>Niveau: {quiz.level}</Text>
+                                </Card.Body>
+                                <Card.Footer>
+                                    <Link href={`/parcours/quiz/${quiz.id}`} passHref>
+                                        <Button colorScheme="green" variant="solid" width="full">
+                                            Commencer le quiz
+                                        </Button>
+                                    </Link>
+                                </Card.Footer>
+                            </Card.Root>
+                        ))}
+                    </SimpleGrid>
+                </Box>
+            )}
+        </Box>
+    );
+}

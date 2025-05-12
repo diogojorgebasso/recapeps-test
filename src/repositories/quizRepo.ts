@@ -2,6 +2,7 @@ import { Quiz, Question, AttemptQuiz, QuizDone } from "@/types/Quiz";
 import { QuizTrail } from "@/types/TreeSkill";
 import { db } from "@/lib/firebase/clientApp";
 import { collection, getDocs, query, where, limit, doc, getDoc, orderBy, serverTimestamp, addDoc, Firestore } from "firebase/firestore";
+
 /**
  * Finds an active (state === 'doing') quiz attempt for a user.
  */
@@ -156,7 +157,14 @@ export async function getProgressOverview(database = db, uid: string | undefined
 /**
  * Fetches completed quiz attempts for a user.
  */
-export async function findCompletedAttempts(database: Firestore = db, uid: string, numberOfEcrit: number, limitResult: number = 5) {
+export async function findCompletedAttempts({ database = db, uid, numberOfEcrit, limitResult = 5 }:
+    {
+        database?: Firestore,
+        uid: string,
+        numberOfEcrit: number,
+        limitResult?: number
+    }
+) {
     try {
 
         const userAttemptsRef = collection(database, "users", uid, `ecrit-${numberOfEcrit}`);
@@ -182,3 +190,4 @@ export async function findCompletedAttempts(database: Firestore = db, uid: strin
         throw new Error(`Failed to fetch quiz history: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
 }
+

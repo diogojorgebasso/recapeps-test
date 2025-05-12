@@ -1,5 +1,10 @@
-
 import { Box, Heading, Text, VStack, List, Separator, Flex, For, Stack, Table } from "@chakra-ui/react";
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Fiche de révision de l’oral 1 du CAPEPS - Basket',
+  description: "Révise efficacement l’oral 1 du CAPEPS avec notre fiche synthétique sur le basket : Définition et enjeux de l’APSA, vocabulaire spécifique, observables et conduites typiques, exemple d’organisation d’un cycle, situation d’apprentissage et sécurité.",
+}
 
 export default function Page() {
   return (
@@ -13,25 +18,25 @@ export default function Page() {
           <Heading size="md" color="white">Sommaire</Heading>
         </Box>
         <List.Root gap={2} pl={4} fontWeight="bold" maxW="600px" borderRadius="lg"  >
-          <List.Item>1. Définition et Enjeux de l’APSA</List.Item>
+          <List.Item>1. Définition et Enjeux de l&apos;APSA</List.Item>
           <List.Item>2. Vocabulaire spécifique</List.Item>
           <List.Item>3. Observables et conduites typiques</List.Item>
           <List.Item>4. Organisation d’un cycle – exemple</List.Item>
-          <List.Item>5. Situation d'apprenstissage</List.Item>
+          <List.Item>5. Situation d&apos;apprentissage</List.Item>
           <List.Item>6. Règlement et Sécurité</List.Item>
           <List.Item>7. Autre</List.Item>
         </List.Root>
 
         <Box bg="teal.500" p={3} borderRadius="lg" w="full">
-          <Heading size="md">1. Définition et Enjeux de l’APSA</Heading>
+          <Heading size="md">1. Définition et Enjeux de l&apos;APSA</Heading>
         </Box>
         <Text px={3}>
-          Le basket-ball est un sport collectif où cinq joueurs s’affrontent afin de marquer des points en lançant le ballon dans un panier.
+          Le basket-ball est un sport collectif où cinq joueurs s&apos;affrontent afin de marquer des points en lançant le ballon dans un panier.
         </Text>
 
 
         <Box>
-          <Heading size="xl" fontWeight={"bold"}>Enjeux:</Heading>
+          <Heading size="xl" fontWeight={"bold"} mb="4">Enjeux:</Heading>
           <List.Root gap={2} pl={4}>
             <List.Item><strong>Moteur :</strong> manipulation de balle, dextérité, adresse</List.Item>
             <List.Item><strong>Perceptif :</strong> situation instable et complexe, se décentrer du ballon</List.Item>
@@ -67,7 +72,7 @@ export default function Page() {
           <List.Item>Organisation collective attaque / défense</List.Item>
           <List.Item>Organisation individuelle PB / NPB (Porteur de Balle/Non Porteur de Balle)</List.Item>
           <List.Item>Motricité générale</List.Item>
-          <List.Item>Prise d'information et de décision</List.Item>
+          <List.Item>Prise d&apos;information et de décision</List.Item>
         </List.Root>
 
         <Stack gap="10">
@@ -225,9 +230,9 @@ export default function Page() {
                 <Table.Cell>
                   <Text >
                     -	Reste sur place une fois le ballon dans les mains. <br />
-                    -	Ne sait pas s’il doit passer ou avancer<br />
+                    -	Ne sait pas s&apos;il doit passer ou avancer<br />
                     -	Hésitant<br />
-                    -	N’ose pas se démarquer/recevoir/tirer<br />
+                    -	N&apos;ose pas se démarquer/recevoir/tirer<br />
                   </Text>
 
 
@@ -275,7 +280,7 @@ export default function Page() {
 
 
         <Box bg="teal.500" p={3} borderRadius="lg" w="full">
-          <Heading size="md" color="white">5. Situations d'apprentissage</Heading>
+          <Heading size="md" color="white">5. Situations d&apos;apprentissage</Heading>
         </Box>
 
         <Heading size="xl" fontWeight={"bold"}>Échauffement:</Heading>
@@ -285,21 +290,21 @@ export default function Page() {
           <List.Item>Parcours de motricité avec dribble : slalom, tir…</List.Item>
           <List.Item>Relais : dribble, demi-tour au plot, passe au suivant</List.Item>
         </List.Root>
-        <Heading size="xl" fontWeight={"bold"}>Passer d’élèves attaquants qui restent derrière le défenseur à des élèves qui se démarquent pour recevoir la passe</Heading>
+        <Heading size="xl" fontWeight={"bold"}>Passer d’élèves attaquants qui restent derrière le défenseur à des élèves qui se démarquent pour recevoir la passe:</Heading>
         <List.Root gap={2} pl={4}>
           <List.Item>Attaque défense en surnombre </List.Item>
           <List.Item>Passe à 10 avec statistiques</List.Item>
           <List.Item>Zones sur le côté : zone bonus : SI on recoit la balle dans cette zone = inattaquable + 1 point</List.Item>
         </List.Root>
 
-        <Heading size="xl" fontWeight={"bold"}>Passer d’élèves qui atteignent rarement la ZFM et jouent en grappe des élèves qui s’organisent collectivement et individuellement pour faire progresser la balle vers la cible </Heading>
+        <Heading size="xl" fontWeight={"bold"}>Passer d’élèves qui atteignent rarement la ZFM et jouent en grappe des élèves qui s’organisent collectivement et individuellement pour faire progresser la balle vers la cible:</Heading>
         <List.Root gap={2} pl={4}>
           <List.Item>3 zones successives avec 1 défenseur par zone. LE but est pour les 3 attaquants de franchir les zones jusqu’à la dernière (Zone 1 = 1 point, 2 = 10 points, 3 = 100 points) </List.Item>
           <List.Item>Jokers sur les côtés ou dans un couloir latéral </List.Item>
           <List.Item>Attaque défense en surnombre avec couloirs. Si pas de défenseur dans mon couloir = je fonce et je tir / si défenseur dans mon couloir = je passe</List.Item>
         </List.Root>
 
-        <Heading size="xl" fontWeight={"bold"}>Passer d’un élève qui tente sans cesse des shoots alors qu’il se trouve loin du panier, à un élève qui tire dans une SFM</Heading>
+        <Heading size="xl" fontWeight={"bold"}>Passer d’un élève qui tente sans cesse des shoots alors qu’il se trouve loin du panier, à un élève qui tire dans une SFM:</Heading>
         <List.Root gap={2} pl={4}>
           <List.Item>Match avec 2 cartouches par élèves (= 2 possibilités de tir seulement) </List.Item>
           <List.Item>Points bonifiés si tir dans ZFM </List.Item>
@@ -386,29 +391,29 @@ export default function Page() {
         <Box bg="teal.500" p={3} borderRadius="lg" w="full">
           <Heading size="md" color="white">7. Autre</Heading>
         </Box>
-        <Heading size="xl" fontWeight={"bold"}>Variables pédagogique tir</Heading>
+        <Heading size="xl" fontWeight={"bold"}>Variables pédagogique tir:</Heading>
         <List.Root gap={2} pl={4}>
           <List.Item>Toucher la planche = 1 point   </List.Item>
           <List.Item>Toucher le rectangle = 10 points       </List.Item>
           <List.Item>Balle qui rentre = 100 points.        </List.Item>
         </List.Root>
 
-        <Heading size="xl" fontWeight={"bold"}>Proposer des grilles statistiques avec des indicateurs simples</Heading>
+        <Heading size="xl" fontWeight={"bold"}>Proposer des grilles statistiques avec des indicateurs simples:</Heading>
         <List.Root gap={2} pl={4}>
           <List.Item>Passes réussies / balles perdues</List.Item>
           <List.Item>Accès à la zone de marque / balles perdues</List.Item>
           <List.Item>Interception / balles perdues / fautes provoquées</List.Item>
         </List.Root>
 
-        <Heading size="xl" fontWeight={"bold"}>Numérique : basket EPS</Heading>
+        <Heading size="xl" fontWeight={"bold"}>Numérique :</Heading>
         <List.Root gap={2} pl={4}>
           <List.Item>
-            Ce qu’on peut regarder quand on analyse une vidéo en basket:
+            Ce qu&apos;on peut regarder quand on analyse une vidéo en basket:
             <List.Root ps="5">
               <List.Item>Nombre de passes</List.Item>
               <List.Item>Main(s) utilisée(s) pour le dribble</List.Item>
               <List.Item>
-                Regarder quand est-ce que l’élève lève la tête (seulement quand il arrête de dribbler ? En même temps que le dribble ?)
+                Regarder quand est-ce que l&apos;élève lève la tête (seulement quand il arrête de dribbler ? En même temps que le dribble ?)
               </List.Item>
               <List.Item>Situation favorable de marque ou non</List.Item>
               <List.Item>Choix : tir, passe</List.Item>
