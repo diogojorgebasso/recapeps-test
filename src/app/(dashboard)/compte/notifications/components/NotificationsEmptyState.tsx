@@ -1,4 +1,3 @@
-"use client";
 import { EmptyState } from '@chakra-ui/react';
 import { IoIosNotificationsOff } from "react-icons/io";
 

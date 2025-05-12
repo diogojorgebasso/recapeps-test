@@ -1,4 +1,3 @@
-"use client";
 import { VStack } from '@chakra-ui/react';
 import { Notification } from '@/types/Notification';
 import NotificationItem from './NotificationItem';

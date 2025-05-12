@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { getAuthenticatedAppForUser } from "@/lib/firebase/serverApp";
 
-export async function requireAuth() {
+export async function requireServerAuth() {
     const { user, isPro } = await getAuthenticatedAppForUser();
 
     if (!user) {

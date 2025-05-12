@@ -1,7 +1,7 @@
 import { Quiz, Question, AttemptQuiz, QuizDone } from "@/types/Quiz";
 import { QuizTrail } from "@/types/TreeSkill";
 import { db } from "@/lib/firebase/clientApp";
-import { collection, getDocs, query, where, limit, doc, getDoc, orderBy, serverTimestamp, addDoc } from "firebase/firestore";
+import { collection, getDocs, query, where, limit, doc, getDoc, orderBy, serverTimestamp, addDoc, Firestore } from "firebase/firestore";
 /**
  * Finds an active (state === 'doing') quiz attempt for a user.
  */
@@ -117,13 +117,13 @@ export async function createAttempt(
     }
 }
 
-export async function getProgressOverview(uid: string | undefined, numberOfEcrit: number): Promise<QuizTrail[]> {
+export async function getProgressOverview(database = db, uid: string | undefined, numberOfEcrit: number) {
     if (!uid) {
         throw new Error("User ID is undefined. Cannot fetch progress overview.");
     }
 
     try {
-        const progressOverviewRef = doc(db, "users", uid, `ecrit-${numberOfEcrit}`, "progressOverview");
+        const progressOverviewRef = doc(database, "users", uid, `ecrit-${numberOfEcrit}`, "progressOverview");
         const progressOverviewSnapshot = await getDoc(progressOverviewRef);
 
         if (progressOverviewSnapshot.exists()) {
@@ -156,10 +156,10 @@ export async function getProgressOverview(uid: string | undefined, numberOfEcrit
 /**
  * Fetches completed quiz attempts for a user.
  */
-export async function findCompletedAttempts(uid: string, numberOfEcrit: number, limitResult: number = 5): Promise<QuizDone[]> {
+export async function findCompletedAttempts(database: Firestore = db, uid: string, numberOfEcrit: number, limitResult: number = 5) {
     try {
 
-        const userAttemptsRef = collection(db, "users", uid, `ecrit-${numberOfEcrit}`);
+        const userAttemptsRef = collection(database, "users", uid, `ecrit-${numberOfEcrit}`);
         const completedQuizzesQuery = query(userAttemptsRef
             , where("state", "==", "completed")
             , orderBy("completedAt", "desc")

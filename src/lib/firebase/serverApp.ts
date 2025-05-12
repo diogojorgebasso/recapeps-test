@@ -8,7 +8,6 @@ import { getAuth } from "firebase/auth";
 
 export async function getAuthenticatedAppForUser() {
     const authIdToken = (await cookies()).get("__session")?.value;
-    console.log("AuthIdToken", authIdToken);
 
     // Firebase Server App is a new feature in the JS SDK that allows you to
     // instantiate the SDK with credentials retrieved from the client & has

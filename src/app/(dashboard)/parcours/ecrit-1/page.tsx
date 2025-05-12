@@ -19,15 +19,16 @@ import { Suspense } from "react";
 
 import { getAuthenticatedAppForUser } from "@/lib/firebase/serverApp";
 import { redirect } from "next/navigation";
+import { getFirestore } from "firebase/firestore";
 
 export default async function Page() {
-    const { user, isPro } = await getAuthenticatedAppForUser();
+    const { user, isPro, firebaseServerApp } = await getAuthenticatedAppForUser();
 
     if (!user) { // this will be resolved in the Layout.
         redirect("/login?redirect=/parcours/ecrit-1");
     }
 
-    const progressData = await getProgressOverview(user.uid, 1);
+    const progressData = await getProgressOverview(getFirestore(firebaseServerApp), user.uid, 1);
     const quizNodesArray: QuizTrail[] = progressData || [];
 
     return (

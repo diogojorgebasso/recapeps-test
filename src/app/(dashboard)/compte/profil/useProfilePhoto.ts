@@ -1,3 +1,4 @@
+"use client"
 import { useState, useCallback } from 'react';
 import { uploadUserAvatar } from '@/lib/firebase/storage';
 import { updateDoc, doc, getFirestore } from 'firebase/firestore';
