@@ -20,9 +20,9 @@ import Link from "next/link";
 import { LuNotebookPen, LuListTodo } from "react-icons/lu";
 import { FiBookOpen } from "react-icons/fi"
 import Logo from "@/components/ui/logo-recapeps";
-import QuizComponent1 from "./quiz1";
-import QuizComponent2 from "./quiz2";
-
+import QuizComponent from "./QuizComponent";
+import quiz1Questions from "@/lib/questions/quiz1Questions";
+import quiz2Questions from "@/lib/questions/quiz2Questions";
 export default function Home() {
   return (
     <Box >
@@ -169,7 +169,7 @@ export default function Home() {
                 <GridItem>
                   <VStack align="start" >
                     <Flex wrap="wrap" gap={4} justify="center" height="100%">
-                      <QuizComponent1 />
+                      <QuizComponent questions={quiz1Questions} title="Santé" />
                     </Flex>
                   </VStack>
                 </GridItem>
@@ -187,7 +187,6 @@ export default function Home() {
                     <Image
                       src="/competence-p1.png"
                       alt="Écrit 2"
-
                       height="auto"
                       objectFit="contain"
                       width={{ base: "100%", md: "300px" }}
@@ -195,7 +194,6 @@ export default function Home() {
                     <Image
                       src="/competence-p2.png"
                       alt="Écrit 2"
-
                       height="auto"
                       objectFit="contain"
                       width={{ base: "100%", md: "300px" }}
@@ -205,7 +203,7 @@ export default function Home() {
                 <GridItem>
                   <VStack align="start">
                     <Flex wrap="wrap" gap={4} justify="center" height="100%">
-                      <QuizComponent2 />
+                      <QuizComponent questions={quiz2Questions} title="Santé" />
                     </Flex>
                   </VStack>
                 </GridItem>
