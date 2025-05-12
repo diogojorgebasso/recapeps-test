@@ -1,11 +1,11 @@
 import { getQuizForAttempt } from "@/services/QuizService";
 import QuizComponent from './QuizComponent';
-import { requireAuth } from "@/lib/firebase/auth-protection";
+import { requireServerAuth } from "@/lib/firebase/auth-protection";
 import { redirect } from "next/navigation";
 
 export default async function QuizPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
-    const { user, isPro } = await requireAuth();
+    const { user, isPro } = await requireServerAuth();
 
     const attemptQuiz = await getQuizForAttempt(1, id, user.uid);
 

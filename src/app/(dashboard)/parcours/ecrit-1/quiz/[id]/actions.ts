@@ -1,3 +1,5 @@
+"use client";
+
 import { db } from '@/lib/firebase/clientApp';
 import { AttemptedQuestion, QuizState, QuizAttemptDonePayload } from '@/types/Quiz';
 import { doc, serverTimestamp, setDoc, getDoc } from 'firebase/firestore';
