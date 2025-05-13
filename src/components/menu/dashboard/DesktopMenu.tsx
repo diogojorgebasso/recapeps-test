@@ -3,33 +3,25 @@
 import {
     VStack,
     IconButton,
-    Avatar,
-    Menu,
     Button,
     Portal,
     useDisclosure,
     Dialog,
     createOverlay,
     Text,
-    HStack,
 } from "@chakra-ui/react";
 import Link from "next/link";
 import {
-    LuBadge,
-    LuLogOut,
-    LuLogIn,
     LuLayoutDashboard,
     LuFileText,
     LuMicVocal,
     LuCircle,
-    LuSparkles,
 } from "react-icons/lu";
 import { useState, useEffect } from "react";
-import { signOut } from "@/lib/firebase/auth";
-import { useAuth } from "@/contexts/Auth/useAuth";
 import { SimpleColorModeButton } from "@/components/ui/color-mode";
 import { usePathname } from "next/navigation";
 import { FaRegUserCircle } from "react-icons/fa";
+import AvatarMenu from "./AvatarMenu";
 
 const ITEMS = [
     { href: "/parcours/dashboard", label: "Tableau de bord", icon: LuLayoutDashboard },
@@ -82,7 +74,6 @@ export const TourViewport = TourOverlay.Viewport;
 const INTRO_TOUR_STORAGE_KEY = 'hasCompletedRecapepsIntroTour'; // Key for localStorage
 
 export default function DesktopMenu() {
-    const { user, pro } = useAuth();
     const pathname = usePathname();
 
     /* intro dialog: offer the tour once */
@@ -181,60 +172,7 @@ export default function DesktopMenu() {
                 shadow="lg"
                 display={{ base: "none", md: "flex" }}
             >
-                {/* avatar menu */}
-                <Menu.Root>
-                    <Menu.Trigger>
-                        <Avatar.Root>
-                            <Avatar.Fallback name={user?.displayName ?? "Étudiant"} />
-                            <Avatar.Image src={user?.photoURL ?? "/avatar.svg"} />
-                        </Avatar.Root>
-                    </Menu.Trigger>
-                    <Portal>
-                        <Menu.Positioner>
-                            <Menu.Content minW="56" rounded="lg">
-                                {pro && (
-                                    <>
-                                        <Menu.Item value="checkout" asChild >
-                                            <Link href="/checkout">
-                                                <HStack gap={2}>
-                                                    <LuSparkles />
-                                                    <span>Passer à Recap&apos;eps Pro</span>
-                                                </HStack>
-                                            </Link>
-                                        </Menu.Item>
-                                        <Menu.Separator />
-                                    </>
-                                )}
-                                <Menu.Item value="profil" asChild>
-                                    <Link href="/compte/profil">
-                                        <HStack gap={2}>
-                                            <LuBadge />
-                                            <span>Profil</span>
-                                        </HStack>
-                                    </Link>
-                                </Menu.Item>
-                                <Menu.Separator />
-                                {user ? (
-                                    <Menu.Item value="logout" onClick={signOut}>
-                                        <HStack gap={2}>
-                                            <LuLogOut />
-                                            <span>Déconnexion</span>
-                                        </HStack>
-                                    </Menu.Item>
-                                ) : (
-                                    <Menu.Item value="login" asChild>
-                                        <Link href="/login">
-                                            <HStack gap={2}>
-                                                <LuLogIn />
-                                                <span>Se connecter</span>
-                                            </HStack>
-                                        </Link>
-                                    </Menu.Item>
-                                )}
-                            </Menu.Content>
-                        </Menu.Positioner>
-                    </Portal>
-                </Menu.Root>
+                <AvatarMenu />
 
                 {/* nav buttons (anchor refs created inline) */}
                 {ITEMS.map((item, idx) => {

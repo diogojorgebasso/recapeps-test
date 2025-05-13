@@ -1,14 +1,15 @@
+"use client"
+import { usePathname } from "next/navigation";
 import { Box, HStack } from "@chakra-ui/react";
 import Link from "next/link";
-import { FaHome } from "react-icons/fa"; //home
-import { FaPencilAlt } from "react-icons/fa"; //ecrit 1
-import { FaPencilRuler } from "react-icons/fa"; //ecrit 2
+import { FaPencilAlt, FaPencilRuler, FaHome } from "react-icons/fa"; //ecrit 1
 import { RxChatBubble } from "react-icons/rx"; //oral 1
 import { SlSpeech } from "react-icons/sl"
-import { FaRegUserCircle } from "react-icons/fa";
+import AvatarMenu from "./AvatarMenu";
 
 export default function MobileMenu() {
-
+    const pathname = usePathname();
+    const isActive = (path: string) => pathname === path;
     return (
         <Box
             display={{ base: "block", md: "none" }}
@@ -17,8 +18,8 @@ export default function MobileMenu() {
             bottom={0}
             insetX={0}
             zIndex="sticky"
-            bg="gray.100"
-            _dark={{ bg: "gray.950" }}
+            bg='rgba(255,255,255,0.8)'
+            _dark={{ bg: 'rgba(26,32,44,0.8)' }}
         >
             <HStack justify="space-around" py={2}>
                 <Link href="/parcours/dashboard">
@@ -36,9 +37,7 @@ export default function MobileMenu() {
                 <Link href="/parcours/oral-3">
                     <SlSpeech size={26} />
                 </Link>
-                <Link href="/compte/profil">
-                    <FaRegUserCircle size={26} />
-                </Link>
+                <AvatarMenu />
             </HStack>
 
         </Box>

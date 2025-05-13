@@ -19,7 +19,11 @@ export default async function DashboardLayout({ children }: { children: ReactNod
             </Suspense>
 
             <Box
-                flex="1">
+                flex="1"
+                overflowY="auto"
+                px={{ base: 4, md: 8 }}
+                py={6}
+                ml={{ md: "24", lg: "60" }}>
                 {children}
             </Box>
         </Flex >

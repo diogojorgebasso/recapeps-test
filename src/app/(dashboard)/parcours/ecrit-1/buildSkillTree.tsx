@@ -1,10 +1,11 @@
 export type SkillState = 'completed' | 'retry' | 'doing' | 'unlocked' | 'locked';
 import { QuizTrail } from "@/types/TreeSkill";
+
 export interface SkillNode {
     id?: string;          // empty when the quiz doesn’t exist yet
     subject: string;      // “Mixité sexuée”, “Adolescence”, …
-    level: number;        // 1-based
-    state: SkillState;    // colour key
+    level: number;       // 1, 2, or 3
+    state: SkillState;
 }
 
 /**
