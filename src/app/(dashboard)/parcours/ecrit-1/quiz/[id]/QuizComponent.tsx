@@ -65,7 +65,6 @@ export default function QuizComponent({ quizId }: { quizId: string }) {
   }
 
   if (!quiz) {
-    // Show a loading state or a message while quiz data is being fetched
     return (
       <Center h="100vh" p={4}>
         <Text>Chargement du quiz...</Text>
@@ -77,7 +76,6 @@ export default function QuizComponent({ quizId }: { quizId: string }) {
   const progress = ((idx + 1) / quiz.questions.length) * 100;
 
   const colour = (answerId: string, isCorrect: boolean) => {
-    /** Before feedback → blue for selected, gray otherwise                */
     if (state === QuizState.QUESTION_DISPLAY) {
       return sel.includes(answerId) ? "blue" : "gray";
     }

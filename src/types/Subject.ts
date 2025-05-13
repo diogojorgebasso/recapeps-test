@@ -4,4 +4,5 @@ export interface Subject {
     name: string;
     image: string;
     premium: boolean;
+    link: string;
 }

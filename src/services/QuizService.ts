@@ -67,7 +67,7 @@ export async function getQuizForAttempt(numberOfEcrit: number, quizId: string, u
             questions: questionsForAttempt, // Use the carefully selected questions
             score: 0,
             lastQuestion: 0,
-            premium: baseQuiz.premium,
+            premium: baseQuiz.premium, // I'm not sure if I need this.
         };
 
         attempt = await createAttempt(numberOfEcrit, uid, newAttemptData);
