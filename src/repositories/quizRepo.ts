@@ -118,13 +118,13 @@ export async function createAttempt(
     }
 }
 
-export async function getProgressOverview(database = db, uid: string | undefined, numberOfEcrit: number) {
+export async function getProgressOverview(uid: string | undefined, numberOfEcrit: number) {
     if (!uid) {
         throw new Error("User ID is undefined. Cannot fetch progress overview.");
     }
 
     try {
-        const progressOverviewRef = doc(database, "users", uid, `ecrit-${numberOfEcrit}`, "progressOverview");
+        const progressOverviewRef = doc(db, "users", uid, `ecrit-${numberOfEcrit}`, "progressOverview");
         const progressOverviewSnapshot = await getDoc(progressOverviewRef);
 
         if (progressOverviewSnapshot.exists()) {

@@ -21,7 +21,7 @@ import {
 import SkillTreeClient from "./SkillTreeClient";
 import { getProgressOverview } from "@/repositories/quizRepo";
 import { QuizTrail } from "@/types/TreeSkill";
-import { useAuth } from "@/contexts/Auth"; // Import useAuth
+import { useAuth } from "@/contexts/Auth";
 import Link from "next/link";
 
 export default function Page() {
@@ -36,8 +36,7 @@ export default function Page() {
         } else {
             const fetchData = async () => {
                 try {
-                    // getProgressOverview uses client 'db' by default
-                    const progressData = await getProgressOverview(undefined, user.uid, 1);
+                    const progressData = await getProgressOverview(user.uid, 1);
                     setQuizNodesArray(progressData || []);
                 } catch (error) {
                     console.error("Failed to fetch progress overview:", error);
@@ -91,7 +90,7 @@ export default function Page() {
             </Tabs.Content>
             <Tabs.Content value="s-entraner">
                 <Suspense fallback={<Center h="50vh"><Spinner size="lg" /></Center>}>
-                    <SkillTreeClient QuizNode={quizNodesArray} />
+                    <SkillTreeClient quizzes={quizNodesArray} />
                 </Suspense>
             </Tabs.Content>
         </Tabs.Root>
