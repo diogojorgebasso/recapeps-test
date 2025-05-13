@@ -1,26 +1,8 @@
-import { getQuizForAttempt } from "@/services/QuizService";
 import QuizComponent from './QuizComponent';
-import { requireServerAuth } from "@/lib/firebase/auth-protection";
-import { redirect } from "next/navigation";
 
 export default async function QuizPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
-    const { user, isPro } = await requireServerAuth();
-
-    const attemptQuiz = await getQuizForAttempt(1, id, user.uid);
-
-    if (!attemptQuiz) {
-        redirect('/dashboard/parcours/ecrit-1');
-    }
-
-    if (attemptQuiz.premium && !isPro) {
-        return <div>Ce quiz est réservé aux utilisateurs Recape&apos;eps Pro.</div>;
-    }
-
     return (
-        <QuizComponent
-            // Pass the fetched attempt data to the client component
-            quiz={attemptQuiz}
-        />
+        <QuizComponent quizId={id} />
     );
 }

@@ -4,8 +4,9 @@ import {
   Box, Button, Card, Heading, Text, Stack, Center,
   Progress, Flex, Accordion,
 } from "@chakra-ui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { getQuizForAttempt } from "@/services/QuizService";
 
 import { AttemptQuiz, AttemptedQuestion, QuizAttemptDonePayload } from "@/types/Quiz";
 import { useAuth } from "@/contexts/Auth/useAuth";
@@ -18,30 +19,63 @@ enum QuizState {
   QUIZ_COMPLETED,
 }
 
-/* ──────────────────────────────────────────────────────────── *
- *  2 ▸   MAIN COMPONENT
- * ──────────────────────────────────────────────────────────── */
-export default function QuizComponent({ quiz }: { quiz: AttemptQuiz }) {
+export default function QuizComponent({ quizId }: { quizId: string }) {
   const { user } = useAuth();
   const router = useRouter();
-
-  const [idx, setIdx] = useState(quiz.lastQuestion ?? 0);
-  const [score, setScore] = useState(quiz.score ?? 0);
+  const [quiz, setQuiz] = useState<AttemptQuiz | undefined>();
+  const [idx, setIdx] = useState(0);
+  const [score, setScore] = useState(0);
   const [sel, setSel] = useState<string[]>([]);
-  const [state, setState] = useState<QuizState>(
-    quiz.questions.length ? QuizState.QUESTION_DISPLAY : QuizState.QUIZ_COMPLETED,
-  );
+  const [state, setState] = useState<QuizState>(QuizState.QUESTION_DISPLAY);
   const [start, setStart] = useState(Date.now());
   const [results, setResults] = useState<AttemptedQuestion[]>([]);
   const [saving, setSaving] = useState(false);
-  if (!user) return null; // TODO: handle this case better
+
+  useEffect(() => {
+    const uid = user?.uid;
+
+    if (!uid) return;
+
+    async function fetchQuiz() {
+      try {
+        const attemptQuiz = await getQuizForAttempt(1, quizId, uid ?? ""); //TODO : remove hardcoded string
+        setQuiz(attemptQuiz);
+        setIdx(attemptQuiz.lastQuestion ?? 0);
+        setScore(attemptQuiz.score ?? 0);
+        setState(
+          attemptQuiz.questions.length ? QuizState.QUESTION_DISPLAY : QuizState.QUIZ_COMPLETED,
+        );
+      } catch (err) {
+        console.error("Failed to fetch quiz data", err);
+      }
+    }
+    fetchQuiz();
+  }, [quizId, user?.uid]);
+
+  if (!user) {
+    return (
+      <Center h="100vh" p={4}>
+        <Heading size="md" mb={4}>Quiz non trouvé</Heading>
+        <Text mb={2}>Veuillez vous connecter pour accéder au quiz.</Text>
+        <Button w="full" mt={6} onClick={() => router.back()}>
+          Retour aux sujets
+        </Button>
+      </Center>
+    );
+  }
+
+  if (!quiz) {
+    // Show a loading state or a message while quiz data is being fetched
+    return (
+      <Center h="100vh" p={4}>
+        <Text>Chargement du quiz...</Text>
+      </Center>
+    );
+  }
 
   const currentQ = quiz.questions[idx];
   const progress = ((idx + 1) / quiz.questions.length) * 100;
 
-  /* ───────────────────────────────────────────────────── *
-   *  3 ▸  HELPERS
-   * ───────────────────────────────────────────────────── */
   const colour = (answerId: string, isCorrect: boolean) => {
     /** Before feedback → blue for selected, gray otherwise                */
     if (state === QuizState.QUESTION_DISPLAY) {
