@@ -10,7 +10,7 @@ MailService.setApiKey(process.env.SENDGRID_API_KEY || "");
 
 // Activate the retrie option automatically.
 export const sendcontactemail = onDocumentCreated({
-    document:"contact/{contactID}",
+    document: "contact/{contactID}",
     serviceAccount: "send-contact-email-run@recapeps-test.iam.gserviceaccount.com"
 },
     async (event) => {
@@ -41,20 +41,21 @@ export const sendcontactemail = onDocumentCreated({
         } catch (error) {
             logger.error("Erro ao enviar emails via SendGrid:", error);
         }
-});
+    });
 
 export const exportuserdata = onCall(
-    { cors: ["https://recapeps.fr"],
-      serviceAccount: "export-user-data-run@recapeps-test.iam.gserviceaccount.com",
-      enforceAppCheck: true
-     },
+    {
+        cors: ["https://recapeps.fr"],
+        serviceAccount: "export-user-data-run@recapeps-test.iam.gserviceaccount.com",
+        enforceAppCheck: true
+    },
     async (request) => {
         const userId = request.auth?.uid;
-        
+
         if (!userId) {
             throw new HttpsError("unauthenticated", "Authentication required");
         }
-        
+
         try {
             logger.info(`Exporting data for user ${userId}`);
 
@@ -124,35 +125,35 @@ export const exportuserdata = onCall(
 );
 
 export const sendwelcomeemail = functions.runWith({
-    serviceAccount:"send-welcome-email-run@recapeps-test.iam.gserviceaccount.com"
+    serviceAccount: "send-welcome-email-run@recapeps-test.iam.gserviceaccount.com"
 }).auth.user().onCreate(async (user) => {
     try {
-      const { email } = user;
-      
-      if (!email) {
-        throw new HttpsError('invalid-argument', 'Email is required');
-      }
-      
-      const msg = {
-        to: email, 
-        from: 'no-reply@recapeps.fr',
-        subject: "Bienvenue sur Recap'eps! ",
-        text: `Bonjour,\n\nBienvenue sur Recap'eps ! Nous sommes ravis de vous compter parmi nos utilisateurs.\n\nN'hésitez pas à explorer toutes les fonctionnalités de notre plateforme.\n\nCordialement,\nL'équipe Recap'eps`,
-        html: `
+        const { email } = user;
+
+        if (!email) {
+            throw new HttpsError('invalid-argument', 'Email is required');
+        }
+
+        const msg = {
+            to: email,
+            from: 'no-reply@recapeps.fr',
+            subject: "Bienvenue sur Recap'eps! ",
+            text: `Bonjour,\n\nBienvenue sur Recap'eps ! Nous sommes ravis de vous compter parmi nos utilisateurs.\n\nN'hésitez pas à explorer toutes les fonctionnalités de notre plateforme.\n\nCordialement,\nL'équipe Recap'eps`,
+            html: `
           <p>Bonjour,</p>
           <p>Bienvenue sur <strong>Recap'eps</strong> !</p>
           <p>Nous sommes ravis de vous compter parmi nos utilisateurs.</p>
           <p>N'hésitez pas à explorer toutes les fonctionnalités de notre plateforme.</p>
           <p>Cordialement,<br>L'équipe RecapEPS</p>
         `
-      };
-      
-      await MailService.send(msg);
-      logger.info(`Welcome email sent to ${email}`);
-      
-      return { success: true };
+        };
+
+        await MailService.send(msg);
+        logger.info(`Welcome email sent to ${email}`);
+
+        return { success: true };
     } catch (error) {
-      logger.error('Error sending welcome email:', error);
-      throw new functions.https.HttpsError('internal', 'Error sending email');
+        logger.error('Error sending welcome email:', error);
+        throw new functions.https.HttpsError('internal', 'Error sending email');
     }
-  });
+});

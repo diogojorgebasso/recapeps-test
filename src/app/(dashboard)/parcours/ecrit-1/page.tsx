@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react"; // Import useEffect, useState
-import { useRouter } from "next/navigation"; // Import for client-side navigation
+import { useEffect, useState, Suspense } from "react";
+import { useRouter } from "next/navigation";
 import { subjects } from "./subjects";
 import {
     Box,
@@ -14,7 +14,9 @@ import {
     Tabs,
     Text,
     Spinner,
-    Center
+    Center,
+    Portal,
+    CloseButton,
 } from "@chakra-ui/react";
 import SkillTreeClient from "./SkillTreeClient";
 import { getProgressOverview } from "@/repositories/quizRepo";
@@ -48,11 +50,10 @@ export default function Page() {
 
 
     if (!user) {
-        // This case should ideally be handled by the redirect,
-        // but as a fallback or if redirect hasn't completed.
         return (
             <Center h="80vh">
                 <Text>Redirection vers la page de connexion...</Text>
+                <Link href="/login">S&apos;inscrire</Link>
             </Center>
         );
     }
@@ -80,8 +81,8 @@ export default function Page() {
                                     name={name}
                                     image={image}
                                     premium={premium}
-                                    isUserPremium={pro} // Use isPro from useAuth
-                                    vers={id}
+                                    isUserPro={pro}
+                                    id={id}
                                 />
                             ))}
                         </SimpleGrid>
@@ -98,78 +99,91 @@ export default function Page() {
 }
 
 function ExamCard({
+    id,
     name,
     image,
     premium,
-    isUserPremium, // This will now be the client-side isPro
-    vers
+    isUserPro,
 }: {
+    id: string;
     name: string;
     image: string;
     premium: boolean;
-    isUserPremium: boolean;
-    vers: string;
+    isUserPro: boolean;
 }) {
-    if (isUserPremium) {
+    if (!isUserPro && premium) {
+        // blocked.
         return (
-            <Card.Root maxW="sm" overflow="hidden" borderWidth="1px" borderRadius="lg" shadow="md">
-                <Image src={image} alt={name} maxH="200px" w="100%" objectFit="cover" />
+            <Card.Root
+                variant="subtle"
+                maxW="sm" overflow="hidden"
+                borderWidth="1px" borderRadius="lg" shadow="md">
+                <Image
+                    filter="grayscale(70%)"
+                    opacity={0.7}
+                    src={image}
+                    alt={name}
+                    maxH="200px"
+                    w="100%"
+                    objectFit="cover" />
                 <Card.Body gap="2" p="4">
                     <Card.Title>{name}</Card.Title>
+                    <Text fontSize="sm" color="gray.500">
+                        Contenu réservé aux membres&nbsp;Pro
+                    </Text>
                 </Card.Body>
                 <Card.Footer gap="2" p="4">
-                    <Button variant="solid" asChild>
-                        <a target="_blank" href={vers}>Voir plus</a>
-                    </Button>
+                    <Dialog.Root>
+                        <Dialog.Trigger asChild>
+                            <Button size="sm">
+                                Découvrir le contenu
+                            </Button>
+                        </Dialog.Trigger>
+                        <Portal>
+                            <Dialog.Backdrop />
+                            <Dialog.Positioner>
+                                <Dialog.Content>
+                                    <Dialog.Header>
+                                        <Dialog.Title>Contenu exclusif Recap&apos;eps Pro</Dialog.Title>
+                                    </Dialog.Header>
+                                    <Dialog.Body>
+                                        <Text>
+                                            Tu apprécies le contenu que nous te proposons mais tu restes sur ta faim? Tu aimerai accéder à tout le contenu que nous t&apos;avons concocté?
+                                            Alors n&apos;hésite plus et passe à Recap&apos;eps Pro ! 🎯
+                                        </Text>
+                                    </Dialog.Body>
+                                    <Dialog.Footer>
+                                        <Dialog.ActionTrigger asChild>
+                                            <Button variant="outline">Plus tard</Button>
+                                        </Dialog.ActionTrigger>
+                                        <Button asChild variant="solid">
+                                            <Link href="/abbonnement">
+                                                Passer à Pro
+                                            </Link>
+                                        </Button>
+                                    </Dialog.Footer>
+                                    <Dialog.CloseTrigger asChild>
+                                        <CloseButton size="sm" />
+                                    </Dialog.CloseTrigger>
+                                </Dialog.Content>
+                            </Dialog.Positioner >
+                        </Portal>
+                    </Dialog.Root>
                 </Card.Footer>
             </Card.Root>
         );
     }
-    else {
-        return (
-            <Card.Root maxW="sm" overflow="hidden" borderWidth="1px" borderRadius="lg" shadow="md">
-                <Image src={image} alt={name} maxH="200px" w="100%" objectFit="cover" />
-                <Card.Body gap="2" p="4">
-                    <Card.Title>{name} {premium ? "🔒" : ""}</Card.Title>
-                </Card.Body>
-                <Card.Footer gap="2" p="4">
-                    {premium ?
-                        <Dialog.Root>
-                            <Dialog.Trigger asChild>
-                                <Button size="sm">
-                                    Voir plus
-                                </Button>
-                            </Dialog.Trigger>
-                            <Dialog.Content>
-                                <Dialog.Header>
-                                    <Dialog.Title>Passer à Recap&apos;eps Pro?
-                                    </Dialog.Title>
-                                </Dialog.Header>
-                                <Dialog.Body>
-                                    <Text>
-                                        Tu apprécies le contenu que nous te proposons mais tu restes sur ta faim? Tu aimerai accéder à tout le contenu que nous t&apos;avons concocté?
-                                        Alors n&apos;hésite plus et passe à Recap&apos;eps Pro ! 🎯
-                                    </Text>
-                                </Dialog.Body>
-                                <Dialog.Footer>
-                                    <Dialog.ActionTrigger asChild>
-                                        <Button variant="outline">Non, merci</Button>
-                                    </Dialog.ActionTrigger>
-                                    <Button asChild variant="solid">
-                                        <Link href="/abbonnement">
-                                            Oui par pitié
-                                        </Link>
-                                    </Button>
-                                </Dialog.Footer>
-                                <Dialog.CloseTrigger />
-                            </Dialog.Content>
-                        </Dialog.Root>
-                        :
-                        <Button variant="solid" asChild>
-                            <a target="_blank" href={vers}>Voir plus</a>
-                        </Button>}
-                </Card.Footer>
-            </Card.Root>
-        );
-    }
+    return (
+        <Card.Root maxW="sm" overflow="hidden" borderWidth="1px" borderRadius="lg" shadow="md">
+            <Image src={image} alt={name} maxH="200px" w="100%" objectFit="cover" />
+            <Card.Body gap="2" p="4">
+                <Card.Title>{name}</Card.Title>
+            </Card.Body>
+            <Card.Footer gap="2" p="4">
+                <Button variant="solid" asChild>
+                    <Link href={"/parcours/ecrit-1/notes/" + id}>Voir plus</Link>
+                </Button>
+            </Card.Footer>
+        </Card.Root>
+    );
 }
