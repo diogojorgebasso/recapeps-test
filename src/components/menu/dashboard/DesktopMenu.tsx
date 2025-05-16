@@ -7,14 +7,14 @@ import {
 import Link from "next/link";
 import {
     LuLayoutDashboard,
-    LuFileText,
-    LuMicVocal,
     LuCircle,
 } from "react-icons/lu";
-import { FaRegUserCircle } from "react-icons/fa";
 import { ColorModeButton } from "@/components/ui/color-mode";
 import { usePathname } from "next/navigation";
 import AvatarMenu from "./AvatarMenu";
+import { FaPencilAlt, FaPencilRuler, FaHome } from "react-icons/fa"; //ecrit 1
+import { RxChatBubble } from "react-icons/rx"; //oral 1
+import { SlSpeech } from "react-icons/sl"
 
 export default function DesktopMenu() {
     const pathname = usePathname();
@@ -41,9 +41,9 @@ export default function DesktopMenu() {
                     bg={isActive("/parcours/dashboard") ? "orange.600" : undefined}
                     size="2xl"
                     color="white"
-                    _hover={{ bg: "orange.500" }}
+                    _hover={{ bg: "orange.600" }}
                 >
-                    <LuLayoutDashboard />
+                    <FaHome />
                 </IconButton>
             </Link>
 
@@ -54,9 +54,9 @@ export default function DesktopMenu() {
                     bg={isActive("/parcours/ecrit-1") ? "orange.600" : undefined}
                     size="2xl"
                     color="white"
-                    _hover={{ bg: "orange.500" }}
+                    _hover={{ bg: "orange.600" }}
                 >
-                    <LuFileText />
+                    <FaPencilAlt />
                 </IconButton>
             </Link>
 
@@ -67,9 +67,9 @@ export default function DesktopMenu() {
                     bg={isActive("/parcours/ecrit-2") ? "orange.600" : undefined}
                     size="2xl"
                     color="white"
-                    _hover={{ bg: "orange.500" }}
+                    _hover={{ bg: "orange.600" }}
                 >
-                    <LuFileText />
+                    <FaPencilRuler />
                 </IconButton>
             </Link>
 
@@ -80,9 +80,9 @@ export default function DesktopMenu() {
                     bg={isActive("/parcours/oral-1") ? "orange.600" : undefined}
                     size="2xl"
                     color="white"
-                    _hover={{ bg: "orange.500" }}
+                    _hover={{ bg: "orange.600" }}
                 >
-                    <LuMicVocal />
+                    <RxChatBubble />
                 </IconButton>
             </Link>
 
@@ -93,24 +93,12 @@ export default function DesktopMenu() {
                     bg={isActive("/parcours/oral-3") ? "orange.600" : undefined}
                     size="2xl"
                     color="white"
-                    _hover={{ bg: "orange.500" }}
+                    _hover={{ bg: "orange.600" }}
                 >
-                    <LuMicVocal />
+                    <SlSpeech />
                 </IconButton>
             </Link>
 
-            <Link href="/compte/profil" passHref>
-                <IconButton
-                    aria-label="Profil"
-                    variant={isActive("/compte/profil") ? "solid" : "ghost"}
-                    bg={isActive("/compte/profil") ? "orange.600" : undefined}
-                    size="2xl"
-                    color="white"
-                    _hover={{ bg: "orange.500" }}
-                >
-                    <FaRegUserCircle />
-                </IconButton>
-            </Link>
 
             <Link href="/contact" passHref>
                 <IconButton
@@ -119,7 +107,7 @@ export default function DesktopMenu() {
                     bg={isActive("/contact") ? "orange.600" : undefined}
                     size="2xl"
                     color="white"
-                    _hover={{ bg: "orange.500" }}
+                    _hover={{ bg: "orange.600" }}
                 >
                     <LuCircle />
                 </IconButton>

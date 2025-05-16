@@ -41,16 +41,6 @@ export default function Page() {
         fetchData();
     }, [user]);
 
-
-    if (!user) {
-        return (
-            <Center h="80vh">
-                <Text>Redirection vers la page de connexion...</Text>
-                <Link href="/login">S&apos;inscrire</Link>
-            </Center>
-        );
-    }
-
     return (
         <Tabs.Root defaultValue="apprendre">
             <Tabs.List>

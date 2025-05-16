@@ -1,5 +1,3 @@
-"use client";
-
 import {
     Avatar,
     Menu,
@@ -25,8 +23,8 @@ export default function ContextualAvatar({ user }: { user: any }) {
         <Menu.Root>
             <Menu.Trigger>
                 <Avatar.Root css={ring}>
-                    <Avatar.Fallback name={user.displayName ?? "Étudiant"} />
-                    <Avatar.Image src={user.photoURL ?? "/avatar.svg"} />
+                    <Avatar.Fallback name={user?.displayName ?? "Étudiant"} />
+                    <Avatar.Image src={user?.photoURL ?? "/avatar.svg"} />
                 </Avatar.Root>
             </Menu.Trigger>
 

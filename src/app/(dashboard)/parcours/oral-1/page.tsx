@@ -45,21 +45,21 @@ export default function SubjectList() {
                 {subjects.map(({ key, label, icon: IconComponent }) => (
                     <GridItem key={key}>
                         <Box
-                            bg={{ base: 'gray.50', md: undefined }}
-                            bgGradient={{ md: 'linear(to-br, teal.50, blue.50)' }}
+                            bgGradient="to-br"
+                            gradientFrom="teal.500"
+                            gradientTo="blue.500"
                             p={{ base: 3, md: 6 }}
                             borderRadius={{ base: 'lg', md: 'xl' }}
                             boxShadow={{ base: 'sm', md: 'md' }}
                             _hover={{
                                 transform: { md: 'translateY(-4px)' },
                                 boxShadow: { md: 'lg' },
-                                bg: { base: 'gray.100', md: undefined },
                             }}
                             transition="all 0.2s ease"
                         >
                             <HStack gap={3} align="center">
-                                <Icon as={IconComponent} w={{ base: 6, md: 8 }} h={{ base: 6, md: 8 }} color="teal.500" />
-                                <Link href={`#${key}`} fontSize={{ base: 'md', md: 'lg' }} fontWeight="bold">
+                                <IconComponent />
+                                <Link href={`/parcours/oral-1/${key}`} fontSize={{ base: 'md', md: 'lg' }} fontWeight="bold">
                                     {label}
                                 </Link>
                             </HStack>
