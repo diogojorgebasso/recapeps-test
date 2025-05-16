@@ -13,7 +13,6 @@ import {
 } from "firebase/auth";
 
 import { auth } from "@/lib/firebase/clientApp";
-import { redirect } from "next/navigation";
 
 let popupInProgress = false;
 
@@ -39,8 +38,6 @@ export async function signInWithGoogle() {
       await sendEmailVerification(user);
       console.log("Verification email sent to", user.email);
     }
-
-    redirect("/parcours/dashboard");
   } catch (error) {
     console.error("Error signing in with Google", error);
     throw error;
@@ -64,8 +61,6 @@ export async function signUpWithGoogle() {
       await sendEmailVerification(user);
       console.log("Verification email sent to", user.email); // TODO : Better error handling.
     }
-
-    redirect("/parcours/dashboard");
   } catch (error) {
     console.error("Error signing up with Google", error);
     throw error;
@@ -105,7 +100,6 @@ export async function sendVerificationEmail(user: User | null) {
 export async function signInWithEmail(email: string, password: string) {
   try {
     await signInWithEmailAndPassword(auth, email, password);
-    redirect("/parcours/dashboard");
 
   } catch (error) {
     console.error("Error signing in with email and password", error);
@@ -118,7 +112,7 @@ export async function registerWithEmailAndPassword(
   email: string,
   password: string,
   displayName?: string
-): Promise<import("firebase/auth").User> {
+) {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
@@ -131,8 +125,6 @@ export async function registerWithEmailAndPassword(
     // Send email verification
     await sendEmailVerification(user);
     console.log("Verification email sent to", user.email);
-    redirect("/verify-email");
-
   } catch (error) {
     console.error("Error registering user with email and password", error);
     throw error; // Re-throw the error to be handled by the caller

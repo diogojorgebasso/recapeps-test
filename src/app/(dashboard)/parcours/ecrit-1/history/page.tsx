@@ -2,8 +2,8 @@ import {
     Heading,
     Container
 } from '@chakra-ui/react';
-import QuizComponent from './QuizComponent'; // Adjust the import path as necessary
-import { findCompletedAttempts } from '@/repositories/quizRepo'; // Assuming fetchQuizHistory exists and returns AttemptQuiz[] or similar
+import QuizComponent from './QuizComponent';
+import { findCompletedAttempts } from '@/repositories/quizRepo';
 import { getAuthenticatedAppForUser } from '@/lib/firebase/serverApp';
 
 export default async function QuizHistoryPage() {

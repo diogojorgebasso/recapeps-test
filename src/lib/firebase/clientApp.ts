@@ -37,7 +37,7 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
 export const auth = getAuth(firebaseApp);
 export const db = getFirestore(firebaseApp);
 export const storage = getStorage(firebaseApp);
-export const functions = getFunctions(firebaseApp, "europe-west1");
+export const functions = getFunctions(firebaseApp);
 
 export const messaging = async () => {
     if (typeof window === 'undefined') return null;          // SSR guard

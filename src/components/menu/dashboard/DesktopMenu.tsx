@@ -5,10 +5,7 @@ import {
     IconButton,
 } from "@chakra-ui/react";
 import Link from "next/link";
-import {
-    LuLayoutDashboard,
-    LuCircle,
-} from "react-icons/lu";
+import { BiSupport } from "react-icons/bi";
 import { ColorModeButton } from "@/components/ui/color-mode";
 import { usePathname } from "next/navigation";
 import AvatarMenu from "./AvatarMenu";
@@ -109,7 +106,7 @@ export default function DesktopMenu() {
                     color="white"
                     _hover={{ bg: "orange.600" }}
                 >
-                    <LuCircle />
+                    <BiSupport />
                 </IconButton>
             </Link>
 
