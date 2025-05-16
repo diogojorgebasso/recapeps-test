@@ -157,9 +157,8 @@ export async function getProgressOverview(uid: string | undefined, numberOfEcrit
 /**
  * Fetches completed quiz attempts for a user.
  */
-export async function findCompletedAttempts({ database = db, uid, numberOfEcrit, limitResult = 5 }:
+export async function findCompletedAttempts({ uid, numberOfEcrit, limitResult = 5 }:
     {
-        database?: Firestore,
         uid: string,
         numberOfEcrit: number,
         limitResult?: number
@@ -167,7 +166,7 @@ export async function findCompletedAttempts({ database = db, uid, numberOfEcrit,
 ) {
     try {
 
-        const userAttemptsRef = collection(database, "users", uid, `ecrit-${numberOfEcrit}`);
+        const userAttemptsRef = collection(db, "users", uid, `ecrit-${numberOfEcrit}`);
         const completedQuizzesQuery = query(userAttemptsRef
             , where("state", "==", "completed")
             , orderBy("completedAt", "desc")
