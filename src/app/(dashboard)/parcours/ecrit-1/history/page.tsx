@@ -7,7 +7,6 @@ import { findCompletedAttempts } from '@/repositories/quizRepo'; // Assuming fet
 import { getFirestore } from 'firebase/firestore';
 import { getAuthenticatedAppForUser } from '@/lib/firebase/serverApp';
 
-
 export default async function QuizHistoryPage() {
     const { firebaseServerApp, user } = await getAuthenticatedAppForUser();
 

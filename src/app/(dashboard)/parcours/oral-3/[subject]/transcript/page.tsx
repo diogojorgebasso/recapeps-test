@@ -20,8 +20,8 @@ import {
 import { useColorModeValue } from "@/components/ui/color-mode";
 import { FaDownload } from "react-icons/fa";
 import { FaChevronLeft } from "react-icons/fa6";
-import { useAuth } from "@/contexts/Auth/useAuth";
 import { useRouter, useParams } from "next/navigation";
+import { useUserWithClaims } from "@/lib/getUser";
 
 interface TranscriptionData {
     transcription: string;
@@ -36,7 +36,7 @@ interface TranscriptionData {
 export default function Transcription() {
     const { subjectId, transcriptId } = useParams();
     const navigate = useRouter();
-    const { user } = useAuth();
+    const { user } = useUserWithClaims();
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [transcription, setTranscription] = useState<TranscriptionData | null>(null);

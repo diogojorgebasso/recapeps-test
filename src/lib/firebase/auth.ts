@@ -15,6 +15,8 @@ import {
 import { auth } from "@/lib/firebase/clientApp";
 import { redirect } from "next/navigation";
 
+let popupInProgress = false;
+
 export function onAuthStateChanged(cb: NextOrObserver<User>) {
   return _onAuthStateChanged(auth, cb);
 }
@@ -24,6 +26,8 @@ export function onIdTokenChanged(cb: NextOrObserver<User>) {
 }
 
 export async function signInWithGoogle() {
+  if (popupInProgress) return;
+  popupInProgress = true;
   const provider = new GoogleAuthProvider();
 
   try {
@@ -40,10 +44,16 @@ export async function signInWithGoogle() {
   } catch (error) {
     console.error("Error signing in with Google", error);
     throw error;
+  } finally {
+    popupInProgress = false;
   }
 }
 
 export async function signUpWithGoogle() {
+  if (popupInProgress) return;
+
+  popupInProgress = true;
+
   const provider = new GoogleAuthProvider();
 
   try {
@@ -59,6 +69,8 @@ export async function signUpWithGoogle() {
   } catch (error) {
     console.error("Error signing up with Google", error);
     throw error;
+  } finally {
+    popupInProgress = false;
   }
 }
 

@@ -14,7 +14,7 @@ import {
 import { subjects } from "./subjects";
 import { subjects2 } from "./subjects2";
 import type { IconType } from "react-icons";
-import { useAuth } from "@/contexts/Auth";
+import { useUserWithClaims } from "@/lib/getUser";
 
 /**
  * A single exam card.
@@ -91,7 +91,7 @@ function ExamCard({
 }
 
 export default function Page() {
-    const { pro } = useAuth();
+    const { pro } = useUserWithClaims();
 
     return (
         <Box px={{ base: 4, md: 8 }} py={8}>

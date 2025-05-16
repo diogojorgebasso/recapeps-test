@@ -130,7 +130,7 @@ export default function VerifyEmail() {
                         loading={isChecking}
                         loadingText="Verification..."
                     >
-                        J'ai confirmé mon email
+                        J&apos;ai confirmé mon email
                     </Button>
                 </HStack>
 
@@ -154,8 +154,8 @@ export default function VerifyEmail() {
                     </Heading>
                     <List.Root gap={2}>
                         <List.Item>Cliquez sur le lien de confirmation dans votre messagerie (vérifiez vos spams).</List.Item>
-                        <List.Item>Après confirmation, revenez sur cette page et cliquez sur le bouton "J'ai confirmé mon email" ci-dessus.</List.Item>
-                        <List.Item>Si vous ne recevez pas d'email ou que le lien a expiré, cliquez sur "Renvoyer un email de confirmation".</List.Item>
+                        <List.Item>Après confirmation, revenez sur cette page et cliquez sur le bouton &quot;J&apos;ai confirmé mon email&quot; ci-dessus.</List.Item>
+                        <List.Item>Si vous ne recevez pas d&apos;email ou que le lien a expiré, cliquez sur &quot;Renvoyer un email de confirmation&quot;.</List.Item>
                     </List.Root>
                 </Box>
             </VStack>

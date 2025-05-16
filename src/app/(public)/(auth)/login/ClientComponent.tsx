@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import {
     Flex,
@@ -15,7 +15,6 @@ import {
 } from "@chakra-ui/react";
 import { FaGoogle } from "react-icons/fa";
 import { PasswordInput } from "@/components/ui/password-input";
-import { useColorModeValue } from "@/components/ui/color-mode";
 import { signInWithGoogle, signInWithEmail } from "@/lib/firebase/auth";
 import { z } from "zod";
 
@@ -43,6 +42,11 @@ export default function ClientComponent() {
         if (errors[name as keyof LoginFormData]) {
             setErrors((prev) => ({ ...prev, [name]: undefined }));
         }
+    };
+
+    const handleGoogleSignIn = (event: React.FormEvent) => {
+        event.preventDefault();
+        signInWithGoogle();
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -80,7 +84,6 @@ export default function ClientComponent() {
             height="100vh"
             alignItems="center"
             justifyContent="center"
-            bg={useColorModeValue("gray.50", "gray.800")}
             p={4}
         >
             <Card.Root width="sm" shadow="md">
@@ -153,7 +156,7 @@ export default function ClientComponent() {
                         variant="outline"
                         w="full"
                         mt={4}
-                        onClick={() => signInWithGoogle()}
+                        onClick={handleGoogleSignIn}
                         disabled={isLoading}
                     >
                         <FaGoogle />
