@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuth } from "@/contexts/Auth";
 import {
     Box,
     Button,
@@ -15,6 +14,7 @@ import {
 import { z } from "zod";
 import { addDoc, collection } from "firebase/firestore";
 import { db } from "@/lib/firebase/clientApp";
+import { useUserWithClaims } from '@/lib/getUser';
 
 // Define validation schema
 const contactSchema = z.object({
@@ -26,7 +26,7 @@ const contactSchema = z.object({
 type ContactFormData = z.infer<typeof contactSchema>;
 
 export default function Page() {
-    const { user } = useAuth();
+    const { user } = useUserWithClaims();
     const [formData, setFormData] = useState<ContactFormData>({
         name: '',
         email: '',
