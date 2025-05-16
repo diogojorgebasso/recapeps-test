@@ -1,10 +1,7 @@
-"use client";
-
 import {
     Avatar,
     Menu,
     defineStyle,
-    Button,
     Portal,
     HStack,
 } from "@chakra-ui/react";
@@ -13,7 +10,6 @@ import {
     LuBadge, LuSparkles, LuLogOut,
 } from "react-icons/lu";
 import { signOut } from "@/lib/firebase/auth";
-import { useAuth } from "@/contexts/Auth/useAuth";
 
 const ring = defineStyle({
     outline: "2px solid",
@@ -21,23 +17,14 @@ const ring = defineStyle({
     outlineOffset: "2px",
 });
 
-export default function ContextualAvatar() {
-    const { user, pro } = useAuth();
-
-    if (!user) {
-        return (
-            <Button as="a" size="sm" asChild>
-                <Link href="/login">Se connecter</Link>
-            </Button>
-        );
-    }
-
+export default function ContextualAvatar({ user }: { user: any }) {
+    console.log("inside the contextual avatar", user);
     return (
         <Menu.Root>
             <Menu.Trigger>
                 <Avatar.Root css={ring}>
-                    <Avatar.Fallback name={user.displayName ?? "Étudiant"} />
-                    <Avatar.Image src={user.photoURL ?? "/avatar.svg"} />
+                    <Avatar.Fallback name={user?.displayName ?? "Étudiant"} />
+                    <Avatar.Image src={user?.photoURL ?? "/avatar.svg"} />
                 </Avatar.Root>
             </Menu.Trigger>
 
@@ -53,15 +40,14 @@ export default function ContextualAvatar() {
                             </Link>
                         </Menu.Item>
                         <Menu.Separator />
-                        {!pro && (
-                            <Menu.Item value="abonnement" asChild >
-                                <Link href="/abonnement">
-                                    <HStack gap={2}>
-                                        <LuSparkles />
-                                        Passer à Recap&apos;eps Pro
-                                    </HStack>
-                                </Link>
-                            </Menu.Item>)}
+                        <Menu.Item value="abonnement" asChild >
+                            <Link href="/abonnement">
+                                <HStack gap={2}>
+                                    <LuSparkles />
+                                    Passer à Recap&apos;eps Pro
+                                </HStack>
+                            </Link>
+                        </Menu.Item>
                         < Menu.Separator />
                         <Menu.Item value="logout" onClick={signOut}>
                             <HStack gap={2}>

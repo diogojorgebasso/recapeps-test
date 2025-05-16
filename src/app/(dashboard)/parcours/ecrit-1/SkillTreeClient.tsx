@@ -6,6 +6,7 @@ import {
 import Link from 'next/link';
 import { buildSkillTree, SkillNode } from './buildSkillTree';
 import { QuizTrail } from '@/types/TreeSkill';
+
 const COLOUR: Record<SkillNode['state'], string> = {
     completed: 'green.400',
     retry: 'orange.400',
@@ -58,7 +59,6 @@ export default function SkillTreeClient({ quizzes }: { quizzes: QuizTrail[] }) {
                                                 ? { filter: 'brightness(1.1)', cursor: 'pointer' }
                                                 : { cursor: 'not-allowed' }
                                         }
-                                        as={isClickable ? 'a' : 'div'}
                                     >
                                         <Text fontWeight="bold">{node.level}</Text>
                                     </Circle>
@@ -67,7 +67,7 @@ export default function SkillTreeClient({ quizzes }: { quizzes: QuizTrail[] }) {
                                 return (
                                     <Flex key={`${subject}-${node.level}`} dir="column" align="center">
                                         {isClickable ? (
-                                            <Link href={`/parcours/ecrit-1/quiz/${node.id}`} passHref>
+                                            <Link href={`/parcours/ecrit-1/quiz/${node.id}`}>
                                                 {Pill}
                                             </Link>
                                         ) : (

@@ -4,10 +4,10 @@ import {
     callUpdateUserName,
     callHandleEmailChange,
 } from './userFunctions';
-import { useAuth } from '@/contexts/Auth/useAuth';
+import { useUserWithClaims } from '@/lib/getUser';
 
 export function useProfileInfo() {
-    const { user } = useAuth();
+    const { user } = useUserWithClaims();
     const [loading, setLoading] = useState(false);
 
     const save = useCallback(

@@ -7,9 +7,8 @@ import {
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getQuizForAttempt } from "@/services/QuizService";
-
+import { useUserWithClaims } from "@/lib/getUser";
 import { AttemptQuiz, AttemptedQuestion, QuizAttemptDonePayload } from "@/types/Quiz";
-import { useAuth } from "@/contexts/Auth/useAuth";
 import { saveQuizResultsAction } from "./getData";
 import { Toaster, toaster } from "@/components/ui/toaster";
 
@@ -20,7 +19,7 @@ enum QuizState {
 }
 
 export default function QuizComponent({ quizId }: { quizId: string }) {
-  const { user } = useAuth();
+  const { user } = useUserWithClaims();
   const router = useRouter();
   const [quiz, setQuiz] = useState<AttemptQuiz | undefined>();
   const [idx, setIdx] = useState(0);

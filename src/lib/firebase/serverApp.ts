@@ -19,20 +19,10 @@ const firebaseConfig = {
 export async function getAuthenticatedAppForUser() {
     const authIdToken = (await cookies()).get("__session")?.value;
 
-    const firebaseServerApp = initializeServerApp(
-        initializeApp(firebaseConfig),
-        {
-            authIdToken
-        }
-    );
-
-    const auth = getAuth(firebaseServerApp);
-    await auth.authStateReady();
-
-    const user = auth.currentUser;
     let isPro = false;
+    let validToken = false;
 
-    if (authIdToken)
+    if (authIdToken) {
         try {
             // Simple JWT decoding (tokens have 3 parts separated by dots)
             const parts = authIdToken.split('.');
@@ -40,11 +30,37 @@ export async function getAuthenticatedAppForUser() {
                 const payload = parts[1];
                 const decoded = Buffer.from(payload, 'base64').toString();
                 const claims = JSON.parse(decoded);
-                isPro = claims.pro === true;
+
+                // Check token expiration
+                const now = Math.floor(Date.now() / 1000);
+                if (claims.exp && claims.exp > now) {
+                    validToken = true;
+                    isPro = claims.pro === true;
+                } else {
+                    console.warn("authIdToken is expired");
+                }
             }
         } catch (error) {
             console.error("Error decoding JWT token:", error);
         }
+    }
+
+    let firebaseServerApp = null;
+    let user = null;
+
+    if (validToken) {
+        firebaseServerApp = initializeServerApp(
+            initializeApp(firebaseConfig),
+            {
+                authIdToken
+            }
+        );
+
+        const auth = getAuth(firebaseServerApp);
+        await auth.authStateReady();
+
+        user = auth.currentUser;
+    }
 
     return { firebaseServerApp, user, isPro };
 }

@@ -1,6 +1,5 @@
 "use client"
 import { signOut } from "@/lib/firebase/auth";
-import { useAuth } from "@/contexts/Auth/useAuth";
 
 import {
     Avatar,
@@ -15,8 +14,10 @@ import {
     LuSparkles,
 } from "react-icons/lu";
 import Link from "next/link";
+import { useUserWithClaims } from "@/lib/getUser";
+
 export default function AvatarMenu() {
-    const { user, pro } = useAuth();
+    const { user, pro } = useUserWithClaims();
 
     return (
         <Menu.Root>

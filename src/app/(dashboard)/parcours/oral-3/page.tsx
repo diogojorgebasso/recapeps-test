@@ -14,7 +14,7 @@ import {
 import { subjects } from "./subjects";
 import { subjects2 } from "./subjects2";
 import type { IconType } from "react-icons";
-import { useAuth } from "@/contexts/Auth";
+import { getAuthenticatedAppForUser } from "@/lib/firebase/serverApp";
 
 /**
  * A single exam card.
@@ -23,13 +23,13 @@ import { useAuth } from "@/contexts/Auth";
 function ExamCard({
     id,
     name,
-    icon,
+    IconCard,
     premium,
     isUserPro,
 }: {
     id: string;
     name: string;
-    icon?: IconType;
+    IconCard: IconType;
     premium: boolean;
     isUserPro: boolean;
 }) {
@@ -53,7 +53,7 @@ function ExamCard({
                 color={blocked ? "gray.400" : "blue.500"}
                 _groupHover={{ color: blocked ? "gray.400" : "blue.600" }}
             >
-                {icon && <Icon as={icon} boxSize={16} />}
+                <IconCard />
             </Flex>
 
             <CardBody textAlign="center" px={4} pb={blocked ? 2 : 4}>
@@ -90,8 +90,8 @@ function ExamCard({
     );
 }
 
-export default function Page() {
-    const { pro } = useAuth();
+export default async function Page() {
+    const { isPro } = await getAuthenticatedAppForUser();
 
     return (
         <Box px={{ base: 4, md: 8 }} py={8}>
@@ -108,9 +108,9 @@ export default function Page() {
                         key={id}
                         id={id}
                         name={name}
-                        icon={icon as IconType}
+                        IconCard={icon as IconType}
                         premium={premium}
-                        isUserPro={pro}
+                        isUserPro={isPro}
                     />
                 ))}
             </SimpleGrid>
@@ -121,9 +121,9 @@ export default function Page() {
                         key={id}
                         id={id}
                         name={name}
-                        icon={icon as IconType}
+                        IconCard={icon as IconType}
                         premium={premium}
-                        isUserPro={pro}
+                        isUserPro={isPro}
                     />
                 ))}
             </SimpleGrid>

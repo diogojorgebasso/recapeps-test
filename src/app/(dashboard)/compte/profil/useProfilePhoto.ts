@@ -2,11 +2,11 @@
 import { useState, useCallback } from 'react';
 import { uploadUserAvatar } from '@/lib/firebase/storage';
 import { updateDoc, doc, getFirestore } from 'firebase/firestore';
-import { useAuth } from '@/contexts/Auth/useAuth';
 import { toaster } from '@/components/ui/toaster';
+import { useUserWithClaims } from '@/lib/getUser';
 
 export function useProfilePhoto() {
-    const { user } = useAuth();
+    const { user } = useUserWithClaims();
     const [loading, setLoading] = useState(false);
     const db = getFirestore();
 

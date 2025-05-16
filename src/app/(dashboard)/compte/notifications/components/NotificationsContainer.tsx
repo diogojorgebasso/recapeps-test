@@ -4,14 +4,14 @@ import { useEffect, useState } from 'react';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase/clientApp';
 import { Notification } from '@/types/Notification';
-import { useAuth } from '@/contexts/Auth';
 import NotificationsList from './NotificationsList';
 import NotificationsEmptyState from './NotificationsEmptyState';
+import { useUserWithClaims } from '@/lib/getUser';
 
 export default function NotificationsContainer() {
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [loading, setLoading] = useState(true);
-    const { user } = useAuth();
+    const { user } = useUserWithClaims();
 
     useEffect(() => {
         async function fetchNotifications() {

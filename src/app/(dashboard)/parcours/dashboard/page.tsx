@@ -25,14 +25,14 @@ import {
     ResponsiveContainer,
     Legend,
 } from "recharts";
-import { useAuth } from "@/contexts/Auth";
 import { EmptyState } from "@/components/ui/empty-state";
 import Link from "next/link";
 import { findCompletedAttempts } from "@/repositories/quizRepo";
 import { QuizDone } from "@/types/Quiz";
+import { useUserWithClaims } from "@/lib/getUser";
 
 export default function Page() {
-    const { user } = useAuth();
+    const { user } = useUserWithClaims();
     const [quizData, setQuizData] = useState<QuizDone[]>([]);
     const recommendedQuizzes = [
         {

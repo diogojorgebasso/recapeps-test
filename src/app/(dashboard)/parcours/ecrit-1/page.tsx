@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, Suspense } from "react";
-import { useRouter } from "next/navigation";
 import { subjects } from "./subjects";
 import {
     Box,
@@ -21,41 +20,26 @@ import {
 import SkillTreeClient from "./SkillTreeClient";
 import { getProgressOverview } from "@/repositories/quizRepo";
 import { QuizTrail } from "@/types/TreeSkill";
-import { useAuth } from "@/contexts/Auth";
+import { useUserWithClaims } from "@/lib/getUser";
 import Link from "next/link";
 
 export default function Page() {
-    const { user, pro } = useAuth();
-    const router = useRouter();
-
+    const { user, pro } = useUserWithClaims();
     const [quizNodesArray, setQuizNodesArray] = useState<QuizTrail[]>([]);
 
     useEffect(() => {
-        if (!user) {
-            router.push("/login?redirect=/parcours/ecrit-1");
-        } else {
-            const fetchData = async () => {
-                try {
-                    const progressData = await getProgressOverview(user.uid, 1);
-                    setQuizNodesArray(progressData || []);
-                } catch (error) {
-                    console.error("Failed to fetch progress overview:", error);
-                    setQuizNodesArray([]); // Set to empty array on error
-                }
-            };
-            fetchData();
-        }
-    }, [user, router]);
-
-
-    if (!user) {
-        return (
-            <Center h="80vh">
-                <Text>Redirection vers la page de connexion...</Text>
-                <Link href="/login">S&apos;inscrire</Link>
-            </Center>
-        );
-    }
+        if (!user) return;
+        const fetchData = async () => {
+            try {
+                const progressData = await getProgressOverview(user.uid, 1);
+                setQuizNodesArray(progressData || []);
+            } catch (error) {
+                console.error("Failed to fetch progress overview:", error);
+                setQuizNodesArray([]);
+            }
+        };
+        fetchData();
+    }, [user]);
 
     return (
         <Tabs.Root defaultValue="apprendre">
@@ -68,25 +52,23 @@ export default function Page() {
                 </Tabs.Trigger>
             </Tabs.List>
             <Tabs.Content value="apprendre">
-                <Box>
-                    <Box mb="12">
-                        <Heading size="xl" mb="4" color="blue.600">
-                            Écrit 1
-                        </Heading>
-                        <SimpleGrid columns={[1, 2, 3]} gap="6">
-                            {subjects.map(({ id, name, image, premium }) => (
-                                <ExamCard
-                                    key={id}
-                                    name={name}
-                                    image={image}
-                                    premium={premium}
-                                    isUserPro={pro}
-                                    id={id}
-                                />
-                            ))}
-                        </SimpleGrid>
-                    </Box>
-                </Box >
+                <Box mb="12">
+                    <Heading size="xl" mb="4" color="blue.600">
+                        Écrit 1
+                    </Heading>
+                    <SimpleGrid columns={[1, 2, 3]} gap="6">
+                        {subjects.map(({ id, name, image, premium }) => (
+                            <ExamCard
+                                key={id}
+                                name={name}
+                                image={image}
+                                premium={premium}
+                                isUserPro={pro}
+                                id={id}
+                            />
+                        ))}
+                    </SimpleGrid>
+                </Box>
             </Tabs.Content>
             <Tabs.Content value="s-entraner">
                 <Suspense fallback={<Center h="50vh"><Spinner size="lg" /></Center>}>

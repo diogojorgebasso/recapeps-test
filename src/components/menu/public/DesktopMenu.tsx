@@ -22,12 +22,36 @@ import { RxChatBubble } from "react-icons/rx";
 import { SlSpeech } from "react-icons/sl";
 import { getIsNotification } from "./getIsNotification";
 import { FaBell } from "react-icons/fa";
-import { useAuth } from "@/contexts/Auth";
 import { useEffect, useState } from "react";
+import { setCookie, deleteCookie } from "cookies-next";
 
-export default function DesktopMenu() {
-    const { user } = useAuth();
+import {
+    onIdTokenChanged,
+} from "@/lib/firebase/auth";
+
+function useUserSession(initialUser: any) {
+    useEffect(() => {
+        return onIdTokenChanged(async (user) => {
+            if (user) {
+                const idToken = await user.getIdToken();
+                await setCookie("__session", idToken);
+            } else {
+                await deleteCookie("__session");
+            }
+            if (initialUser?.uid === user?.uid) {
+                return;
+            }
+            window.location.reload();
+        });
+    }, [initialUser]);
+
+    return initialUser;
+}
+
+export default function DesktopMenu({ initialUser }: { initialUser: any }) {
+    const user = useUserSession(initialUser);
     const [isNotification, setIsNotification] = useState(false);
+    console.log("user", user);
 
     useEffect(() => {
         if (user) {
@@ -149,7 +173,7 @@ export default function DesktopMenu() {
                                 />
                             </Float>)}
                     </Link>
-                    <ContextualAvatar />
+                    <ContextualAvatar user={user} />
                     <ColorModeButton />
                 </HStack>
             </Flex>
