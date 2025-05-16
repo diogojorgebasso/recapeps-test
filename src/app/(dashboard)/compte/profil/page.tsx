@@ -1,15 +1,15 @@
 'use client';
 
 import { Box, Flex, Heading, VStack, Spinner, Alert } from '@chakra-ui/react';
-import { useAuth } from '@/contexts/Auth/useAuth';
 import ProfilePhotoUploader from './components/ProfilePhotoUploader';
 import ProfileDetailsForm from './components/ProfileDetailsForm';
 import SubscriptionSection from './components/SubscriptionSection';
 import EmailNotificationToggle from './components/EmailNotificationToggle';
 import { useEffect, useState } from 'react';
+import { useUserWithClaims } from '@/lib/getUser';
 
 export default function ProfilePage() {
-    const { user, pro } = useAuth();
+    const { user, pro } = useUserWithClaims();
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
