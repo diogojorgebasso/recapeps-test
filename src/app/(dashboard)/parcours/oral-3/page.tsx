@@ -91,7 +91,7 @@ function ExamCard({
 }
 
 export default async function Page() {
-    const { isPro } = await getAuthenticatedAppForUser();
+    const { pro } = await getAuthenticatedAppForUser();
 
     return (
         <Box px={{ base: 4, md: 8 }} py={8}>
@@ -110,7 +110,7 @@ export default async function Page() {
                         name={name}
                         IconCard={icon as IconType}
                         premium={premium}
-                        isUserPro={isPro}
+                        isUserPro={pro}
                     />
                 ))}
             </SimpleGrid>
@@ -123,7 +123,7 @@ export default async function Page() {
                         name={name}
                         IconCard={icon as IconType}
                         premium={premium}
-                        isUserPro={isPro}
+                        isUserPro={pro}
                     />
                 ))}
             </SimpleGrid>

@@ -19,7 +19,7 @@ const firebaseConfig = {
 export async function getAuthenticatedAppForUser() {
     const authIdToken = (await cookies()).get("__session")?.value;
 
-    let isPro = false;
+    let pro = false;
     let validToken = false;
 
     if (authIdToken) {
@@ -35,7 +35,7 @@ export async function getAuthenticatedAppForUser() {
                 const now = Math.floor(Date.now() / 1000);
                 if (claims.exp && claims.exp > now) {
                     validToken = true;
-                    isPro = claims.pro === true;
+                    pro = claims.pro === true;
                 } else {
                     console.warn("authIdToken is expired");
                 }
@@ -62,5 +62,5 @@ export async function getAuthenticatedAppForUser() {
         user = auth.currentUser;
     }
 
-    return { firebaseServerApp, user, isPro };
+    return { firebaseServerApp, user, pro };
 }
