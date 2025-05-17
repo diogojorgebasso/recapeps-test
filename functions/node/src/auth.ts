@@ -10,6 +10,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
 }
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
+// 1 gen
 export const saveusertofirestore = functions.runWith({
     serviceAccount: "save-user-to-firestore-run@recapeps-test.iam.gserviceaccount.com",
     ingressSettings: "ALLOW_INTERNAL_ONLY"
@@ -34,6 +35,7 @@ export const saveusertofirestore = functions.runWith({
         }
     });
 
+// 1 gen
 export const deleteuserdocument = functions.runWith({
     serviceAccount: "delete-user-document-run@recapeps-test.iam.gserviceaccount.com",
     ingressSettings: "ALLOW_INTERNAL_ONLY"

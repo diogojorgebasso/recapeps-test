@@ -18,7 +18,7 @@ interface CheckoutSessionRequest {
 
 export const createstripecheckoutsession = onCall<CheckoutSessionRequest>(
   {
-    cors: "https://recapeps.fr",
+    cors: ["https://recapeps.fr", "https://recapeps-test--recapeps-test.europe-west4.hosted.app"],
     enforceAppCheck: true,
     serviceAccount: "stripe-checkout-session-run@recapeps-test.iam.gserviceaccount.com"
   },
@@ -231,7 +231,7 @@ export const stripewebhooktest = onRequest({
 
 export const createportalsession = onCall(
   {
-    cors: "https://recapeps.fr",
+    cors: ["https://recapeps.fr", "https://recapeps-test--recapeps-test.europe-west4.hosted.app"],
     serviceAccount: "create-portal-session-run@recapeps-test.iam.gserviceaccount.com",
     enforceAppCheck: true
   },

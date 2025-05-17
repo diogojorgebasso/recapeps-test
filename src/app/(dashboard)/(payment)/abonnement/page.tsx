@@ -31,7 +31,7 @@ const PLANS: Plan[] = [
         id: 'monthly',
         name: 'Abonnement Mensuel',
         price: '5,99 €',
-        priceId: 'price_1OYSQGEfLSFXfvk1YmzR1IC8',
+        priceId: 'price_1QqcQ4Ij1lxZjyG3usxxSmZZ',
         period: 'par mois',
         features: [
             'Accès à tous les cours',
@@ -47,7 +47,7 @@ const PLANS: Plan[] = [
         id: 'yearly',
         name: 'Abonnement Annuel',
         price: '50€',
-        priceId: 'price_1OYSQnEfLSFXfvk1jcfRgO6C',
+        priceId: 'price_1RPgqEIj1lxZjyG32oGC7hXI',
         period: 'par an',
         features: [
             'Accès à tous les cours',

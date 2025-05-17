@@ -7,6 +7,7 @@ const db = getFirestore();
 
 export const savefcmtoken = onCall(
     {
+        serviceAccount: "save-fcm-token@recapeps-test.iam.gserviceaccount.com",
         cors: "https://recapeps.fr",
         enforceAppCheck: true,
     },

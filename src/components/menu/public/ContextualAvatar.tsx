@@ -4,12 +4,14 @@ import {
     defineStyle,
     Portal,
     HStack,
+    Button
 } from "@chakra-ui/react";
 import Link from "next/link";
 import {
     LuBadge, LuSparkles, LuLogOut,
 } from "react-icons/lu";
 import { signOut } from "@/lib/firebase/auth";
+import { FiLogIn } from "react-icons/fi";
 
 const ring = defineStyle({
     outline: "2px solid",
@@ -18,7 +20,18 @@ const ring = defineStyle({
 });
 
 export default function ContextualAvatar({ user }: { user: any }) {
-    console.log("inside the contextual avatar", user);
+    if (!user) {
+        return (
+            <Button asChild>
+                <Link href="/auth">
+                    <HStack gap={2}>
+                        <FiLogIn />
+                        Login
+                    </HStack>
+                </Link>
+            </Button>
+        )
+    }
     return (
         <Menu.Root>
             <Menu.Trigger>

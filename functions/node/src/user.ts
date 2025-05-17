@@ -6,12 +6,12 @@ import { getFirestore } from 'firebase-admin/firestore';
 const auth = getAuth();
 const db = getFirestore();
 
-export const handleEmailChange = onCall<
+export const handleemailchange = onCall<
     { newEmail: string }
 >(
     {
         enforceAppCheck: true,
-        cors: "https://recapeps.fr"
+        cors: ["https://recapeps.fr", "https://recapeps-test--recapeps-test.europe-west4.hosted.app"]
     },
     async (req) => {
         const uid = req.auth?.uid;
@@ -34,12 +34,12 @@ export const handleEmailChange = onCall<
 );
 
 
-export const updateUserName = onCall<
+export const updateusername = onCall<
     { firstName: string; lastName: string }
 >(
     {
         enforceAppCheck: true,
-        cors: "https://recapeps.fr"
+        cors: ["https://recapeps.fr", "https://recapeps-test--recapeps-test.europe-west4.hosted.app"]
     },
     async (req) => {
         const uid = req.auth?.uid;

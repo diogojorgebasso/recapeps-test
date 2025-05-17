@@ -8,7 +8,6 @@ import * as functions from 'firebase-functions/v1';
 const db = getFirestore();
 MailService.setApiKey(process.env.SENDGRID_API_KEY || "");
 
-// Activate the retrie option automatically.
 export const sendcontactemail = onDocumentCreated({
     document: "contact/{contactID}",
     serviceAccount: "send-contact-email-run@recapeps-test.iam.gserviceaccount.com"
@@ -45,7 +44,7 @@ export const sendcontactemail = onDocumentCreated({
 
 export const exportuserdata = onCall(
     {
-        cors: ["https://recapeps.fr"],
+        cors: ["https://recapeps.fr", "https://recapeps-test--recapeps-test.europe-west4.hosted.app"],
         serviceAccount: "export-user-data-run@recapeps-test.iam.gserviceaccount.com",
         enforceAppCheck: true
     },
@@ -124,8 +123,10 @@ export const exportuserdata = onCall(
     }
 );
 
+// 1 gen
 export const sendwelcomeemail = functions.runWith({
-    serviceAccount: "send-welcome-email-run@recapeps-test.iam.gserviceaccount.com"
+    serviceAccount: "send-welcome-email-run@recapeps-test.iam.gserviceaccount.com",
+    ingressSettings: "ALLOW_INTERNAL_ONLY"
 }).auth.user().onCreate(async (user) => {
     try {
         const { email } = user;

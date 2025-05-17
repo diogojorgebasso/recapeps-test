@@ -1,4 +1,7 @@
-Individual React components then import the wrapped functions from the
-src/lib/firebase directory, rather than importing Firebase functions directly.
+# Recapeps development.
 
-Routes: /ecrit-1
+This is not stable.
+
+This repository tries to be as similiar as the real envrionement.
+
+This is were we try different things.
