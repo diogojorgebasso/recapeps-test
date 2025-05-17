@@ -31,6 +31,7 @@ export default function ClientComponent() {
         email: "",
         password: "",
     });
+
     const [errors, setErrors] = useState<Partial<Record<keyof LoginFormData, string>>>({});
     const [isLoading, setIsLoading] = useState(false);
     const [generalError, setGeneralError] = useState<string | null>(null);

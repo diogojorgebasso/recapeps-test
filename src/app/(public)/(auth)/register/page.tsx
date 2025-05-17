@@ -67,22 +67,6 @@ export default function Register() {
         }
     };
 
-    const handleCheckboxChange = (details: { checked: boolean | 'indeterminate' }) => {
-        const checked = details.checked === true; // Ensure it's a boolean
-        setFormData(prev => ({
-            ...prev,
-            acceptTerms: checked
-        }));
-
-        if (errors.acceptTerms) {
-            setErrors(prev => {
-                const newErrors = { ...prev };
-                delete newErrors.acceptTerms;
-                return newErrors;
-            });
-        }
-    };
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setGeneralError(null);
@@ -175,7 +159,7 @@ export default function Register() {
                                     <Checkbox
                                         name="acceptTerms"
                                         checked={formData.acceptTerms}
-                                        onCheckedChange={handleCheckboxChange}
+                                        onChange={handleChange}
                                     >
                                         J&apos;ai lu et j&apos;accepte la <Link href="/legal/politique-confidentialite">Politique de Confidentialité</Link>
                                     </Checkbox>
