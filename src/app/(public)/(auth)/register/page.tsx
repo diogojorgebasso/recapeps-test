@@ -79,7 +79,7 @@ export default function Register() {
         try {
             const validated = registerSchema.parse(formData);
             setIsLoading(true);
-            await registerWithEmailAndPassword(validated.email, validated.password, validated.name);
+            await registerWithEmailAndPassword(validated.email, validated.password, validated.name ?? undefined);
             router.push("/verify-email");
         } catch (err) {
             if (err instanceof z.ZodError) {
