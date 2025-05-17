@@ -138,7 +138,7 @@ function ExamCard({
                                             <Button variant="outline">Plus tard</Button>
                                         </Dialog.ActionTrigger>
                                         <Button asChild variant="solid">
-                                            <Link href="/abbonnement">
+                                            <Link href="/abonnement">
                                                 Passer à Pro
                                             </Link>
                                         </Button>

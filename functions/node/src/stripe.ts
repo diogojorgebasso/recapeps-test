@@ -182,7 +182,7 @@ export const stripewebhooktest = onRequest({
       await admin.auth().setCustomUserClaims(userId, { pro: false });
     }
 
-    if (event.type === "customer.subscription.updated") {
+    if (event.type === "customer.subscription.updated" || event.type === "customer.subscription.created") {
 
       const subscription = event.data.object as Stripe.Subscription;
       const isPro = subscription.status === "active";

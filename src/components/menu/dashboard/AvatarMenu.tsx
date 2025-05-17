@@ -18,7 +18,7 @@ import { useUserWithClaims } from "@/lib/getUser";
 
 export default function AvatarMenu() {
     const { user, pro } = useUserWithClaims();
-
+    console.log("user", pro);
     return (
         <Menu.Root>
             <Menu.Trigger>

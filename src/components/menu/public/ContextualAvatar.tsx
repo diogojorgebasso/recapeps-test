@@ -23,7 +23,7 @@ export default function ContextualAvatar({ user }: { user: any }) {
     if (!user) {
         return (
             <Button asChild>
-                <Link href="/auth">
+                <Link href="/login">
                     <HStack gap={2}>
                         <FiLogIn />
                         Login
