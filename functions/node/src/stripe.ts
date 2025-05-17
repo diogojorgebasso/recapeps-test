@@ -67,7 +67,7 @@ export const createstripecheckoutsession = onCall<CheckoutSessionRequest>(
           },
         ],
         mode: "subscription",
-        return_url: "https://recapeps.fr/return?session_id={CHECKOUT_SESSION_ID}",
+        return_url: "https://recapeps-test--recapeps-test.europe-west4.hosted.app/return?session_id={CHECKOUT_SESSION_ID}",
         metadata: { firebaseUID: userId },
       });
 
