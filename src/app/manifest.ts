@@ -2,8 +2,8 @@ import type { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
     return {
-        name: "Recapeps - Réussir ce n'est qu'une question d'entraînement",
-        short_name: 'Recapeps',
+        name: "Recap'eps",
+        short_name: "Recap'eps",
         description: "Recap'eps est un outil de révision imparable pour réussir les concours du CAPEPS.",
         start_url: '/',
         scope: '/',
