@@ -13,8 +13,8 @@ import {
     Button,
     HStack,
     Separator,
+    Checkbox
 } from "@chakra-ui/react";
-import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
 import { FaGoogle } from "react-icons/fa";
 import { useColorModeValue } from "@/components/ui/color-mode";
@@ -22,17 +22,14 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { registerWithEmailAndPassword, signUpWithGoogle } from "@/lib/firebase/auth";
 import { z } from "zod";
 
-// Define validation schema
+// Schéma de validation
 const registerSchema = z.object({
     email: z.string().email("Adresse email invalide"),
     password: z.string()
-        .min(8, "Le mot de passe doit contenir au moins 8 caractères")
+        .min(8, "Le mot de passe doit contenir au moins 8 caractères")
         .regex(/[A-Z]/, "Le mot de passe doit contenir au moins une lettre majuscule")
         .regex(/[a-z]/, "Le mot de passe doit contenir au moins une lettre minuscule")
         .regex(/[0-9]/, "Le mot de passe doit contenir au moins un chiffre"),
-    acceptTerms: z.boolean().refine(val => val === true, {
-        message: "Vous devez accepter la politique de confidentialité"
-    })
 });
 
 type RegisterFormData = z.infer<typeof registerSchema>;
@@ -41,9 +38,7 @@ export default function Register() {
     const [formData, setFormData] = useState<RegisterFormData>({
         email: "",
         password: "",
-        acceptTerms: false
     });
-
     const [errors, setErrors] = useState<Record<string, string[]>>({});
     const [isLoading, setIsLoading] = useState(false);
     const [generalError, setGeneralError] = useState<string | null>(null);
@@ -54,15 +49,14 @@ export default function Register() {
 
         setFormData(prev => ({
             ...prev,
-            [name]: newValue
+            [name]: newValue,
         }));
 
-        // Clear error for this field when user changes it
         if (errors[name]) {
             setErrors(prev => {
-                const newErrors = { ...prev };
-                delete newErrors[name];
-                return newErrors;
+                const cp = { ...prev };
+                delete cp[name];
+                return cp;
             });
         }
     };
@@ -73,31 +67,20 @@ export default function Register() {
         setErrors({});
 
         try {
-            // Validate form data
-            const validatedData = registerSchema.parse(formData);
+            const validated = registerSchema.parse(formData);
             setIsLoading(true);
-
-            // Register the user
-            await registerWithEmailAndPassword(
-                validatedData.email,
-                validatedData.password
-            );
-        } catch (error) {
-            if (error instanceof z.ZodError) {
-                // Format Zod errors
-                const fieldErrors: Record<string, string[]> = {};
-                error.errors.forEach(err => {
-                    const path = err.path[0] as string;
-                    if (!fieldErrors[path]) {
-                        fieldErrors[path] = [];
-                    }
-                    fieldErrors[path].push(err.message);
+            await registerWithEmailAndPassword(validated.email, validated.password);
+        } catch (err) {
+            if (err instanceof z.ZodError) {
+                const fieldErrs: Record<string, string[]> = {};
+                err.errors.forEach(issue => {
+                    const key = issue.path[0] as string;
+                    (fieldErrs[key] ||= []).push(issue.message);
                 });
-                setErrors(fieldErrors);
+                setErrors(fieldErrs);
             } else {
-                // Handle Firebase errors
                 setGeneralError("Échec de l'inscription. Veuillez réessayer.");
-                console.error("Registration error:", error);
+                console.error(err);
             }
         } finally {
             setIsLoading(false);
@@ -114,9 +97,7 @@ export default function Register() {
         >
             <Card.Root width="sm" shadow="md">
                 <Card.Header textAlign="center">
-                    <Heading as="h2" size="lg">
-                        Inscription
-                    </Heading>
+                    <Heading size="lg">Inscription</Heading>
                     <Text mt={2} fontSize="sm" color="gray.600">
                         Veuillez compléter les informations ci-dessous pour créer votre compte.
                     </Text>
@@ -126,7 +107,7 @@ export default function Register() {
                     <form onSubmit={handleSubmit}>
                         <Stack gap={4}>
                             <Fieldset.Root>
-                                <Field.Root>
+                                <Field.Root required>
                                     <Field.Label>Email</Field.Label>
                                     <Input
                                         type="email"
@@ -134,37 +115,34 @@ export default function Register() {
                                         value={formData.email}
                                         onChange={handleChange}
                                         placeholder="exemple@email.com"
-                                        required
                                     />
-                                    {errors.email && errors.email.map((error, index) => (
-                                        <Field.ErrorText key={index}>{error}</Field.ErrorText>
+                                    {errors.email?.map((e, i) => (
+                                        <Field.ErrorText key={i}>{e}</Field.ErrorText>
                                     ))}
                                 </Field.Root>
 
-                                <Field.Root>
+                                {/* Mot de passe */}
+                                <Field.Root required>
                                     <Field.Label>Mot de passe</Field.Label>
                                     <PasswordInput
                                         name="password"
                                         value={formData.password}
                                         onChange={handleChange}
                                         placeholder="Entrez votre mot de passe"
-                                        required
                                     />
-                                    {errors.password && errors.password.map((error, index) => (
-                                        <Field.ErrorText key={index}>- {error}</Field.ErrorText>
+                                    {errors.password?.map((e, i) => (
+                                        <Field.ErrorText key={i}>{e}</Field.ErrorText>
                                     ))}
                                 </Field.Root>
-
                                 <Field.Root required>
-                                    <Checkbox
-                                        name="acceptTerms"
-                                        checked={formData.acceptTerms}
-                                        onChange={handleChange}
-                                    >
-                                        J&apos;ai lu et j&apos;accepte la <Link href="/legal/politique-confidentialite">Politique de Confidentialité</Link>
-                                    </Checkbox>
-                                    {errors.acceptTerms && errors.acceptTerms.map((error, index) => (
-                                        <Field.ErrorText key={index}>{error}</Field.ErrorText>
+                                    <Checkbox.Root
+                                        name="acceptTerms">
+                                        <Checkbox.HiddenInput />
+                                        <Checkbox.Control />
+                                        <Checkbox.Label>J&apos;ai lu et j&apos;accepte la <Link href="/legal/politique-confidentialite">Politique de Confidentialité</Link></Checkbox.Label>
+                                    </Checkbox.Root>
+                                    {errors.acceptTerms?.map((e, i) => (
+                                        <Field.ErrorText key={i}>{e}</Field.ErrorText>
                                     ))}
                                 </Field.Root>
                             </Fieldset.Root>
@@ -173,13 +151,7 @@ export default function Register() {
                                 <Text color="red.500" fontSize="sm">{generalError}</Text>
                             )}
 
-                            <Button
-                                type="submit"
-                                colorPalette="blue"
-                                w="full"
-                                loading={isLoading}
-                                disabled={isLoading}
-                            >
+                            <Button type="submit" colorPalette="blue" w="full" loading={isLoading} disabled={isLoading}>
                                 Créer un compte
                             </Button>
                         </Stack>
@@ -191,22 +163,14 @@ export default function Register() {
                         <Separator flex="1" />
                     </HStack>
 
-                    <Button
-                        variant="outline"
-                        w="full"
-                        mt={4}
-                        onClick={() => signUpWithGoogle()}
-                        disabled={isLoading}
-                    >
+                    <Button variant="outline" w="full" mt={4} onClick={signUpWithGoogle} disabled={isLoading}>
                         <FaGoogle />
                         <Text ml={2}>S&apos;inscrire avec Google</Text>
                     </Button>
 
                     <Text mt={4} fontSize="sm" textAlign="center">
-                        Vous avez déjà un compte ?{" "}
-                        <Link href="/login">
-                            Connectez-vous
-                        </Link>
+                        Vous avez déjà un compte ? {" "}
+                        <Link href="/login">Connectez-vous</Link>
                     </Text>
                 </Card.Body>
             </Card.Root>

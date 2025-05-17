@@ -11,7 +11,9 @@ import { useUserWithClaims } from '@/lib/getUser';
 export default function ProfilePage() {
     const { user, pro } = useUserWithClaims();
     const [error, setError] = useState<string | null>(null);
+
     console.log("user", user);
+
     useEffect(() => {
         if (!user) {
             setError("Unable to load user profile. Please try again later.");

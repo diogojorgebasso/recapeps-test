@@ -41,8 +41,6 @@ export function PushNotificationsProvider({ children }: { children: ReactNode })
 
                     return () => unsubscribe();
                 });
-            } else {
-                console.log("Push notifications not supported");
             }
         } catch (error) {
             console.log("Error initializing Firebase:", error);
