@@ -161,7 +161,7 @@ export default function DesktopMenu({ initialUser }: { initialUser: any }) {
                 </HStack>
 
                 <HStack gap={4}>
-                    <Link href="/compte/notifications">
+                    <Link href="/compte/notifications" aria-label="Notifications">
                         <FaBell />
                         {isNotification && (
                             <Float placement="top-end" offsetX="1" offsetY="1">

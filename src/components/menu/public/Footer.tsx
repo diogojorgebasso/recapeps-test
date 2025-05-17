@@ -24,10 +24,16 @@ export default function Footer() {
 
                 {/* Social media icons */}
                 <HStack gap={3}>
-                    <a href="https://linkedin.com/company/recapeps" target="_blank" rel="noopener noreferrer">
+                    <a href="https://linkedin.com/company/recapeps"
+                        aria-label="Recapeps sur LinkedIn"
+                        target="_blank"
+                        rel="noopener noreferrer">
                         <FaLinkedin size="20px" />
                     </a>
-                    <a href="https://instagram.com/recapeps" target="_blank" rel="noopener noreferrer">
+                    <a href="https://instagram.com/recapeps"
+                        aria-label="Recapeps sur Instagram"
+                        target="_blank"
+                        rel="noopener noreferrer">
                         <FaInstagram size="20px" />
                     </a>
                 </HStack>
