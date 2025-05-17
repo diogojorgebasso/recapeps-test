@@ -21,6 +21,7 @@ import { useColorModeValue } from "@/components/ui/color-mode";
 import { PasswordInput } from "@/components/ui/password-input";
 import { registerWithEmailAndPassword, signUpWithGoogle } from "@/lib/firebase/auth";
 import { z } from "zod";
+import { useRouter } from 'next/navigation'
 
 // Schéma de validation
 const registerSchema = z.object({
@@ -35,6 +36,7 @@ const registerSchema = z.object({
 type RegisterFormData = z.infer<typeof registerSchema>;
 
 export default function Register() {
+    const router = useRouter();
     const [formData, setFormData] = useState<RegisterFormData>({
         email: "",
         password: "",
@@ -61,6 +63,12 @@ export default function Register() {
         }
     };
 
+    const hangleSignUpWithGoogle = async (event: React.FormEvent) => {
+        event.preventDefault();
+        signUpWithGoogle();
+        router.push("/parcours/dashboard"); // we assume the email is verified.
+    }
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setGeneralError(null);
@@ -70,6 +78,7 @@ export default function Register() {
             const validated = registerSchema.parse(formData);
             setIsLoading(true);
             await registerWithEmailAndPassword(validated.email, validated.password);
+            router.push("/verify-email");
         } catch (err) {
             if (err instanceof z.ZodError) {
                 const fieldErrs: Record<string, string[]> = {};
@@ -163,7 +172,7 @@ export default function Register() {
                         <Separator flex="1" />
                     </HStack>
 
-                    <Button variant="outline" w="full" mt={4} onClick={signUpWithGoogle} disabled={isLoading}>
+                    <Button variant="outline" w="full" mt={4} onClick={hangleSignUpWithGoogle} disabled={isLoading}>
                         <FaGoogle />
                         <Text ml={2}>S&apos;inscrire avec Google</Text>
                     </Button>

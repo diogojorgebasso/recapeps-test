@@ -17,6 +17,7 @@ import { FaGoogle } from "react-icons/fa";
 import { PasswordInput } from "@/components/ui/password-input";
 import { signInWithGoogle, signInWithEmail } from "@/lib/firebase/auth";
 import { z } from "zod";
+import { useRouter } from 'next/navigation'
 
 // Define the validation schema
 const loginSchema = z.object({
@@ -27,6 +28,8 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function ClientComponent() {
+
+    const router = useRouter();
     const [formData, setFormData] = useState<LoginFormData>({
         email: "",
         password: "",
@@ -48,6 +51,7 @@ export default function ClientComponent() {
     const handleGoogleSignIn = (event: React.FormEvent) => {
         event.preventDefault();
         signInWithGoogle();
+        router.push("/parcours/dashboard");
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -60,6 +64,7 @@ export default function ClientComponent() {
             setIsLoading(true);
 
             await signInWithEmail(validatedData.email, validatedData.password);
+            router.push("/parcours/dashboard");
         } catch (error) {
             if (error instanceof z.ZodError) {
                 // Handle validation errors
@@ -123,6 +128,7 @@ export default function ClientComponent() {
                                         onChange={handleChange}
                                         placeholder="Entrez votre mot de passe"
                                         required
+                                        autoComplete='current-password'
                                     />
                                     {errors.password && (
                                         <Fieldset.ErrorText>{errors.password}</Fieldset.ErrorText>
