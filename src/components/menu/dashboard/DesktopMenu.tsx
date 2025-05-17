@@ -12,9 +12,36 @@ import AvatarMenu from "./AvatarMenu";
 import { FaPencilAlt, FaPencilRuler, FaHome } from "react-icons/fa"; //ecrit 1
 import { RxChatBubble } from "react-icons/rx"; //oral 1
 import { SlSpeech } from "react-icons/sl"
+import { useEffect } from "react";
+import { setCookie, deleteCookie } from "cookies-next";
 
-export default function DesktopMenu() {
+import {
+    onIdTokenChanged,
+} from "@/lib/firebase/auth";
+import { init } from "next/dist/compiled/webpack/webpack";
+
+function useUserSession(initialUser: any) {
+    useEffect(() => {
+        return onIdTokenChanged(async (user) => {
+            if (user) {
+                const idToken = await user.getIdToken();
+                await setCookie("__session", idToken);
+            } else {
+                await deleteCookie("__session");
+            }
+            if (initialUser?.uid === user?.uid) {
+                return;
+            }
+            window.location.reload();
+        });
+    }, [initialUser]);
+
+    return initialUser;
+}
+
+export default function DesktopMenu({ initialUser }: { initialUser: any }) {
     const pathname = usePathname();
+    const user = useUserSession(initialUser)
 
     const isActive = (href: string) =>
         pathname === href || (href !== "/parcours/dashboard" && pathname.startsWith(href));

@@ -57,7 +57,7 @@ export default function Page() {
                         Écrit 1
                     </Heading>
                     <SimpleGrid columns={[1, 2, 3]} gap="6">
-                        {subjects.map(({ id, name, image, premium }) => (
+                        {subjects.map(({ id, name, image, premium, link }) => (
                             <ExamCard
                                 key={id}
                                 name={name}
@@ -65,6 +65,7 @@ export default function Page() {
                                 premium={premium}
                                 isUserPro={pro}
                                 id={id}
+                                link={link}
                             />
                         ))}
                     </SimpleGrid>
@@ -85,12 +86,14 @@ function ExamCard({
     image,
     premium,
     isUserPro,
+    link
 }: {
     id: string;
     name: string;
     image: string;
     premium: boolean;
     isUserPro: boolean;
+    link: string;
 }) {
     if (!isUserPro && premium) {
         // blocked.
@@ -162,7 +165,7 @@ function ExamCard({
             </Card.Body>
             <Card.Footer gap="2" p="4">
                 <Button variant="solid" asChild>
-                    <Link href={"/parcours/ecrit-1/notes/" + id}>Voir plus</Link>
+                    <a href={link}>Voir plus</a>
                 </Button>
             </Card.Footer>
         </Card.Root>

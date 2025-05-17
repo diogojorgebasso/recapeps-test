@@ -9,12 +9,15 @@ import {
 
 import DesktopMenu from "@/components/menu/dashboard/DesktopMenu";
 import MobileMenu from "@/components/menu/dashboard/MobileMenu";
+import { getAuthenticatedAppForUser } from "@/lib/firebase/serverApp";
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
+    const { user } = await getAuthenticatedAppForUser();
+
     return (
         <Flex minH="100vh">
             <Suspense fallback={<Spinner position="fixed" top={4} left={4} />}>
-                <DesktopMenu />
+                <DesktopMenu initialUser={user?.toJSON()} />
                 <MobileMenu />
             </Suspense>
 
