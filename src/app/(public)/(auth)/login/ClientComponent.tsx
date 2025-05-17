@@ -106,7 +106,7 @@ export default function ClientComponent() {
                     <form onSubmit={handleSubmit}>
                         <Stack gap={4}>
                             <Fieldset.Root>
-                                <Field.Root>
+                                <Field.Root required>
                                     <Field.Label>Email</Field.Label>
                                     <Input
                                         type="email"
@@ -114,20 +114,20 @@ export default function ClientComponent() {
                                         placeholder="exemple@email.com"
                                         value={formData.email}
                                         onChange={handleChange}
-                                        required
+                                        autoComplete='email'
                                     />
                                     {errors.email && (
                                         <Fieldset.ErrorText>{errors.email}</Fieldset.ErrorText>
                                     )}
                                 </Field.Root>
-                                <Field.Root>
+                                <Field.Root required>
                                     <Field.Label>Mot de passe</Field.Label>
                                     <PasswordInput
                                         name="password"
                                         value={formData.password}
                                         onChange={handleChange}
                                         placeholder="Entrez votre mot de passe"
-                                        required
+
                                         autoComplete='current-password'
                                     />
                                     {errors.password && (

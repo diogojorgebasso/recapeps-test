@@ -17,7 +17,7 @@ function MentionsLegales() {
                 <Text>
                     Conformément aux dispositions des Articles 6-III et 19 de la loi n°2004-575 du 21 juin 2004
                     pour la Confiance en l’économie numérique, dit L.C.E.N., il est porté à la connaissance des
-                    utilisateurs et visiteurs, ci-après l' <strong>"Utilisateur"</strong>, du site recapeps.fr, ci-après le <strong>"Site"</strong>, les
+                    utilisateurs et visiteurs, ci-après l&apos; <strong>&quot;Utilisateur&quot;</strong>, du site recapeps.fr, ci-après le <strong>&quot;Site&quot;</strong>, les
                     présentes mentions légales.
 
                 </Text>
@@ -80,7 +80,7 @@ function MentionsLegales() {
                     l&#39;adresse électronique: <Link target="_blank" href="mailto:contact@recapeps.fr">contact@recapeps.fr</Link>. < br /> <br />
                     Les données personnelles récoltées permettent le bon fonctionnement du Site et ne seront
                     ni partagées, ni utilisées par des tiers.
-                    L’Utilisateur peut trouver des informations complémentaires sur notre collecte, utilisation et
+                    L&lsquo;Utilisateur peut trouver des informations complémentaires sur notre collecte, utilisation et
                     protection des données personnelles sur notre page Mentions Légales.
                 </Text>
 
@@ -88,12 +88,12 @@ function MentionsLegales() {
                     ARTICLE 5 - COOKIES
                 </Heading>
                 <Text>
-                    Le Site utilise des cookies dans le but d’améliorer l’expérience de l’Utilisateur. La durée de
+                    Le Site utilise des cookies dans le but d&apos;améliorer l&apos;expérience de l&apos;Utilisateur. La durée de
                     validité du consentement donnée dans ce cadre est de 13 mois maximum. Au bout de 13
-                    mois, le consentement de l’Utilisateur sera automatiquement redemandé pour le traitement
-                    des cookies. L’Utilisateur peut gérer ses préférences de cookies à tout moment via la
+                    mois, le consentement de l&apos;Utilisateur sera automatiquement redemandé pour le traitement
+                    des cookies. L&apos;Utilisateur peut gérer ses préférences de cookies à tout moment via la
                     bannière de consentement affichée lors de sa première visite ou via les paramètres de son
-                    navigateur. Pour plus d’information sur les cookies, l’Utilisateur peut se référer à notre page
+                    navigateur. Pour plus d&apos;information sur les cookies, l&apos;Utilisateur peut se référer à notre page
                     Mentions Légales.
                 </Text>
 

@@ -22,7 +22,7 @@ export default function Page() {
                     engageons à respecter la confidentialité et la protection des données conformément
                     au <strong>Règlement Général sur la Protection des Données(RGPD)</strong>.<br />
                     Par la suite, sont considérées comme données personnelles toute information permettant
-                    d'identifier un Utilisateur.Il peut s&apos;agir de ses noms et prénoms, âge, adresse postale ou
+                    d&apos;identifier un Utilisateur.Il peut s&apos;agir de ses noms et prénoms, âge, adresse postale ou
                     électronique, de sa localisation ou encore de son adresse IP(liste non - exhaustive)
                     Toute personne physique se connectant ou utilisant le Site reconnaît expressément avoir pris
                     connaissance de notre politique de confidentialité et de protection des données

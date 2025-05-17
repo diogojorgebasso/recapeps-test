@@ -25,6 +25,7 @@ import { useRouter } from 'next/navigation'
 
 // Schéma de validation
 const registerSchema = z.object({
+    name: z.string().nullable().optional(),
     email: z.string().email("Adresse email invalide"),
     password: z.string()
         .min(8, "Le mot de passe doit contenir au moins 8 caractères")
@@ -38,6 +39,7 @@ type RegisterFormData = z.infer<typeof registerSchema>;
 export default function Register() {
     const router = useRouter();
     const [formData, setFormData] = useState<RegisterFormData>({
+        name: "",
         email: "",
         password: "",
     });
@@ -77,7 +79,7 @@ export default function Register() {
         try {
             const validated = registerSchema.parse(formData);
             setIsLoading(true);
-            await registerWithEmailAndPassword(validated.email, validated.password);
+            await registerWithEmailAndPassword(validated.email, validated.password, validated.name);
             router.push("/verify-email");
         } catch (err) {
             if (err instanceof z.ZodError) {
@@ -116,6 +118,20 @@ export default function Register() {
                     <form onSubmit={handleSubmit}>
                         <Stack gap={4}>
                             <Fieldset.Root>
+                                <Field.Root>
+                                    <Field.Label>Ton nom :</Field.Label>
+                                    <Input
+                                        type="text"
+                                        name="name"
+                                        value={formData.name ?? ""}
+                                        onChange={handleChange}
+                                        autoComplete='name'
+                                    />
+                                    {errors.name?.map((e, i) => (
+                                        <Field.ErrorText key={i}>{e}</Field.ErrorText>
+                                    ))}
+                                </Field.Root>
+
                                 <Field.Root required>
                                     <Field.Label>Email</Field.Label>
                                     <Input
@@ -124,6 +140,7 @@ export default function Register() {
                                         value={formData.email}
                                         onChange={handleChange}
                                         placeholder="exemple@email.com"
+                                        autoComplete='email'
                                     />
                                     {errors.email?.map((e, i) => (
                                         <Field.ErrorText key={i}>{e}</Field.ErrorText>
@@ -138,6 +155,7 @@ export default function Register() {
                                         value={formData.password}
                                         onChange={handleChange}
                                         placeholder="Entrez votre mot de passe"
+                                        autoCapitalize="new-password"
                                     />
                                     {errors.password?.map((e, i) => (
                                         <Field.ErrorText key={i}>{e}</Field.ErrorText>
@@ -160,7 +178,11 @@ export default function Register() {
                                 <Text color="red.500" fontSize="sm">{generalError}</Text>
                             )}
 
-                            <Button type="submit" colorPalette="blue" w="full" loading={isLoading} disabled={isLoading}>
+                            <Button type="submit"
+                                colorPalette="blue"
+                                w="full"
+                                loading={isLoading}
+                                disabled={isLoading}>
                                 Créer un compte
                             </Button>
                         </Stack>

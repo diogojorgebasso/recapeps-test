@@ -126,7 +126,6 @@ export async function registerWithEmailAndPassword(
     await sendEmailVerification(user);
     console.log("Verification email sent to", user.email);
   } catch (error) {
-    console.error("Error registering user with email and password", error);
     throw error; // Re-throw the error to be handled by the caller
   }
 }
