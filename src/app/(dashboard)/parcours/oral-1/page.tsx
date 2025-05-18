@@ -34,22 +34,17 @@ const subjects = [
     { key: 'arts-du-cirque', label: 'Arts du Cirque', icon: GiJuggler, premium: false },
     { key: 'basket', label: 'Basket', icon: FaBasketballBall, premium: true },
     { key: 'escalade', label: 'Escalade', icon: GiMountainClimbing, premium: true },
-    { key: 'lutte', label: 'Lutte', icon: GiHighPunch, premium: false },
+    { key: 'lutte', label: 'Lutte', icon: GiHighPunch, premium: true },
     { key: 'musculation', label: 'Musculation', icon: GiWeightLiftingUp, premium: true },
-    { key: 'natation-vitesse', label: 'Natation Vitesse', icon: FaPersonSwimming, premium: false },
+    { key: 'natation-vitesse', label: 'Natation Vitesse', icon: FaPersonSwimming, premium: true },
     { key: 'relais-vitesse', label: 'Relais Vitesse', icon: FaRunning, premium: true },
-    { key: 'savoir-nager', label: 'Savoir Nager', icon: FaPersonDrowning, premium: false },
+    { key: 'savoir-nager', label: 'Savoir Nager', icon: FaPersonDrowning, premium: true },
     { key: 'step', label: 'Step', icon: GiStairs, premium: true },
-    { key: 'tennis-de-table', label: 'Tennis de Table', icon: GiPingPongBat, premium: false },
+    { key: 'tennis-de-table', label: 'Tennis de Table', icon: GiPingPongBat, premium: true },
 ];
 
 export default function Page() {
     const { user, pro } = useUserWithClaims(); // Use client-side hook
-
-    // Optional: Add a loading state while user and pro status are being determined
-    // if (user === undefined) { 
-    //     return <Box p={{ base: 4, md: 8 }}><Text>Chargement...</Text></Box>;
-    // }
 
     if (!user) {
         return (

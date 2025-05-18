@@ -28,6 +28,7 @@ export default function Page() {
     const { user, pro } = useUserWithClaims();
     const router = useRouter();
     const [quizNodesArray, setQuizNodesArray] = useState<QuizTrail[]>([]);
+
     useEffect(() => {
         if (!user) {
             router.push("/login?redirect=/parcours/ecrit-1");
