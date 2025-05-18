@@ -5,14 +5,16 @@ import {
     Box,
     Button,
     Dialog,
-    Text,
+    VStack, // Import VStack for layout
 } from '@chakra-ui/react';
 import { HiUpload } from 'react-icons/hi';
-import { FileUpload } from '@chakra-ui/react';
+import { FileUpload } from '@chakra-ui/react'; // Assuming this is a custom or library component
 import { useProfilePhoto } from '../useProfilePhoto';
+import { useUserWithClaims } from '@/lib/getUser'; // Import useUserWithClaims
 
 export default function ProfilePhotoUploader() {
-    const { savePhoto, loading } = useProfilePhoto();
+    const { user } = useUserWithClaims(); // Get user data
+    const { savePhoto, loading: savingPhoto } = useProfilePhoto(); // Renamed loading to savingPhoto for clarity
     const [file, setFile] = useState<File | null>(null);
     const [crop, setCrop] = useState({ x: 0, y: 0 });
     const [zoom, setZoom] = useState(1);
@@ -30,15 +32,23 @@ export default function ProfilePhotoUploader() {
     const onSave = async () => {
         if (!file || !area) return;
         const blob = await cropToBlob(file, area);
-        await savePhoto(blob);
+        await savePhoto(blob); // This should trigger a refresh of user.photoURL via onAuthStateChanged
         setOpen(false);
         setFile(null);
     };
 
     return (
-        <>
-            <FileUpload.Root onChange={onChoose}>
-                <FileUpload.Trigger>
+        <VStack gap={4} align="center">
+
+            <img
+                width={100}
+                height={100}
+                src={user?.photoURL || "/avatar.svg"} alt="Profile Photo"
+            />
+
+
+            < FileUpload.Root onChange={onChoose} >
+                <FileUpload.Trigger asChild>
                     <Button><HiUpload />Changer de photo</Button>
                 </FileUpload.Trigger>
             </FileUpload.Root>
@@ -65,8 +75,10 @@ export default function ProfilePhotoUploader() {
                         <Button variant="ghost" onClick={() => setOpen(false)}>
                             Annuler
                         </Button>
-                        {loading ? (
-                            <Text>Enregistrement…</Text>
+                        {savingPhoto ? (
+                            <Button loading colorPalette="green" loadingText="Enregistrement…">
+                                Enregistrer
+                            </Button>
                         ) : (
                             <Button colorPalette="green" onClick={onSave}>
                                 Enregistrer
@@ -75,7 +87,7 @@ export default function ProfilePhotoUploader() {
                     </Dialog.Footer>
                 </Dialog.Content>
             </Dialog.Root>
-        </>
+        </VStack >
     );
 }
 

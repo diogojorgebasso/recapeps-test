@@ -1,32 +1,40 @@
 'use client';
 
-import { Box, Flex, Heading, VStack, Spinner, Alert } from '@chakra-ui/react';
+import { Box, Flex, Heading, VStack, Spinner, Alert, Center, Text } from '@chakra-ui/react'; // Added Center, Text
 import ProfilePhotoUploader from './components/ProfilePhotoUploader';
 import ProfileDetailsForm from './components/ProfileDetailsForm';
 import SubscriptionSection from './components/SubscriptionSection';
 import EmailNotificationToggle from './components/EmailNotificationToggle';
-import { useEffect, useState } from 'react';
+// Removed useEffect and useState for error as user state will handle this
 import { useUserWithClaims } from '@/lib/getUser';
 
 export default function ProfilePage() {
     const { user, pro } = useUserWithClaims();
-    const [error, setError] = useState<string | null>(null);
 
-    console.log("user", user);
 
-    useEffect(() => {
-        if (!user) {
-            setError("Unable to load user profile. Please try again later.");
-        }
-    }, [user]);
+    // Handle loading state: user is undefined while onAuthStateChanged is resolving
+    if (user === undefined) {
+        return (
+            <Center h="calc(100vh - 200px)"> {/* Adjust height as needed */}
+                <Spinner />
+            </Center>
+        );
+    }
 
-    if (error || !user) return (
-        <Alert.Root status="error">
-            <Alert.Indicator />
-            {error || "Authentication error. Please refresh the page or sign in again."}
-        </Alert.Root>
-    );
+    // Handle not authenticated state: user is null after onAuthStateChanged resolved
+    if (user === null) {
+        return (
+            <Box p={6} display="flex" justifyContent="center" alignItems="center" minHeight="calc(100vh - 200px)">
+                <Alert.Root status="warning" variant="subtle" flexDirection="column" alignItems="center" justifyContent="center" textAlign="center" borderRadius="md" p={6}>
+                    <Alert.Indicator boxSize="40px" mr={0} mb={3} />
+                    <Heading size="md" mb={2}>Accès non autorisé</Heading>
+                    <Text>Veuillez vous connecter pour accéder à votre profil.</Text>
+                </Alert.Root>
+            </Box>
+        );
+    }
 
+    // At this point, user is a valid User object
     return (
         <Box p={6}>
             <Heading size="lg" mb={6}>
