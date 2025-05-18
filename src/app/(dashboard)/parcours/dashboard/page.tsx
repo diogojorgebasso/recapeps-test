@@ -25,7 +25,6 @@ import {
     ResponsiveContainer,
     Legend,
 } from "recharts";
-import { EmptyState } from "@/components/ui/empty-state";
 import Link from "next/link";
 import { findCompletedAttempts } from "@/repositories/quizRepo";
 import { QuizDone } from "@/types/Quiz";
@@ -74,22 +73,6 @@ export default function Page() {
             <Center h="100vh">
                 <Spinner size="xl" />
             </Center>
-        );
-    }
-
-    if (quizData.length === 0 && !isLoading) {
-        return (
-            <EmptyState
-                icon={<HiOutlineClipboardList size="48px" />}
-                title="Aucun résultat ou recommandation pour le moment"
-                description="Commencez par faire des quiz pour voir vos résultats et obtenir des recommandations personnalisées."
-            >
-                <HStack gap={4} mt={4}>
-                    <Link href="/parcours/oral-1">
-                        <Button variant="outline">Explorer les Oral 1</Button>
-                    </Link>
-                </HStack>
-            </EmptyState>
         );
     }
 
