@@ -46,9 +46,8 @@ export function useUserWithClaims() {
             }
         });
 
-        // Cleanup: Unsubscribe from the listener when the component unmounts.
         return unsubscribe;
-    }, []); // Empty dependency array: sets up the listener once on mount.
+    }, []);
 
     return { user, pro };
 }

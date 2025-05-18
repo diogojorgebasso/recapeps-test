@@ -35,30 +35,47 @@ export default function Page() {
     const { user } = useUserWithClaims();
     const [quizData, setQuizData] = useState<QuizDone[]>([]);
     const router = useRouter();
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoading, setIsLoading] = useState(true); // Initialize isLoading to true
     const currentEcritNumber = 1;
 
     useEffect(() => {
-        const loadData = async () => {
-            if (!user?.uid) {
-                router.push("/login");
-                return;
-            }
+        // Case 1: Auth state is still loading
+        if (user === undefined) {
+            setIsLoading(true); // Ensure loading spinner is shown
+            return;
+        }
 
-            const uid = user.uid;
+        if (user === null) {
+            router.push("/login");
+            return;
+        }
+
+        // Case 3: User is authenticated (user is a User object)
+        const loadData = async () => {
+            // No need to set isLoading(true) here if it's already true from initial state or user === undefined case
+            // However, if this effect could re-run for other reasons while user is defined,
+            // it might be safer to ensure it's true before an async operation.
+            // For this specific logic, it's okay as is, because the main loading is handled by the initial state.
+            // If data fetching itself is what we want to show a spinner for *after* auth is confirmed,
+            // then setIsLoading(true) here is appropriate.
+            // Given the outer isLoading state, this setIsLoading(true) inside loadData is redundant if
+            // the initial isLoading state is true and only set to false in the finally block.
+            // Let's keep it for clarity that this specific operation is "loading".
             setIsLoading(true);
             try {
-                const completedAttemptsData = await findCompletedAttempts({ uid, numberOfEcrit: currentEcritNumber, limitResult: 10 });
+                // user.uid is now guaranteed to be a string
+                const completedAttemptsData = await findCompletedAttempts({ uid: user.uid, numberOfEcrit: currentEcritNumber, limitResult: 10 });
                 setQuizData(completedAttemptsData);
             } catch (error) {
                 console.error("Erreur lors du chargement des données du tableau de bord:", error);
+                setQuizData([]); // Set to empty array on error
             } finally {
                 setIsLoading(false);
             }
         };
 
         loadData();
-    }, [user, router]);
+    }, [user, router]); // Dependencies are correct
     console.log("Quiz Data:", quizData);
 
 
