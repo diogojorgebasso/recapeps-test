@@ -7,8 +7,6 @@ import { getFirestore } from "firebase-admin/firestore";
 const db = getFirestore();
 
 export const transcribeuploaddocument = onObjectFinalized({
-    ingressSettings: "ALLOW_INTERNAL_ONLY",
-    serviceAccount: "transcribe-upload-document-run@recapeps-test.iam.gserviceaccount.com"
 }, async (event) => {
     const filePath = event.data.name; // Example: user/someUserId/transcripts/someTheme.webm
     // Updated regex to capture userId and the fileName (e.g., someTheme.webm)
@@ -51,11 +49,10 @@ export const transcribeuploaddocument = onObjectFinalized({
             const request = {
                 recognizer: `projects/recapeps-test/locations/global/recognizers/_`,
                 config: {
-                    languageCodes: ["fr-FR"],
-                    model: "latest_long",
+                    languageCode: "fr-FR",
+                    model: "chirp2",
                     profanityFilter: true,
                     enableAutomaticPunctuation: true, // Enable punctuation
-                    enableWordConfidence: true,       // Get confidence scores
                     enableSpokenPunctuation: true,    // Detect spoken punctuation
                     maxAlternatives: 1,
                     useEnhanced: true,                // Use enhanced model for better formatting

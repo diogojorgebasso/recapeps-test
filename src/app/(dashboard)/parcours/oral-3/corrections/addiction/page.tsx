@@ -4,17 +4,7 @@ import { Box, Heading, Text, VStack, List } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import getTranscription from "../getTranscription";
 import { useUserWithClaims } from "@/lib/getUser";
-
-// Define a basic interface for TranscriptionData
-interface TranscriptionData {
-  transcription: string;
-  originalFile: string;
-  theme: string;
-  fileName: string;
-  contentType: string;
-  fileSize: number;
-  createdAt: any; // Firestore Timestamp or similar
-}
+import { TranscriptionData } from "@/types/Transcript";
 
 export default function Page() {
   const [transcription, setTranscription] = useState<TranscriptionData | null>(null);
@@ -32,29 +22,53 @@ export default function Page() {
   useEffect(() => {
 
     if (!user) {
-      setError("User ID is missing.");
+      // If user is explicitly null or undefined after initial check, handle appropriately.
+      // For example, if useUserWithClaims initially returns undefined then null.
+      if (user === null) {
+        setError("Utilisateur non connecté."); // More specific error for null user
+      } else {
+        setError("User ID is missing.");
+      }
       setIsLoading(false);
       return;
     }
 
     const fetchTranscriptData = async () => {
+      const startTime = Date.now(); // Record start time
       setIsLoading(true);
       setError(null);
+
+      let data = null;
+      let fetchError: any = null;
+
       try {
         // Ensure getTranscription is compatible with the data it returns or cast appropriately
-        const data = await getTranscription(user?.uid, "addiction");
-        if (data) {
+        data = await getTranscription(user.uid, "addiction"); // Assuming user.uid is available
+      } catch (err: any) {
+        console.error("Failed to fetch transcription:", err);
+        fetchError = err;
+      }
+
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = 4000 - elapsedTime;
+
+      const updateState = () => {
+        if (fetchError) {
+          setError(fetchError.message || "Failed to load transcription.");
+          setTranscription(null);
+        } else if (data) {
           setTranscription(data as TranscriptionData);
         } else {
           setTranscription(null); // Explicitly set to null if no data
           setError("Transcription not found.");
         }
-      } catch (err: any) {
-        console.error("Failed to fetch transcription:", err);
-        setError(err.message || "Failed to load transcription.");
-        setTranscription(null);
-      } finally {
         setIsLoading(false);
+      };
+
+      if (remainingTime > 0) {
+        setTimeout(updateState, remainingTime);
+      } else {
+        updateState();
       }
     };
 
@@ -69,10 +83,28 @@ export default function Page() {
         {isLoading && <Text>Chargement de la transcription...</Text>}
         {error && <Text color="red.500">Erreur: {error}</Text>}
 
+        <Box
+          w={{ base: "90%", md: "70%", lg: "66%" }}
+          border="5px solid"
+          borderRadius="lg"
+          p={{ base: 4, md: 6 }}
+          boxShadow="md"
+          textAlign="center"
+          alignSelf={"center"}
+          my={"4"}
+        >
+          <Text fontWeight="bold">Sujet vie scolaire</Text>
+          <Text mt={4}>
+            Vous êtes professeur(e) d’Éducation Physique et Sportive dans un collège rural. Lors d’un CA, est constaté l’addiction des élèves aux écrans avec des conséquences sur les apprentissages.</Text>
+          <Text mt={2}>
+            Comment analysez-vous cette situation et quelles solutions envisagez-vous ?
+
+          </Text>
+        </Box>
+
         {transcription ? (
           <Box
             p={4}
-            bg="gray.50"
             borderRadius="md"
             borderWidth="1px"
             borderColor="gray.200"
@@ -93,25 +125,6 @@ export default function Page() {
             </Text>
           )
         )}
-
-        <Box
-          w={{ base: "90%", md: "70%", lg: "66%" }}
-          border="5px solid"
-          borderRadius="lg"
-          p={{ base: 4, md: 6 }}
-          boxShadow="md"
-          textAlign="center"
-          alignSelf={"center"}
-          my={"4"}
-        >
-          <Text fontWeight="bold">Sujet vie scolaire</Text>
-          <Text mt={4}>
-            Vous êtes professeur(e) d’Éducation Physique et Sportive dans un collège rural. Lors d’un CA, est constaté l’addiction des élèves aux écrans avec des conséquences sur les apprentissages.</Text>
-          <Text mt={2}>
-            Comment analysez-vous cette situation et quelles solutions envisagez-vous ?
-
-          </Text>
-        </Box>
 
         <Box bg="teal.500" p="3" borderRadius="lg" w="full">
           <Heading size="md" >Définitions</Heading>

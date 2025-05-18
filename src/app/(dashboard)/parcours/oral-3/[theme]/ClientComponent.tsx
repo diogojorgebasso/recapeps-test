@@ -29,7 +29,7 @@ export default function ClientComponent({ theme }: { theme: string }) {
 
         // If user is null, it means the user is not logged in after loading.
         if (user === null) {
-            router.push("/auth/login");
+            router.push("/login");
             return;
         }
 
@@ -233,7 +233,7 @@ export default function ClientComponent({ theme }: { theme: string }) {
                     type: "success",
                 });
                 // Pass transcriptionId as a query parameter
-                router.push(`${result.filePath}?transcriptionId=${result.transcriptionId}`);
+                router.push(`${result.filePath}`);
             } else {
                 console.error("File path is undefined or upload failed:", result.error);
                 toaster.create({

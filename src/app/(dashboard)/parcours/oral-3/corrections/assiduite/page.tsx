@@ -1,32 +1,127 @@
+"use client";
 import { Box, Heading, Text, VStack, List } from "@chakra-ui/react";
-import type { Metadata } from 'next' 
-export const metadata: Metadata = {
-  title: 'Correction oral 3 CAPEPS – Assiduité',
-  description: "Prépare-toi efficacement à l'oral 3 du CAPEPS avec cette correction complète d’un sujet sur l'assiduité : définition des mots clés, hypothèses explicatives, valeurs de la République, dilemme de l'enseignant et éléments de réponse.",
-}
+
+import { useEffect, useState } from "react";
+import getTranscription from "../getTranscription";
+import { useUserWithClaims } from "@/lib/getUser";
+import { TranscriptionData } from "@/types/Transcript";
 
 const Page = () => {
+
+  const [transcription, setTranscription] = useState<TranscriptionData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const { user } = useUserWithClaims();
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return bytes + " B";
+    else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + " KB";
+    else return (bytes / 1048576).toFixed(1) + " MB";
+  };
+
+  useEffect(() => {
+
+    if (!user) {
+      // If user is explicitly null or undefined after initial check, handle appropriately.
+      // For example, if useUserWithClaims initially returns undefined then null.
+      if (user === null) {
+        setError("Utilisateur non connecté."); // More specific error for null user
+      } else {
+        setError("User ID is missing.");
+      }
+      setIsLoading(false);
+      return;
+    }
+
+    const fetchTranscriptData = async () => {
+      const startTime = Date.now(); // Record start time
+      setIsLoading(true);
+      setError(null);
+
+      let data = null;
+      let fetchError: any = null;
+
+      try {
+        // Ensure getTranscription is compatible with the data it returns or cast appropriately
+        data = await getTranscription(user.uid, "assiduite"); // Assuming user.uid is available
+      } catch (err: any) {
+        console.error("Failed to fetch transcription:", err);
+        fetchError = err;
+      }
+
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = 4000 - elapsedTime;
+
+      const updateState = () => {
+        if (fetchError) {
+          setError(fetchError.message || "Failed to load transcription.");
+          setTranscription(null);
+        } else if (data) {
+          setTranscription(data as TranscriptionData);
+        } else {
+          setTranscription(null); // Explicitly set to null if no data
+          setError("Transcription not found.");
+        }
+        setIsLoading(false);
+      };
+
+      if (remainingTime > 0) {
+        setTimeout(updateState, remainingTime);
+      } else {
+        updateState();
+      }
+    };
+
+    fetchTranscriptData();
+  }, [user]);
+
   return (
-    <Box p={5} maxW="3/4" mx="auto"  boxShadow="md">
+    <Box p={5} maxW="3/4" mx="auto" boxShadow="md">
       <VStack align="start">
-      <Box
-        w={{ base: "90%", md: "70%", lg: "66%" }}
-        border="5px solid"
-        borderRadius="lg"
-        p={{ base: 4, md: 6 }}
-        boxShadow="md"
-        textAlign="center"
-        alignSelf={"center"}
-        my={"4"}
-      >
-        <Text fontWeight="bold">Sujet disciplinaire</Text>
-        <Text mt={4}>
-          Vous êtes professeur d&apos;EPS en lycée, le jour de l&apos;évaluation d&apos;un cycle de danse, une élève de seconde refuse catégoriquement de présenter sa chorégraphie avec son groupe devant toute la classe.
-        </Text>
-        <Text  mt={2}>
-          Comment analysez-vous cette situation et quelles solutions envisagez-vous ?
-        </Text>
-      </Box>
+        <Box
+          w={{ base: "90%", md: "70%", lg: "66%" }}
+          border="5px solid"
+          borderRadius="lg"
+          p={{ base: 4, md: 6 }}
+          boxShadow="md"
+          textAlign="center"
+          alignSelf={"center"}
+          my={"4"}
+        >
+          <Text fontWeight="bold">Sujet disciplinaire</Text>
+          <Text mt={4}>
+            Vous êtes professeur d&apos;EPS en lycée, le jour de l&apos;évaluation d&apos;un cycle de danse, une élève de seconde refuse catégoriquement de présenter sa chorégraphie avec son groupe devant toute la classe.
+          </Text>
+          <Text mt={2}>
+            Comment analysez-vous cette situation et quelles solutions envisagez-vous ?
+          </Text>
+        </Box>
+
+        {transcription ? (
+          <Box
+            p={4}
+            borderRadius="md"
+            borderWidth="1px"
+            borderColor="gray.200"
+            fontSize="md"
+            whiteSpace="pre-wrap"
+            w="full"
+          >
+            <Text fontWeight="bold">Fichier: {transcription.fileName}</Text>
+            <Text fontSize="sm" color="gray.500">
+              Taille: {formatFileSize(transcription.fileSize)} | Type: {transcription.contentType}
+            </Text>
+            <Text mt={2}>{transcription.transcription}</Text>
+          </Box>
+        ) : (
+          !isLoading && !error && (
+            <Text color="gray.500" fontStyle="italic">
+              Aucune transcription disponible pour l&apos;ID fourni ou les critères.
+            </Text>
+          )
+        )}
+
         <Box bg="teal.500" p="3" borderRadius="lg" w="full">
           <Heading size="md" >Définitions</Heading>
         </Box>

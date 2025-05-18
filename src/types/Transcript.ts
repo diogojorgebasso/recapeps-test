@@ -1,9 +1,9 @@
-interface TranscriptionData {
+export interface TranscriptionData {
     transcription: string;
     originalFile: string;
+    theme: string;
+    fileName: string;
     contentType: string;
     fileSize: number;
-    createdAt: {
-        toDate: () => Date;
-    };
+    createdAt: any; // Firestore Timestamp or similar
 }
