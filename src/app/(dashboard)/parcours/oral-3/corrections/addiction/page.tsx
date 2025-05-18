@@ -2,7 +2,6 @@
 
 import { Box, Heading, Text, VStack, List } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
-import { useSearchParams } from 'next/navigation'; // Import useSearchParams
 import getTranscription from "../getTranscription";
 import { useUserWithClaims } from "@/lib/getUser";
 
@@ -22,10 +21,7 @@ export default function Page() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const searchParams = useSearchParams(); // Get search params
-
-  // Placeholder for user ID - replace with your actual auth logic
-  const { user } = useUserWithClaims(); // Example: replace with actual user ID from auth context
+  const { user } = useUserWithClaims();
 
   const formatFileSize = (bytes: number) => {
     if (bytes < 1024) return bytes + " B";
@@ -34,10 +30,9 @@ export default function Page() {
   };
 
   useEffect(() => {
-    const transcriptionIdFromQuery = searchParams.get('transcriptionId');
 
-    if (!user || !transcriptionIdFromQuery) {
-      setError("User ID or Transcription ID is missing.");
+    if (!user) {
+      setError("User ID is missing.");
       setIsLoading(false);
       return;
     }
@@ -47,7 +42,7 @@ export default function Page() {
       setError(null);
       try {
         // Ensure getTranscription is compatible with the data it returns or cast appropriately
-        const data = await getTranscription(user?.uid, transcriptionIdFromQuery);
+        const data = await getTranscription(user?.uid, "addiction");
         if (data) {
           setTranscription(data as TranscriptionData);
         } else {
@@ -64,7 +59,7 @@ export default function Page() {
     };
 
     fetchTranscriptData();
-  }, [user, searchParams]); // Re-run if userId or searchParams change
+  }, [user]);
 
   return (
     <Box p={5} maxW="3/4" mx="auto" boxShadow="md">

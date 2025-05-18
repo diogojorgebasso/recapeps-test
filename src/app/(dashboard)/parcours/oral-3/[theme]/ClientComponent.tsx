@@ -8,14 +8,14 @@ import {
     Center,
     Heading,
     Text,
-    VStack,
     Dialog,
     Container,
-    CloseButton
+    CloseButton,
 } from "@chakra-ui/react";
 import { uploadRecordingAction } from "./uploadRecordingAction";
 import { getOral } from "./getOral";
 import { useUserWithClaims } from "@/lib/getUser";
+import { toaster, Toaster } from "@/components/ui/toaster";
 
 export default function ClientComponent({ theme }: { theme: string }) {
     const router = useRouter();
@@ -54,6 +54,7 @@ export default function ClientComponent({ theme }: { theme: string }) {
     const [isRecording, setIsRecording] = useState(false);
     const [timeLeft, setTimeLeft] = useState(180);
     const [open, setOpen] = useState(false);
+    const [isUploading, setIsUploading] = useState(false); // Add uploading state
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const audioChunksRef = useRef<Blob[]>([]);
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -201,23 +202,51 @@ export default function ClientComponent({ theme }: { theme: string }) {
     };
 
     const uploadRecording = async () => {
-        if (audioChunksRef.current.length === 0) return;
+        if (audioChunksRef.current.length === 0 || !user?.uid) {
+            toaster.create({
+                title: "Erreur",
+                description: "Aucun enregistrement à envoyer ou utilisateur non identifié.",
+                type: "error",
+            });
+            return;
+        }
+
+        setIsUploading(true); // Set uploading state to true
+        toaster.create({
+            title: "Upload en cours...",
+            description: "Votre enregistrement est en cours d'envoi.",
+            type: "info",
+        });
 
         try {
             const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
             const formData = new FormData();
-            // Use a filename that the server action can recognize
             formData.append('audioBlob', blob, `oral_${theme}.webm`);
 
-            const result = await uploadRecordingAction(formData, user?.uid || "", theme);
+            const result = await uploadRecordingAction(formData, user.uid, theme);
 
-            if (result.filePath) {
-                router.push(result.filePath);
+
+            if (result.success && result.filePath && result.transcriptionId) {
+                toaster.create({
+                    title: "Upload réussi!",
+                    description: "Redirection vers la page de correction.",
+                    type: "success",
+                });
+                // Pass transcriptionId as a query parameter
+                router.push(`${result.filePath}?transcriptionId=${result.transcriptionId}`);
             } else {
-                console.error("File path is undefined.");
+                console.error("File path is undefined or upload failed:", result.error);
+                toaster.create({
+                    title: "Erreur d'upload",
+                    description: result.error || "Une erreur est survenue lors de l'upload.",
+                    type: "error",
+                });
             }
         } catch (error) {
-            console.error("Error uploading recording:", error);
+            console.error("Error uploading recording:", error)
+        } finally {
+            setIsUploading(false); // Reset uploading state
+            setOpen(false); // Close dialog after attempting upload
         }
     };
 
@@ -229,59 +258,57 @@ export default function ClientComponent({ theme }: { theme: string }) {
 
     return (
         <Container maxW="container.md" py={8}>
-            <VStack gap={8}>
-                <Center>
-                    <Heading size="xl" textAlign="center">{theme}</Heading>
-                    <Text fontSize="lg" color="gray.500" mt={2}>
-                        {title}
-                    </Text>
-                    <Text fontSize="lg" color="gray.500" mt={2}>
-                        Comment analysez-vous cette situation et quelles solutions envisagez-vous ?
-                    </Text>
-                </Center>
+            <Toaster />
+            <Heading size="xl" textAlign="center">{theme}</Heading>
+            <Text fontSize="lg" mt={2}>
+                {title}
+            </Text>
+            <Text fontSize="lg" mt={2}>
+                Comment analysez-vous cette situation et quelles solutions envisagez-vous ?
+            </Text>
 
-                <Box
-                    width="100%"
-                    height="120px"
-                    bg="gray.50"
-                    borderRadius="md"
-                    border="1px solid"
-                    borderColor="gray.200"
-                    overflow="hidden"
-                >
-                    <canvas
-                        ref={canvasRef}
-                        width="800"
-                        height="120"
-                        style={{ width: '100%', height: '100%' }}
-                    />
-                </Box>
+            <Box
+                width="100%"
+                height="120px"
+                bg="gray.50"
+                borderRadius="md"
+                border="1px solid"
+                borderColor="gray.200"
+                overflow="hidden"
+            >
+                <canvas
+                    ref={canvasRef}
+                    width="800"
+                    height="120"
+                    style={{ width: '100%', height: '100%' }}
+                />
+            </Box>
 
-                <Text
-                    fontSize="4xl"
-                    fontWeight="bold"
-                    fontFamily="mono"
-                    color={timeLeft <= 30 ? "red.500" : ""}
-                >
-                    {formatTime(timeLeft)}
-                </Text>
+            <Text
+                fontSize="4xl"
+                fontWeight="bold"
+                fontFamily="mono"
+                color={timeLeft <= 30 ? "red.500" : ""}
+            >
+                {formatTime(timeLeft)}
+            </Text>
 
-                <Button
-                    size="lg"
-                    height="70px"
-                    width="220px"
-                    colorPalette={isRecording ? "red" : "teal"}
-                    onClick={isRecording ? stopRecording : startRecording}
-                    boxShadow="md"
-                    _hover={{ transform: 'scale(1.05)' }}
-                    transition="all 0.2s"
-                    borderRadius="full"
-                >
-                    {isRecording ? "Arrêter l'enregistrement" : "Démarrer l'enregistrement"}
-                </Button>
-            </VStack>
+            <Button
+                size="lg"
+                height="70px"
+                width="220px"
+                colorPalette={isRecording ? "red" : "teal"} // Use colorPalette for Chakra UI v2+
+                onClick={isRecording ? stopRecording : startRecording}
+                boxShadow="md"
+                _hover={{ transform: 'scale(1.05)' }}
+                transition="all 0.2s"
+                borderRadius="full"
+                disabled={isUploading} // Disable button when uploading
+            >
+                {isRecording ? "Arrêter l'enregistrement" : "Démarrer l'enregistrement"}
+            </Button>
 
-            <Dialog.Root open={open} onOpenChange={(e) => setOpen(e.open)}>
+            <Dialog.Root open={open} onOpenChange={(e) => { if (!isUploading) setOpen(e.open) }}> {/* Prevent closing dialog by clicking outside when uploading */}
                 <Dialog.Backdrop />
                 <Dialog.Positioner>
                     <Dialog.Content>
@@ -291,23 +318,31 @@ export default function ClientComponent({ theme }: { theme: string }) {
                             </Dialog.Title>
                         </Dialog.Header>
                         <Dialog.Body>
-                            <Text>Le temps est écoulé</Text>
+                            <Text>{timeLeft === 0 ? "Le temps est écoulé." : "Vous avez arrêté l'enregistrement."}</Text>
+                            <Text>Souhaitez-vous voir la correction ?</Text>
                         </Dialog.Body>
                         <Dialog.Footer>
-                            <Dialog.ActionTrigger asChild>
-                                <Button variant="ghost">
+                            <Dialog.CloseTrigger asChild>
+                                <Button variant="ghost" disabled={isUploading}>
                                     Continuer à réfléchir
                                 </Button>
-                            </Dialog.ActionTrigger>
-                            <Dialog.ActionTrigger asChild>
-                                <Button colorPalette="blue" mr={3} onClick={uploadRecording}>
-                                    Voir la correction !
-                                </Button>
-                            </Dialog.ActionTrigger>
+                            </Dialog.CloseTrigger>
+                            <Button
+                                colorPalette="blue" // Use colorPalette
+                                mr={3}
+                                onClick={uploadRecording}
+                                loading={isUploading} // Show loading spinner
+                                loadingText="Envoi..." // Text shown with spinner
+                                disabled={isUploading}
+                            >
+                                Voir la correction !
+                            </Button>
                         </Dialog.Footer>
-                        <Dialog.CloseTrigger asChild>
-                            <CloseButton size="sm" />
-                        </Dialog.CloseTrigger>
+                        {!isUploading && ( // Only show close button if not uploading
+                            <Dialog.CloseTrigger asChild>
+                                <CloseButton size="sm" />
+                            </Dialog.CloseTrigger>
+                        )}
                     </Dialog.Content>
                 </Dialog.Positioner>
             </Dialog.Root>

@@ -102,7 +102,7 @@ export default function Page() {
             >
                 <HStack gap={4} mt={4}>
                     <Link href={`/parcours/ecrit-${currentEcritNumber}`}>
-                        <Button colorScheme="green">Explorer les quiz (Écrit {currentEcritNumber})</Button>
+                        <Button colorPalette="green">Explorer les quiz (Écrit {currentEcritNumber})</Button>
                     </Link>
                     <Link href="/parcours/oral-1">
                         <Button variant="outline">Explorer les Oral 1</Button>
@@ -197,7 +197,7 @@ export default function Page() {
                                 </Card.Body>
                                 <Card.Footer>
                                     <Link href={`/parcours/ecrit-${currentEcritNumber}/${quiz.id}`} passHref>
-                                        <Button colorScheme="green" variant="solid" width="full">
+                                        <Button colorPalette="green" variant="solid" width="full">
                                             Commencer le quiz
                                         </Button>
                                     </Link>

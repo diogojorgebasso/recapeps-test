@@ -136,7 +136,7 @@ export default function NotificationsContainer() {
         <Box>
             <Button
                 onClick={handleTokenSubmit}
-                colorScheme={subscriptionStatus === 'error' ? 'red' : subscriptionStatus === 'success' ? 'green' : 'teal'}
+                colorPalette={subscriptionStatus === 'error' ? 'red' : subscriptionStatus === 'success' ? 'green' : 'teal'}
                 fontWeight="bold"
                 py={4}
                 px={8}
