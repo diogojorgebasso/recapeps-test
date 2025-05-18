@@ -90,6 +90,77 @@ function ExamCard({
     );
 }
 
+function ExamCard2({
+    id,
+    name,
+    IconCard,
+    premium,
+    isUserPro,
+}: {
+    id: string;
+    name: string;
+    IconCard: IconType;
+    premium: boolean;
+    isUserPro: boolean;
+}) {
+    const blocked = premium && !isUserPro;
+
+    return (
+        <Card.Root
+            role="group"
+            borderWidth="1px"
+            shadow="sm"
+            rounded="lg"
+            overflow="hidden"
+            position="relative"
+            _hover={{ shadow: "md", transform: "translateY(-2px)", transition: "all 0.15s" }}
+        >
+            <Flex
+                align="center"
+                justify="center"
+                pt={8}
+                pb={4}
+                color={blocked ? "gray.400" : "blue.500"}
+                _groupHover={{ color: blocked ? "gray.400" : "blue.600" }}
+            >
+                <IconCard />
+            </Flex>
+
+            <CardBody textAlign="center" px={4} pb={blocked ? 2 : 4}>
+                <Heading as="h3" size="md">
+                    {name}
+                </Heading>
+                {blocked && (
+                    <Text mt={1} fontSize="sm" color="gray.500">
+                        Contenu réservé aux membres&nbsp;Pro
+                    </Text>
+                )}
+            </CardBody>
+
+            <CardFooter justifyContent="center" py={4}>
+                {blocked ? (
+                    <Button asChild size="sm" variant="solid">
+                        <Link href="/abonnement">
+                            Passer à Pro
+                        </Link>
+                    </Button>
+                ) : (
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        asChild
+                    >
+                        <Link href={`/parcours/oral-3/fiches/${id}`}>
+                            Voir plus
+                        </Link>
+                    </Button>
+                )}
+            </CardFooter>
+        </Card.Root>
+    );
+}
+
+
 export default async function Page() {
     const { pro } = await getAuthenticatedAppForUser();
 
@@ -117,7 +188,7 @@ export default async function Page() {
             <Heading id="fiches">Fiches de révision</Heading>
             <SimpleGrid columns={{ base: 1, sm: 2, lg: 3 }} gap={6} mt={4}>
                 {subjects2.map(({ id, name, icon, premium }) => (
-                    <ExamCard
+                    <ExamCard2
                         key={id}
                         id={id}
                         name={name}

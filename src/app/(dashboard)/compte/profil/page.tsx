@@ -34,7 +34,6 @@ export default function ProfilePage() {
         );
     }
 
-    // At this point, user is a valid User object
     return (
         <Box p={6}>
             <Heading size="lg" mb={6}>
@@ -42,9 +41,6 @@ export default function ProfilePage() {
             </Heading>
 
             <Flex gap={10} align="flex-start" direction={{ base: "column", md: "row" }}>
-                <VStack gap={4}>
-                    <ProfilePhotoUploader />
-                </VStack>
 
                 <ProfileDetailsForm
                     defaultFirst={user.displayName?.split(' ')[0] ?? ''}
