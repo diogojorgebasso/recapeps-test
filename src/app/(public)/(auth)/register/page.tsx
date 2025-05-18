@@ -80,6 +80,7 @@ export default function Register() {
             const validated = registerSchema.parse(formData);
             setIsLoading(true);
             await registerWithEmailAndPassword(validated.email, validated.password, validated.name ?? undefined);
+            console.log("Redirecting to verify email");
             router.push("/verify-email");
         } catch (err) {
             if (err instanceof z.ZodError) {

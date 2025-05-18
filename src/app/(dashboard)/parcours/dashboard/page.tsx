@@ -29,24 +29,27 @@ import Link from "next/link";
 import { findCompletedAttempts } from "@/repositories/quizRepo";
 import { QuizDone } from "@/types/Quiz";
 import { useUserWithClaims } from "@/lib/getUser";
+import { useRouter } from "next/router";
 
 export default function Page() {
     const { user } = useUserWithClaims();
     const [quizData, setQuizData] = useState<QuizDone[]>([]);
-
+    const router = useRouter();
     const [isLoading, setIsLoading] = useState(true);
     const currentEcritNumber = 1;
 
     useEffect(() => {
         const loadData = async () => {
-            if (!user) {
+            if (!user?.uid) {
                 setIsLoading(false);
+                router.push("/login");
                 return;
             }
 
+            const uid = user.uid;
             setIsLoading(true);
             try {
-                const completedAttemptsData = await findCompletedAttempts({ uid: user.uid, numberOfEcrit: currentEcritNumber, limitResult: 10 });
+                const completedAttemptsData = await findCompletedAttempts({ uid, numberOfEcrit: currentEcritNumber, limitResult: 10 });
                 setQuizData(completedAttemptsData);
             } catch (error) {
                 console.error("Erreur lors du chargement des données du tableau de bord:", error);
@@ -56,7 +59,7 @@ export default function Page() {
         };
 
         loadData();
-    }, [user]);
+    }, [user, router]);
     console.log("Quiz Data:", quizData);
 
 
