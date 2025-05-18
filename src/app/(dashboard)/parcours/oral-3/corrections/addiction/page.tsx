@@ -4,11 +4,9 @@ import { Box, Heading, Text, VStack, List, Spinner, Alert } from "@chakra-ui/rea
 import { useEffect, useState, useRef } from "react";
 import { useUserWithClaims } from "@/lib/getUser";
 import { TranscriptionData, TranscriptionStatus } from "@/types/Transcript";
-import { useSearchParams } from 'next/navigation';
 import { db, storage } from "@/lib/firebase/clientApp";
 import { doc, onSnapshot, Unsubscribe } from "firebase/firestore";
 import { ref as storageRef, getBlob } from "firebase/storage";
-import { toaster } from "@/components/ui/toaster";
 
 // Define SpeechApiResponse interface locally if not imported from elsewhere
 interface SpeechApiResponseAlternative {
@@ -37,27 +35,20 @@ const formatFileSize = (bytes?: number): string => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 };
 
-
 export default function Page() {
   const [transcriptionDocData, setTranscriptionDocData] = useState<TranscriptionData | null>(null);
   const [fetchedTranscriptionText, setFetchedTranscriptionText] = useState<string | null>(null);
   const [currentStatus, setCurrentStatus] = useState<TranscriptionStatus>("processing"); // Start with processing
   const [error, setError] = useState<string | null>(null);
-  const searchParams = useSearchParams();
-  const transcriptionIdFromQuery = searchParams.get('transcriptionId'); // This should be the 'theme'
 
   const { user } = useUserWithClaims();
   const unsubscribeRef = useRef<Unsubscribe | null>(null);
   const [isFetchingText, setIsFetchingText] = useState(false);
 
   useEffect(() => {
-    if (!user || !transcriptionIdFromQuery) {
-      if (user === null && !transcriptionIdFromQuery) {
+    if (!user) {
+      if (user === null) {
         setError("Utilisateur non connecté ou ID de transcription manquant.");
-      } else if (user === null) {
-        setError("Utilisateur non connecté.");
-      } else if (!transcriptionIdFromQuery) {
-        setError("ID de transcription manquant dans l'URL.");
       }
       setCurrentStatus("error");
       return;
@@ -70,7 +61,7 @@ export default function Page() {
     setFetchedTranscriptionText(null); // Reset fetched text when ID changes
     setIsFetchingText(false);
 
-    const transcriptDocRef = doc(db, "users", user.uid, "transcripts", transcriptionIdFromQuery);
+    const transcriptDocRef = doc(db, "users", user.uid, "transcripts", "addiction");
 
     unsubscribeRef.current = onSnapshot(transcriptDocRef, async (docSnap) => {
       if (docSnap.exists()) {
@@ -79,7 +70,7 @@ export default function Page() {
         setCurrentStatus(data.status || "processing");
         setError(null);
 
-        if (data.status === "completed" && data.transcriptionJsonPath) { // Use transcriptionJsonPath
+        if (data.status === "completed" && data.transcriptionJsonPath) {
           if (!fetchedTranscriptionText && !isFetchingText) {
             setIsFetchingText(true);
             try {
@@ -114,7 +105,6 @@ export default function Page() {
             } catch (fetchError: any) {
               console.error("Error fetching or parsing transcription JSON from GCS:", fetchError);
               setError("Impossible de charger ou d'analyser le fichier de transcription.");
-              toaster.create({ title: "Erreur de chargement", description: "Le fichier de transcription n'a pas pu être récupéré ou analysé.", type: "error" });
               // Fallback to direct transcription field if it exists (e.g., for older error messages)
               setFetchedTranscriptionText(data.transcription || "Erreur lors du chargement du texte.");
             } finally {
@@ -138,7 +128,6 @@ export default function Page() {
       setError("Erreur de connexion au suivi de la transcription.");
       setCurrentStatus("error");
       setTranscriptionDocData(null);
-      toaster.create({ title: "Erreur de Suivi", description: "Impossible de suivre l'état de la transcription.", type: "error" });
     });
 
     // Cleanup listener on component unmount
@@ -147,13 +136,13 @@ export default function Page() {
         unsubscribeRef.current();
       }
     };
-  }, [user, transcriptionIdFromQuery, fetchedTranscriptionText, isFetchingText]);
+  }, [user, fetchedTranscriptionText, isFetchingText]);
 
   return (
     <Box p={5} maxW="3/4" mx="auto" boxShadow="md">
       <VStack align="start" gap={4}>
 
-        <Heading size="lg">Transcription de l&apos;enregistrement (Thème: {transcriptionIdFromQuery || 'N/A'})</Heading>
+        <Heading size="lg">Transcription de l&apos;enregistrement</Heading>
 
         {(currentStatus === "processing" || (currentStatus === "completed" && isFetchingText)) && (
           <Alert.Root status="info" variant="subtle" flexDirection="column" alignItems="center" justifyContent="center" textAlign="center" height="200px">
@@ -182,7 +171,7 @@ export default function Page() {
         )}
         {currentStatus === "error_unsupported_type" && (
           <Alert.Root status="warning">
-            <Alert.Indicator /> {/* Default Chakra icon or your custom one */}
+            <Alert.Indicator />
             <Alert.Content>
               <Alert.Title>Type de fichier non supporté</Alert.Title>
               <Alert.Description>La transcription n&apos;a pas pu être effectuée pour ce fichier.</Alert.Description>

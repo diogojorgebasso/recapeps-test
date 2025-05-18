@@ -7,17 +7,27 @@ const db = getFirestore();
 
 export const transcribeuploaddocument = onObjectFinalized(async (event) => {
     const filePath = event.data.name; // Example: user/someUserId/transcripts/someTheme.webm
-    const pathMatch = filePath.match(/^user\/(.*?)\/transcripts\/(.*?)$/);
+    // Regex updated to only match files directly under transcripts/ and not in subdirectories.
+    // It captures userId and the filename with extension.
+    const pathMatch = filePath.match(/^user\/(.*?)\/transcripts\/([^/]+)$/);
 
     if (!pathMatch) {
-        info(`File ${filePath} does not match the target path pattern. Skipping.`);
+        info(`File ${filePath} does not match the target path pattern (user/{uid}/transcripts/{filename}). Skipping.`);
+        return;
+    }
+
+    const userId = pathMatch[1];
+    const fileNameWithExtension = pathMatch[2]; // e.g., someTheme.webm
+
+    // Check if the file has a supported audio extension
+    const audioExtensions = /\.(webm|mp3|wav|ogg|aac|flac|m4a)$/i;
+    if (!audioExtensions.test(fileNameWithExtension)) {
+        info(`File ${filePath} is not a supported audio file type. Skipping.`);
         return;
     }
 
     const speechClient = new speech.SpeechClient();
-    const userId = pathMatch[1];
-    const fileNameWithExtension = pathMatch[2]; // e.g., someTheme.webm
-    const theme = fileNameWithExtension.replace(/\.(webm|mp3|wav|ogg|aac|flac|m4a)$/i, '');
+    const theme = fileNameWithExtension.replace(audioExtensions, ''); // Use the regex for stripping extension
     const bucketName = event.data.bucket;
     const fileSize = event.data.size; // Get file size
     const contentType = event.data.contentType; // Get content type
