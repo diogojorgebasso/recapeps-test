@@ -7,20 +7,20 @@ export async function uploadRecordingAction(formData: FormData, userId: string, 
     if (!file) {
         return { success: false, error: "No audio file received." };
     }
-    const originalFileName = file.name; // Capture the original file name
 
     try {
-        const blob = new Blob([file], { type: file.type || 'audio/webm' }); // Use file.type if available
-        // Construct the full path in Firebase Storage, incorporating the theme as a directory
-        // and using the original file name.
-        const storagePath = `user/${userId}/transcripts/${theme}/${originalFileName}`;
+        const blob = new Blob([file], { type: file.type || 'audio/webm' });
+        // Storage path will be user/{userId}/transcripts/{theme}.webm
+        // Assuming one recording per theme, identified by the theme name with a .webm extension.
+        const storageFileName = `${theme}.webm`;
+        const storagePath = `user/${userId}/transcripts/${storageFileName}`;
         const storageRef = ref(storage, storagePath);
 
         await uploadBytes(storageRef, blob);
 
         const redirectionFilePath = `/parcours/oral-3/corrections/${theme}`;
-        // This ID will be used to fetch the specific transcription later.
-        const transcriptionId = `${theme}-${originalFileName}`;
+        // The transcriptionId is now simply the theme.
+        const transcriptionId = theme;
 
         return { success: true, filePath: redirectionFilePath, transcriptionId: transcriptionId };
     } catch (error: any) {

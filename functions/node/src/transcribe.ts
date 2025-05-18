@@ -10,9 +10,9 @@ export const transcribeuploaddocument = onObjectFinalized({
     ingressSettings: "ALLOW_INTERNAL_ONLY",
     serviceAccount: "transcribe-upload-document-run@recapeps-test.iam.gserviceaccount.com"
 }, async (event) => {
-    const filePath = event.data.name; // Example: user/someUserId/transcripts/someTheme/myAudio.webm
-    // Updated regex to capture userId, theme, and fileName from the path
-    const pathMatch = filePath.match(/^user\/(.*?)\/transcripts\/(.*?)\/(.*?)$/);
+    const filePath = event.data.name; // Example: user/someUserId/transcripts/someTheme.webm
+    // Updated regex to capture userId and the fileName (e.g., someTheme.webm)
+    const pathMatch = filePath.match(/^user\/(.*?)\/transcripts\/(.*?)$/);
 
     const speechClient = new speech.SpeechClient();
 
@@ -22,18 +22,22 @@ export const transcribeuploaddocument = onObjectFinalized({
     }
 
     const userId = pathMatch[1];
-    const theme = pathMatch[2]; // Extracted theme
-    const fileName = pathMatch[3]; // Extracted original file name (e.g., myAudio.webm)
+    const fileNameWithExtension = pathMatch[2]; // e.g., someTheme.webm
+
+    // Extract theme by removing the expected extension (e.g., .webm)
+    // This assumes a consistent extension, adjust if necessary.
+    const theme = fileNameWithExtension.replace(/\.(webm|mp3|wav|ogg|aac|flac|m4a)$/i, '');
+
 
     info(`File path: ${filePath}`);
-    // Log the extracted theme and fileName
-    info(`User ID: ${userId}, Theme: ${theme}, File Name: ${fileName}`);
+    // Log the extracted userId, theme, and full fileName
+    info(`User ID: ${userId}, Theme: ${theme}, File Name: ${fileNameWithExtension}`);
 
     const bucketName = event.data.bucket;
     const gcsUri = `gs://${bucketName}/${filePath}`;
 
     // Use theme and fileName for logging purposes
-    info(`Processing transcription for user ${userId}, theme ${theme}, file ${fileName}`);
+    info(`Processing transcription for user ${userId}, theme ${theme}, file ${fileNameWithExtension}`);
 
     try {
         const bucket = admin.storage().bucket(bucketName);
@@ -86,15 +90,14 @@ export const transcribeuploaddocument = onObjectFinalized({
         }
 
         // Save to Firestore
-        // The document ID in Firestore will be a combination of theme and fileName
-        // to ensure uniqueness and retrievability.
-        const firestoreDocId = `${theme}-${fileName}`;
+        // The document ID in Firestore will be the theme.
+        const firestoreDocId = theme;
         const docRef = db.collection("users").doc(userId).collection("transcripts").doc(firestoreDocId);
         await docRef.set({
             transcription: transcriptionText,
             originalFile: filePath, // Store the full GCS path
-            theme: theme, // Store theme separately
-            fileName: fileName, // Store original file name separately
+            theme: theme, // Store theme
+            fileName: fileNameWithExtension, // Store the file name (e.g., theme.webm)
             contentType: contentType,
             fileSize: metadata.size,
             createdAt: admin.firestore.FieldValue.serverTimestamp()

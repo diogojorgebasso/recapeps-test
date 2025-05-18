@@ -1,15 +1,31 @@
-import { Box, Heading, Text, VStack, List } from "@chakra-ui/react";
-import type { Metadata } from 'next'
-import { useEffect, useState } from "react";
-import getTranscription from "../getTranscription";
+"use client";
 
-export const metadata: Metadata = {
-  title: 'Correction oral 3 CAPEPS - Addiction',
-  description: "Prépare-toi efficacement à l'oral 3 du CAPEPS avec cette correction complète d’un sujet sur l’addiction : définition des mots clés, hypothèses explicatives, valeurs de la République, dilemme de l'enseignant et éléments de réponse.",
+import { Box, Heading, Text, VStack, List } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from 'next/navigation'; // Import useSearchParams
+import getTranscription from "../getTranscription";
+import { useUserWithClaims } from "@/lib/getUser";
+
+// Define a basic interface for TranscriptionData
+interface TranscriptionData {
+  transcription: string;
+  originalFile: string;
+  theme: string;
+  fileName: string;
+  contentType: string;
+  fileSize: number;
+  createdAt: any; // Firestore Timestamp or similar
 }
 
 export default function Page() {
   const [transcription, setTranscription] = useState<TranscriptionData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const searchParams = useSearchParams(); // Get search params
+
+  // Placeholder for user ID - replace with your actual auth logic
+  const { user } = useUserWithClaims(); // Example: replace with actual user ID from auth context
 
   const formatFileSize = (bytes: number) => {
     if (bytes < 1024) return bytes + " B";
@@ -17,31 +33,70 @@ export default function Page() {
     else return (bytes / 1048576).toFixed(1) + " MB";
   };
 
-  useEffect(async () => {
-    const fetchTranscript = await getTranscript();
-  }, []);
+  useEffect(() => {
+    const transcriptionIdFromQuery = searchParams.get('transcriptionId');
+
+    if (!user || !transcriptionIdFromQuery) {
+      setError("User ID or Transcription ID is missing.");
+      setIsLoading(false);
+      return;
+    }
+
+    const fetchTranscriptData = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        // Ensure getTranscription is compatible with the data it returns or cast appropriately
+        const data = await getTranscription(user?.uid, transcriptionIdFromQuery);
+        if (data) {
+          setTranscription(data as TranscriptionData);
+        } else {
+          setTranscription(null); // Explicitly set to null if no data
+          setError("Transcription not found.");
+        }
+      } catch (err: any) {
+        console.error("Failed to fetch transcription:", err);
+        setError(err.message || "Failed to load transcription.");
+        setTranscription(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTranscriptData();
+  }, [user, searchParams]); // Re-run if userId or searchParams change
 
   return (
-
     <Box p={5} maxW="3/4" mx="auto" boxShadow="md">
-      <VStack align="start">
+      <VStack align="start" gap={4}>
 
-        {transcription?.transcription ? (
+        <Heading size="lg">Transcription de l&apos;enregistrement</Heading>
+        {isLoading && <Text>Chargement de la transcription...</Text>}
+        {error && <Text color="red.500">Erreur: {error}</Text>}
+
+        {transcription ? (
           <Box
             p={4}
             bg="gray.50"
             borderRadius="md"
             borderWidth="1px"
-            borderColor={borderColor}
+            borderColor="gray.200"
             fontSize="md"
             whiteSpace="pre-wrap"
+            w="full"
           >
-            {transcription.transcription}
+            <Text fontWeight="bold">Fichier: {transcription.fileName}</Text>
+            <Text fontSize="sm" color="gray.500">
+              Taille: {formatFileSize(transcription.fileSize)} | Type: {transcription.contentType}
+            </Text>
+            <Text mt={2}>{transcription.transcription}</Text>
           </Box>
         ) : (
-          <Text color="gray.500" fontStyle="italic">
-            Aucune transcription disponible.
-          </Text>
+          !isLoading && !error && (
+            <Text color="gray.500" fontStyle="italic">
+              Aucune transcription disponible pour l&apos;ID fourni ou les critères.
+            </Text>
+          )
         )}
 
         <Box
