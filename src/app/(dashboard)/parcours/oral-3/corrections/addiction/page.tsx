@@ -106,7 +106,6 @@ export default function Page() {
                 const blob = await getBlob(fileRef);
                 const jsonText = await blob.text();
                 const speechApiOutput = JSON.parse(jsonText) as SpeechApiResponse;
-
                 if (speechApiOutput.results && speechApiOutput.results.length > 0) {
                   const combinedTranscript = speechApiOutput.results
                     .map(result => result.alternatives?.[0]?.transcript?.trim() ?? "")

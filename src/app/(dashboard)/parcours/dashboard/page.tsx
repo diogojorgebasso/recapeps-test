@@ -14,7 +14,7 @@ import {
     Center,
 } from "@chakra-ui/react";
 
-import { HiOutlineClipboardList, HiOutlineSparkles } from "react-icons/hi";
+import { HiOutlineSparkles } from "react-icons/hi";
 import {
     LineChart,
     Line,
@@ -154,6 +154,11 @@ export default function Page() {
                         <Card.Header>
                             <Heading size="md">Oral 1</Heading>
                         </Card.Header>
+                        <Card.Body>
+                            <Text fontSize="sm" color="gray.500">
+                                Préparez-vous pour l&apos;oral 1 avec nos fiches de révision.
+                            </Text>
+                        </Card.Body>
                         <Card.Footer>
                             <Link href={`/parcours/oral-1`} passHref>
                                 <Button colorPalette="green" variant="solid" width="full">
@@ -166,8 +171,13 @@ export default function Page() {
                         <Card.Header>
                             <Heading size="md">Oral 3</Heading>
                         </Card.Header>
+                        <Card.Body>
+                            <Text fontSize="sm" color="gray.500">
+                                Préparez-vous pour l&apos;oral 3 avec nos fiches de révision.
+                            </Text>
+                        </Card.Body>
                         <Card.Footer>
-                            <Link href={`/parcours/oral-1#fiches`} passHref>
+                            <Link href={`/parcours/oral-3#fiches`} passHref>
                                 <Button colorPalette="green" variant="solid" width="full">
                                     Voir les fiches
                                 </Button>

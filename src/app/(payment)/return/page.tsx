@@ -34,7 +34,6 @@ export default async function Return({
                 alignItems="center"
                 justifyContent="center"
                 minH="100vh"
-                bg="gray.50"
                 p={8}
             >
                 <Box
@@ -44,7 +43,6 @@ export default async function Return({
                     borderWidth="1px"
                     borderRadius="lg"
                     boxShadow="xl"
-                    bg="white"
                     textAlign="center"
                     maxW="md"
                 >
@@ -74,7 +72,7 @@ export default async function Return({
                             mt={6}
                             asChild
                         >
-                            <Link href="/parcours/dashboard">
+                            <Link href="/parcours/dashboard?refresh_claims=true">
                                 Accéder à mon tableau de bord
                             </Link>
                         </Button>
