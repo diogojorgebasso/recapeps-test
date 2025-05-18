@@ -1,14 +1,42 @@
 "use client";
 
-import { Box, Heading, Text, VStack, List, Spinner, Alert } from "@chakra-ui/react"; // Keep existing imports for now, Alert might be from a different import if it's a custom component
+import { Box, Heading, Text, VStack, List, Spinner, Alert } from "@chakra-ui/react";
 import { useEffect, useState, useRef } from "react";
 import { useUserWithClaims } from "@/lib/getUser";
 import { TranscriptionData, TranscriptionStatus } from "@/types/Transcript";
 import { useSearchParams } from 'next/navigation';
-import { db, storage } from "@/lib/firebase/clientApp"; // Import clientStorage
+import { db, storage } from "@/lib/firebase/clientApp";
 import { doc, onSnapshot, Unsubscribe } from "firebase/firestore";
-import { ref as storageRef, getBlob } from "firebase/storage"; // For fetching from GCS
+import { ref as storageRef, getBlob } from "firebase/storage";
 import { toaster } from "@/components/ui/toaster";
+
+// Define SpeechApiResponse interface locally if not imported from elsewhere
+interface SpeechApiResponseAlternative {
+  transcript?: string;
+  confidence?: number;
+  // other properties if any
+}
+
+interface SpeechApiResult {
+  alternatives?: SpeechApiResponseAlternative[];
+  // other properties if any
+}
+
+interface SpeechApiResponse {
+  results?: SpeechApiResult[];
+  // other properties if any
+}
+
+// Placeholder for formatFileSize to prevent runtime errors
+const formatFileSize = (bytes?: number): string => {
+  if (bytes === undefined || bytes === null) return 'N/A';
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+};
+
 
 export default function Page() {
   const [transcriptionDocData, setTranscriptionDocData] = useState<TranscriptionData | null>(null);
@@ -22,14 +50,7 @@ export default function Page() {
   const unsubscribeRef = useRef<Unsubscribe | null>(null);
   const [isFetchingText, setIsFetchingText] = useState(false);
 
-  const formatFileSize = (bytes: number) => {
-    if (bytes < 1024) return bytes + " B";
-    else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + " KB";
-    else return (bytes / 1048576).toFixed(1) + " MB";
-  };
-
   useEffect(() => {
-    // Ensure user and transcriptionId (theme) are available
     if (!user || !transcriptionIdFromQuery) {
       if (user === null && !transcriptionIdFromQuery) {
         setError("Utilisateur non connecté ou ID de transcription manquant.");
@@ -37,8 +58,6 @@ export default function Page() {
         setError("Utilisateur non connecté.");
       } else if (!transcriptionIdFromQuery) {
         setError("ID de transcription manquant dans l'URL.");
-      } else {
-        // User is undefined (still loading), wait for user object
       }
       setCurrentStatus("error");
       return;
@@ -60,43 +79,54 @@ export default function Page() {
         setCurrentStatus(data.status || "processing");
         setError(null);
 
-        if (data.status === "completed" && data.transcriptionPath) {
-          if (!fetchedTranscriptionText && !isFetchingText) { // Fetch only if not already fetched or fetching
+        if (data.status === "completed" && data.transcriptionJsonPath) { // Use transcriptionJsonPath
+          if (!fetchedTranscriptionText && !isFetchingText) {
             setIsFetchingText(true);
             try {
-              // Assuming data.transcriptionPath is the full gs:// URI, extract the path part.
-              // Or if your backend stores just the path, adjust accordingly.
-              let pathInBucket = data.transcriptionPath;
+              let pathInBucket = data.transcriptionJsonPath; // Use transcriptionJsonPath
+              // If pathInBucket is already relative (e.g., "user/.../...json"), this block is skipped.
               if (pathInBucket.startsWith("gs://")) {
-                pathInBucket = pathInBucket.substring(pathInBucket.indexOf('/', 5) + 1); // Remove gs://bucket-name/
+                pathInBucket = pathInBucket.substring(pathInBucket.indexOf('/', 5) + 1);
               }
 
               const fileRef = storageRef(storage, pathInBucket);
-              // const downloadUrl = await getDownloadURL(fileRef); // Option 1: Get URL and fetch
-              // const response = await fetch(downloadUrl);
-              // const text = await response.text();
-              // setFetchedTranscriptionText(text);
-
-              // Option 2: Get Blob and read as text (more direct with Firebase SDK)
               const blob = await getBlob(fileRef);
-              const text = await blob.text();
-              setFetchedTranscriptionText(text);
+              const jsonText = await blob.text();
+              const speechApiOutput = JSON.parse(jsonText) as SpeechApiResponse;
+
+              if (speechApiOutput.results && speechApiOutput.results.length > 0) {
+                const combinedTranscript = speechApiOutput.results
+                  .map(result => {
+                    const alternative = result.alternatives && result.alternatives[0];
+                    return alternative && alternative.transcript ? alternative.transcript.trim() : "";
+                  })
+                  .join(" ")
+                  .replace(/\.\s+/g, ".\n\n")
+                  .replace(/\?\s+/g, "?\n\n")
+                  .replace(/!\s+/g, "!\n\n")
+                  .trim();
+                setFetchedTranscriptionText(combinedTranscript);
+              } else {
+                setFetchedTranscriptionText("Aucune transcription trouvée dans le fichier de résultats.");
+                console.info("No transcription results found in the API output file."); // Changed info to console.info
+              }
 
             } catch (fetchError: any) {
-              console.error("Error fetching transcription text from GCS:", fetchError);
-              setError("Impossible de charger le texte de la transcription depuis le stockage.");
-              toaster.create({ title: "Erreur de chargement", description: "Le texte de la transcription n'a pas pu être récupéré.", type: "error" });
-              setFetchedTranscriptionText(data.transcription || "Erreur lors du chargement du texte."); // Fallback if direct transcription was stored
+              console.error("Error fetching or parsing transcription JSON from GCS:", fetchError);
+              setError("Impossible de charger ou d'analyser le fichier de transcription.");
+              toaster.create({ title: "Erreur de chargement", description: "Le fichier de transcription n'a pas pu être récupéré ou analysé.", type: "error" });
+              // Fallback to direct transcription field if it exists (e.g., for older error messages)
+              setFetchedTranscriptionText(data.transcription || "Erreur lors du chargement du texte.");
             } finally {
               setIsFetchingText(false);
             }
           }
-        } else if (data.status === "completed" && !data.transcriptionPath) {
-          // Completed, but no transcription path (e.g., empty audio or no speech detected)
-          setFetchedTranscriptionText(data.transcription || ""); // Use direct transcription if available (e.g. empty string)
+        } else if (data.status === "completed" && !data.transcriptionJsonPath) { // Use transcriptionJsonPath
+          setFetchedTranscriptionText(data.transcription || ""); // E.g. empty audio resulted in empty transcription
         } else if (data.status === "error" || data.status === "error_unsupported_type") {
           setError(data.errorMessage || (data.status === "error_unsupported_type" ? "Type de fichier non supporté." : "Erreur lors du traitement."));
-          setFetchedTranscriptionText(data.transcription || null); // Display error message from transcription field if present
+          // If there's an error, the 'transcription' field in Firestore might hold the error message from the function
+          setFetchedTranscriptionText(data.transcription || null);
         }
       } else {
         setError("Document de transcription non trouvé. Il est possible qu'il soit encore en cours de création ou que l'ID soit incorrect.");
@@ -117,7 +147,7 @@ export default function Page() {
         unsubscribeRef.current();
       }
     };
-  }, [user, transcriptionIdFromQuery, fetchedTranscriptionText, isFetchingText]); // Add dependencies
+  }, [user, transcriptionIdFromQuery, fetchedTranscriptionText, isFetchingText]);
 
   return (
     <Box p={5} maxW="3/4" mx="auto" boxShadow="md">
@@ -130,12 +160,12 @@ export default function Page() {
             <Alert.Indicator asChild>
               <Spinner size="xl" />
             </Alert.Indicator>
-            <Alert.Content mt={4}> {/* Added mt={4} to Alert.Content for spacing similar to previous AlertTitle */}
+            <Alert.Content mt={4}>
               <Alert.Title mb={1} fontSize="lg">
-                {currentStatus === "completed" && isFetchingText ? "Chargement du texte..." : "Traitement en cours..."}
+                {currentStatus === "completed" && isFetchingText ? "Chargement de la transcription..." : "Traitement en cours..."}
               </Alert.Title>
               <Alert.Description maxWidth="sm">
-                {currentStatus === "completed" && isFetchingText ? "Récupération du texte de la transcription." : "Votre transcription est en cours de préparation. Cela peut prendre quelques instants."}
+                {currentStatus === "completed" && isFetchingText ? "Récupération et analyse du fichier de transcription." : "Votre transcription est en cours de préparation. Cela peut prendre quelques instants."}
               </Alert.Description>
             </Alert.Content>
           </Alert.Root>
@@ -190,9 +220,9 @@ export default function Page() {
             whiteSpace="pre-wrap"
             w="full"
           >
-            <Text fontWeight="bold">Fichier: {transcriptionDocData.fileName}</Text>
+            <Text fontWeight="bold">Fichier Audio: {transcriptionDocData.fileName}</Text>
             <Text fontSize="sm" color="gray.500">
-              Taille: {formatFileSize(transcriptionDocData.fileSize)} | Type: {transcriptionDocData.contentType}
+              Taille: {formatFileSize(transcriptionDocData.fileSize)} | Type: {transcriptionDocData.contentType || 'N/A'}
             </Text>
             <Text mt={2}>{fetchedTranscriptionText}</Text>
           </Box>

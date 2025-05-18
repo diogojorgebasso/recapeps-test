@@ -10,8 +10,6 @@ export async function uploadRecordingAction(formData: FormData, userId: string, 
 
     try {
         const blob = new Blob([file], { type: file.type || 'audio/webm' });
-        // Storage path will be user/{userId}/transcripts/{theme}.webm
-        // Assuming one recording per theme, identified by the theme name with a .webm extension.
         const storageFileName = `${theme}.webm`;
         const storagePath = `user/${userId}/transcripts/${storageFileName}`;
         const storageRef = ref(storage, storagePath);
@@ -19,7 +17,6 @@ export async function uploadRecordingAction(formData: FormData, userId: string, 
         await uploadBytes(storageRef, blob);
 
         const redirectionFilePath = `/parcours/oral-3/corrections/${theme}`;
-        // The transcriptionId is now simply the theme.
         const transcriptionId = theme;
 
         return { success: true, filePath: redirectionFilePath, transcriptionId: transcriptionId };

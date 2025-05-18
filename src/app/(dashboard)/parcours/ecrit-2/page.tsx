@@ -1,3 +1,4 @@
+import { getAuthenticatedAppForUser } from "@/lib/firebase/serverApp";
 import { subjects } from "./subjects";
 import {
     Box,
@@ -12,13 +13,18 @@ import {
     Portal,
     CloseButton,
 } from "@chakra-ui/react";
-import { useUserWithClaims } from "@/lib/getUser";
 import Link from "next/link";
 
-export default function Page() {
-    const { user, pro } = useUserWithClaims();
+export default async function Page() {
+    const { user, pro } = await getAuthenticatedAppForUser();
 
-
+    if (!user) {
+        return (
+            <Box>
+                <Text>Veuillez vous connecter pour accéder à cette page.</Text>
+            </Box>
+        );
+    }
     return (
         <Box>
             <Heading>Apprendre</Heading>
@@ -55,7 +61,6 @@ function ExamCard({
     link: string;
 }) {
     if (!isUserPro && premium) {
-        // blocked.
         return (
             <Card.Root
                 variant="subtle"

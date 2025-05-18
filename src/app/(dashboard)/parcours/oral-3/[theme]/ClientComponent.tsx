@@ -22,7 +22,6 @@ export default function ClientComponent({ theme }: { theme: string }) {
     const [title, setTitle] = useState("");
     const { user } = useUserWithClaims();
 
-    // useEffect for user login check and fetching oral title (no change from your existing code)
     useEffect(() => {
         if (user === undefined) {
             return;
@@ -52,8 +51,6 @@ export default function ClientComponent({ theme }: { theme: string }) {
     const [timeLeft, setTimeLeft] = useState(180);
     const [open, setOpen] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
-    // Removed transcriptionStatus and transcriptionError states
-
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const audioChunksRef = useRef<Blob[]>([]);
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -62,8 +59,6 @@ export default function ClientComponent({ theme }: { theme: string }) {
     const audioContextRef = useRef<AudioContext | null>(null);
     const analyserRef = useRef<AnalyserNode | null>(null);
     const animationRef = useRef<number | null>(null);
-    // Removed unsubscribeFromTranscriptionRef
-
 
     const visualizeAudio = useCallback(() => {
         // ... (visualizeAudio implementation - ensure it's defined or keep existing)
@@ -258,7 +253,6 @@ export default function ClientComponent({ theme }: { theme: string }) {
     }, [isRecording, isPaused, timeLeft]);
 
     useEffect(() => {
-        // Cleanup (no listener to unsubscribe from)
         return () => {
             if (animationRef.current) cancelAnimationFrame(animationRef.current);
             if (mediaRecorderRef.current?.stream) {
@@ -293,7 +287,7 @@ export default function ClientComponent({ theme }: { theme: string }) {
 
     return (
         <Container maxW="container.md" py={8}>
-            <Toaster /> {/* Ensure Toaster is rendered */}
+            <Toaster />
             <Heading size="xl" textAlign="center">{theme}</Heading>
             <Text fontSize="lg" mt={2}>{title}</Text>
             <Text fontSize="lg" mt={2}>Comment analysez-vous cette situation et quelles solutions envisagez-vous ?</Text>
@@ -305,8 +299,6 @@ export default function ClientComponent({ theme }: { theme: string }) {
             <Text fontSize="4xl" fontWeight="bold" fontFamily="mono" color={timeLeft <= 30 && !isPaused ? "red.500" : ""}>
                 {formatTime(timeLeft)}
             </Text>
-
-            {/* Removed Alert components for transcription status */}
 
             <Button
                 size="lg"
