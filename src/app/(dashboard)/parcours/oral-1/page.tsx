@@ -37,7 +37,7 @@ const subjects = [
 export default function SubjectList() {
     return (
         <Box p={{ base: 4, md: 8 }}>
-            <Heading mb={{ base: 4, md: 6 }}>Nos disciplines</Heading>
+            <Heading mb={{ base: 4, md: 6 }}>Oral 1</Heading>
             <Grid
                 templateColumns={{ base: '1fr', md: 'repeat(auto-fit, minmax(180px, 1fr))' }}
                 gap={{ base: 4, md: 6 }}
