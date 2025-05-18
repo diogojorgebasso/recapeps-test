@@ -6,6 +6,15 @@ import getTranscription from "../getTranscription";
 import { useUserWithClaims } from "@/lib/getUser";
 import { TranscriptionData } from "@/types/Transcript";
 
+const formatFileSize = (bytes?: number): string => {
+  if (bytes === undefined || bytes === null) return 'N/A';
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+};
+
 const Page = () => {
 
   const [transcription, setTranscription] = useState<TranscriptionData | null>(null);
@@ -14,11 +23,6 @@ const Page = () => {
 
   const { user } = useUserWithClaims();
 
-  const formatFileSize = (bytes: number) => {
-    if (bytes < 1024) return bytes + " B";
-    else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + " KB";
-    else return (bytes / 1048576).toFixed(1) + " MB";
-  };
 
   useEffect(() => {
 
