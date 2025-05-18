@@ -219,6 +219,35 @@ export default function Page() {
             Comment analysez-vous cette situation et quelles solutions envisagez-vous ?
           </Text>
         </Box>
+
+        {currentStatus === "completed" && fetchedTranscriptionText !== null && !isFetchingJson && transcriptionDocData ? (
+          <Box
+            p={4}
+            borderRadius="md"
+            borderWidth="1px"
+            borderColor="gray.200"
+            fontSize="md"
+            whiteSpace="pre-wrap"
+            w="full"
+          >
+            <Text fontWeight="bold">Fichier Audio: {transcriptionDocData.fileName}</Text>
+            <Text fontSize="sm" color="gray.500">
+              Taille: {formatFileSize(transcriptionDocData.fileSize)} | Type: {transcriptionDocData.contentType || 'N/A'}
+            </Text>
+            <Text mt={2}>{fetchedTranscriptionText}</Text>
+          </Box>
+        ) : (
+          currentStatus !== "processing" &&
+          !(currentStatus === "completed" && isFetchingJson) &&
+          currentStatus !== "error" &&
+          currentStatus !== "error_unsupported_type" &&
+          fetchedTranscriptionText === null && ( // Ensure text is null to show this message
+            <Text color="gray.500" fontStyle="italic">
+              Aucune transcription disponible ou en attente de traitement.
+            </Text>
+          )
+        )}
+
         <Box bg="teal.500" p="3" borderRadius="lg" w="full">
           <Heading size="md" >Définitions</Heading>
         </Box>
