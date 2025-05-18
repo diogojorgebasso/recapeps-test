@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import { Box, Heading, Text, VStack, List, Spinner, Alert } from "@chakra-ui/react";
