@@ -5,12 +5,12 @@ import { useRouter } from 'next/navigation';
 import {
     Box,
     Button,
-    Center,
     Heading,
     Text,
     Dialog,
     Container,
     CloseButton,
+    Spinner,
 } from "@chakra-ui/react";
 import { uploadRecordingAction } from "./uploadRecordingAction";
 import { getOral } from "./getOral";
@@ -22,19 +22,15 @@ export default function ClientComponent({ theme }: { theme: string }) {
     const [title, setTitle] = useState("");
     const { user } = useUserWithClaims();
 
+    // useEffect for user login check and fetching oral title (no change from your existing code)
     useEffect(() => {
         if (user === undefined) {
-            return; // Wait for user state to be determined
-        }
-
-        // If user is null, it means the user is not logged in after loading.
-        if (user === null) {
-            router.push("/login");
             return;
         }
-
-        // If user is an object, the user is logged in. Proceed to fetch data.
-        // Ensure subjectId is valid before fetching
+        if (user === null) {
+            router.push("/login"); // Ensure this path is correct for your app
+            return;
+        }
         if (theme) {
             getOral(theme)
                 .then((oralDoc) => {
@@ -49,111 +45,29 @@ export default function ClientComponent({ theme }: { theme: string }) {
                     console.error(`Error fetching oral document for subjectId "${theme}":`, error);
                 });
         }
-    }, [user, router, theme]); // Added router to dependency array
+    }, [user, router, theme]);
 
     const [isRecording, setIsRecording] = useState(false);
+    const [isPaused, setIsPaused] = useState(false);
     const [timeLeft, setTimeLeft] = useState(180);
     const [open, setOpen] = useState(false);
-    const [isUploading, setIsUploading] = useState(false); // Add uploading state
+    const [isUploading, setIsUploading] = useState(false);
+    // Removed transcriptionStatus and transcriptionError states
+
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const audioChunksRef = useRef<Blob[]>([]);
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    // Refs for audio visualization
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const audioContextRef = useRef<AudioContext | null>(null);
     const analyserRef = useRef<AnalyserNode | null>(null);
     const animationRef = useRef<number | null>(null);
-
-    const stopRecording = useCallback(() => {
-        if (mediaRecorderRef.current && isRecording) {
-            mediaRecorderRef.current.stop();
-            mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
-            setIsRecording(false);
-            if (animationRef.current) {
-                cancelAnimationFrame(animationRef.current);
-                animationRef.current = null;
-            }
-            // Clear canvas
-            if (canvasRef.current) {
-                const ctx = canvasRef.current.getContext('2d');
-                if (ctx) {
-                    ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-                }
-            }
-
-            // Show upload dialog when manually stopping recording
-            setTimeout(() => {
-                if (audioChunksRef.current.length > 0) {
-                    setOpen(true);
-                }
-            }, 200);
-        }
-    }, [isRecording]);
-
-    const startRecording = async () => {
-        audioChunksRef.current = [];
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            const mediaRecorder = new MediaRecorder(stream);
-
-            // Setup audio visualization
-            audioContextRef.current = new AudioContext();
-            analyserRef.current = audioContextRef.current.createAnalyser();
-            const source = audioContextRef.current.createMediaStreamSource(stream);
-            analyserRef.current.fftSize = 256;
-            source.connect(analyserRef.current);
-
-            // Start visualizing
-            visualizeAudio();
-
-            mediaRecorder.ondataavailable = (e) => {
-                if (e.data.size > 0) {
-                    audioChunksRef.current.push(e.data);
-                }
-            };
-
-            mediaRecorder.start();
-            mediaRecorderRef.current = mediaRecorder;
-            setIsRecording(true);
-            setTimeLeft(180); // Reset timer to 3 minutes
-        } catch (err) {
-            console.error("Error accessing microphone:", err);
-        }
-    };
-
-    // Timer countdown effect
-    useEffect(() => {
-        if (isRecording && timeLeft > 0) {
-            timerRef.current = setTimeout(() => {
-                setTimeLeft(timeLeft - 1);
-            }, 1000);
-        } else if (isRecording && timeLeft === 0) {
-            stopRecording();
-            setOpen(true);
-        }
-
-        return () => {
-            if (timerRef.current) clearTimeout(timerRef.current);
-        };
-    }, [timeLeft, isRecording, stopRecording]);
-
-    // Cleanup animation on unmount
-    useEffect(() => {
-        return () => {
-            if (animationRef.current) {
-                cancelAnimationFrame(animationRef.current);
-            }
-            if (audioContextRef.current) {
-                audioContextRef.current.close();
-            }
-        };
-    }, []);
+    // Removed unsubscribeFromTranscriptionRef
 
 
-    const visualizeAudio = () => {
-        if (!canvasRef.current || !analyserRef.current) return;
-
+    const visualizeAudio = useCallback(() => {
+        // ... (visualizeAudio implementation - ensure it's defined or keep existing)
+        if (!canvasRef.current || !analyserRef.current || !audioContextRef.current) return;
         const canvas = canvasRef.current;
         const canvasCtx = canvas.getContext('2d');
         if (!canvasCtx) return;
@@ -166,89 +80,195 @@ export default function ClientComponent({ theme }: { theme: string }) {
         canvasCtx.clearRect(0, 0, width, height);
 
         const draw = () => {
+            if (!analyserRef.current) { // Check if analyser is still valid
+                if (animationRef.current) cancelAnimationFrame(animationRef.current);
+                return;
+            }
             animationRef.current = requestAnimationFrame(draw);
-
-            if (!analyserRef.current) return;
             analyserRef.current.getByteTimeDomainData(dataArray);
 
-            canvasCtx.fillStyle = 'rgb(245, 245, 245)';
+            canvasCtx.fillStyle = 'rgb(245, 245, 245)'; // Or your theme background
             canvasCtx.fillRect(0, 0, width, height);
-
             canvasCtx.lineWidth = 2;
-            canvasCtx.strokeStyle = isRecording ? 'rgb(255, 0, 0)' : 'rgb(0, 123, 255)';
+            // Stroke color based on actual recording state, not just isRecording
+            const currentRecorderState = mediaRecorderRef.current?.state;
+            canvasCtx.strokeStyle = currentRecorderState === 'recording' ? 'rgb(255, 0, 0)' : 'rgb(0, 123, 255)';
             canvasCtx.beginPath();
 
             const sliceWidth = width / bufferLength;
             let x = 0;
-
             for (let i = 0; i < bufferLength; i++) {
                 const v = dataArray[i] / 128.0;
                 const y = v * height / 2;
-
-                if (i === 0) {
-                    canvasCtx.moveTo(x, y);
-                } else {
-                    canvasCtx.lineTo(x, y);
-                }
-
+                if (i === 0) canvasCtx.moveTo(x, y);
+                else canvasCtx.lineTo(x, y);
                 x += sliceWidth;
             }
-
             canvasCtx.lineTo(width, height / 2);
             canvasCtx.stroke();
         };
-
         draw();
-    };
+    }, []);
 
-    const uploadRecording = async () => {
-        if (audioChunksRef.current.length === 0 || !user?.uid) {
-            toaster.create({
-                title: "Erreur",
-                description: "Aucun enregistrement à envoyer ou utilisateur non identifié.",
-                type: "error",
-            });
+
+    const performUpload = async (audioBlob: Blob) => {
+        if (!user?.uid) {
+            toaster.create({ title: "Erreur", description: "Utilisateur non identifié.", type: "error" });
+            setIsUploading(false);
             return;
         }
 
-        setIsUploading(true); // Set uploading state to true
-        toaster.create({
-            title: "Upload en cours...",
-            description: "Votre enregistrement est en cours d'envoi.",
-            type: "info",
-        });
+        setIsUploading(true);
+        const uploadToastId = toaster.create({ title: "Upload en cours...", description: "Votre enregistrement est en cours d'envoi.", type: "info", duration: 0 });
 
         try {
-            const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
             const formData = new FormData();
-            formData.append('audioBlob', blob, `oral_${theme}.webm`);
-
+            formData.append('audioBlob', audioBlob, `oral_${theme}.webm`);
             const result = await uploadRecordingAction(formData, user.uid, theme);
 
+            if (uploadToastId) toaster.dismiss(uploadToastId);
 
             if (result.success && result.filePath && result.transcriptionId) {
-                toaster.create({
-                    title: "Upload réussi!",
-                    description: "Redirection vers la page de correction.",
-                    type: "success",
-                });
-                // Pass transcriptionId as a query parameter
-                router.push(`${result.filePath}`);
+                toaster.create({ title: "Upload réussi!", description: "Redirection vers la page de correction.", type: "success" });
+                // Navigate immediately. The correction page will handle loading/processing states.
+                router.push(`${result.filePath}?transcriptionId=${result.transcriptionId}`);
             } else {
-                console.error("File path is undefined or upload failed:", result.error);
-                toaster.create({
-                    title: "Erreur d'upload",
-                    description: result.error || "Une erreur est survenue lors de l'upload.",
-                    type: "error",
-                });
+                toaster.create({ title: "Erreur d'upload", description: result.error || "Une erreur est survenue.", type: "error" });
             }
-        } catch (error) {
-            console.error("Error uploading recording:", error)
+        } catch (error: any) {
+            if (uploadToastId) toaster.dismiss(uploadToastId);
+            toaster.create({ title: "Erreur critique d'upload", description: error.message || "Une erreur inattendue est survenue.", type: "error" });
         } finally {
-            setIsUploading(false); // Reset uploading state
-            setOpen(false); // Close dialog after attempting upload
+            setIsUploading(false); // Set to false after upload attempt
         }
     };
+
+    // Removed listenForTranscription function
+
+    const setupMediaRecorder = (stream: MediaStream) => {
+        const recorder = new MediaRecorder(stream);
+        mediaRecorderRef.current = recorder;
+        audioChunksRef.current = [];
+
+        recorder.ondataavailable = event => {
+            if (event.data.size > 0) {
+                audioChunksRef.current.push(event.data);
+            }
+        };
+
+        recorder.onstop = () => {
+            setIsRecording(false);
+            setIsPaused(false);
+            // isUploading will be set by performUpload
+            if (animationRef.current) cancelAnimationFrame(animationRef.current);
+            if (canvasRef.current) {
+                const ctx = canvasRef.current.getContext('2d');
+                ctx?.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+            }
+            // Close audio context and disconnect source
+            if (analyserRef.current) analyserRef.current.disconnect();
+            if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+                // Check if source nodes exist and disconnect them
+                // This part is tricky as source nodes are not directly held on ref
+                // The stream tracks are stopped which should help.
+                audioContextRef.current.close().catch(console.error);
+                audioContextRef.current = null;
+                analyserRef.current = null;
+            }
+
+
+            if (audioChunksRef.current.length > 0) {
+                const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+                performUpload(audioBlob);
+            }
+            // Stream tracks are stopped by the caller of mediaRecorder.stop() if it's a final stop.
+        };
+
+        recorder.onpause = () => {
+            setIsRecording(false); // Timer will use this
+            if (animationRef.current) cancelAnimationFrame(animationRef.current);
+        };
+
+        recorder.onresume = () => {
+            setIsRecording(true); // Timer will use this
+            visualizeAudio();
+        };
+
+        // Setup audio visualization
+        if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+            audioContextRef.current.close().catch(console.error); // Close previous context if any
+        }
+        audioContextRef.current = new AudioContext();
+        analyserRef.current = audioContextRef.current.createAnalyser();
+        const source = audioContextRef.current.createMediaStreamSource(stream);
+        source.connect(analyserRef.current);
+        analyserRef.current.fftSize = 256;
+    };
+
+    const startNewRecording = async () => {
+        if (isUploading) return;
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            setupMediaRecorder(stream);
+            mediaRecorderRef.current!.start();
+            setIsRecording(true);
+            setIsPaused(false);
+            setTimeLeft(180);
+            visualizeAudio();
+        } catch (err) {
+            console.error("Error accessing microphone:", err);
+            toaster.create({ title: "Erreur Microphone", description: "Vérifiez les permissions du microphone.", type: "error" });
+        }
+    };
+
+    const handlePauseRecording = async () => {
+        if (mediaRecorderRef.current?.state === "recording") {
+            mediaRecorderRef.current.pause();
+            setIsPaused(true); // isRecording will be set to false by onpause handler
+            setOpen(true);
+        }
+    };
+
+    const handleResumeRecording = async () => {
+        if (mediaRecorderRef.current?.state === "paused") {
+            mediaRecorderRef.current.resume();
+            setIsPaused(false); // isRecording will be set to true by onresume handler
+            setOpen(false);
+        }
+    };
+
+    const handleStopAndFinalizeRecording = () => {
+        if (mediaRecorderRef.current && (mediaRecorderRef.current.state === "recording" || mediaRecorderRef.current.state === "paused")) {
+            mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop()); // Stop stream tracks
+            mediaRecorderRef.current.stop(); // Triggers onstop, then performUpload
+        }
+        setOpen(false);
+    };
+
+    useEffect(() => {
+        if (isRecording && !isPaused && timeLeft > 0) {
+            timerRef.current = setTimeout(() => setTimeLeft(prevTime => prevTime - 1), 1000);
+        } else if (isRecording && !isPaused && timeLeft === 0) {
+            toaster.create({ title: "Temps écoulé!", description: "Enregistrement terminé, préparation de l'envoi...", type: "info" });
+            handleStopAndFinalizeRecording(); // Stop, which will trigger upload via onstop
+        }
+        return () => {
+            if (timerRef.current) clearTimeout(timerRef.current);
+        };
+    }, [isRecording, isPaused, timeLeft]);
+
+    useEffect(() => {
+        // Cleanup (no listener to unsubscribe from)
+        return () => {
+            if (animationRef.current) cancelAnimationFrame(animationRef.current);
+            if (mediaRecorderRef.current?.stream) {
+                mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
+            }
+            if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+                audioContextRef.current.close().catch(console.error);
+            }
+        };
+    }, []);
 
     const formatTime = (seconds: number) => {
         const minutes = Math.floor(seconds / 60);
@@ -256,89 +276,84 @@ export default function ClientComponent({ theme }: { theme: string }) {
         return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     };
 
+    let mainButtonText = "Démarrer l'enregistrement";
+    let mainButtonAction = startNewRecording;
+    let mainButtonColorScheme = "teal";
+
+    if (isRecording && !isPaused) {
+        mainButtonText = "Mettre en pause";
+        mainButtonAction = handlePauseRecording;
+        mainButtonColorScheme = "orange";
+    } else if (isPaused) {
+        mainButtonText = "Reprendre";
+        mainButtonAction = handleResumeRecording;
+        mainButtonColorScheme = "green";
+    }
+
+
     return (
         <Container maxW="container.md" py={8}>
-            <Toaster />
+            <Toaster /> {/* Ensure Toaster is rendered */}
             <Heading size="xl" textAlign="center">{theme}</Heading>
-            <Text fontSize="lg" mt={2}>
-                {title}
-            </Text>
-            <Text fontSize="lg" mt={2}>
-                Comment analysez-vous cette situation et quelles solutions envisagez-vous ?
-            </Text>
+            <Text fontSize="lg" mt={2}>{title}</Text>
+            <Text fontSize="lg" mt={2}>Comment analysez-vous cette situation et quelles solutions envisagez-vous ?</Text>
 
-            <Box
-                width="100%"
-                height="120px"
-                bg="gray.50"
-                borderRadius="md"
-                border="1px solid"
-                borderColor="gray.200"
-                overflow="hidden"
-            >
-                <canvas
-                    ref={canvasRef}
-                    width="800"
-                    height="120"
-                    style={{ width: '100%', height: '100%' }}
-                />
+            <Box width="100%" height="120px" bg="gray.50" borderRadius="md" border="1px solid" borderColor="gray.200" overflow="hidden" my={4}>
+                <canvas ref={canvasRef} width="800" height="120" style={{ width: '100%', height: '100%' }} />
             </Box>
 
-            <Text
-                fontSize="4xl"
-                fontWeight="bold"
-                fontFamily="mono"
-                color={timeLeft <= 30 ? "red.500" : ""}
-            >
+            <Text fontSize="4xl" fontWeight="bold" fontFamily="mono" color={timeLeft <= 30 && !isPaused ? "red.500" : ""}>
                 {formatTime(timeLeft)}
             </Text>
+
+            {/* Removed Alert components for transcription status */}
 
             <Button
                 size="lg"
                 height="70px"
                 width="220px"
-                colorPalette={isRecording ? "red" : "teal"} // Use colorPalette for Chakra UI v2+
-                onClick={isRecording ? stopRecording : startRecording}
+                colorScheme={mainButtonColorScheme}
+                onClick={mainButtonAction}
                 boxShadow="md"
                 _hover={{ transform: 'scale(1.05)' }}
                 transition="all 0.2s"
                 borderRadius="full"
-                disabled={isUploading} // Disable button when uploading
+                disabled={isUploading || (mainButtonAction === startNewRecording && user === undefined)}
             >
-                {isRecording ? "Arrêter l'enregistrement" : "Démarrer l'enregistrement"}
+                {isUploading ? <Spinner /> : mainButtonText}
             </Button>
 
-            <Dialog.Root open={open} onOpenChange={(e) => { if (!isUploading) setOpen(e.open) }}> {/* Prevent closing dialog by clicking outside when uploading */}
+            <Dialog.Root open={open} onOpenChange={(e) => { if (!isUploading) setOpen(e.open); }}>
                 <Dialog.Backdrop />
                 <Dialog.Positioner>
                     <Dialog.Content>
                         <Dialog.Header>
                             <Dialog.Title>
-                                Enregistrement terminé
+                                {isPaused ? "Enregistrement en pause" : "Enregistrement terminé"}
                             </Dialog.Title>
                         </Dialog.Header>
                         <Dialog.Body>
-                            <Text>{timeLeft === 0 ? "Le temps est écoulé." : "Vous avez arrêté l'enregistrement."}</Text>
-                            <Text>Souhaitez-vous voir la correction ?</Text>
+                            <Text>
+                                {isPaused ? "Que souhaitez-vous faire ?" : "Le temps est écoulé ou vous avez arrêté l'enregistrement."}
+                            </Text>
                         </Dialog.Body>
                         <Dialog.Footer>
-                            <Dialog.CloseTrigger asChild>
-                                <Button variant="ghost" disabled={isUploading}>
+                            {isPaused && timeLeft > 0 && (
+                                <Button variant="ghost" onClick={handleResumeRecording} disabled={isUploading}>
                                     Continuer à réfléchir
                                 </Button>
-                            </Dialog.CloseTrigger>
+                            )}
                             <Button
-                                colorPalette="blue" // Use colorPalette
+                                colorScheme="blue"
                                 mr={3}
-                                onClick={uploadRecording}
-                                loading={isUploading} // Show loading spinner
-                                loadingText="Envoi..." // Text shown with spinner
+                                onClick={handleStopAndFinalizeRecording}
+                                loading={isUploading && mediaRecorderRef.current?.state !== 'paused'}
                                 disabled={isUploading}
                             >
-                                Voir la correction !
+                                {isPaused ? "Terminer et voir la correction" : "Voir la correction"}
                             </Button>
                         </Dialog.Footer>
-                        {!isUploading && ( // Only show close button if not uploading
+                        {!isUploading && (
                             <Dialog.CloseTrigger asChild>
                                 <CloseButton size="sm" />
                             </Dialog.CloseTrigger>

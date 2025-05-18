@@ -114,7 +114,7 @@ export default async function Page() {
                     />
                 ))}
             </SimpleGrid>
-            <Heading>Fiches de révision</Heading>
+            <Heading id="fiches">Fiches de révision</Heading>
             <SimpleGrid columns={{ base: 1, sm: 2, lg: 3 }} gap={6} mt={4}>
                 {subjects2.map(({ id, name, icon, premium }) => (
                     <ExamCard

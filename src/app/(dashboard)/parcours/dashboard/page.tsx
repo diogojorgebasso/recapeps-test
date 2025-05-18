@@ -34,23 +34,7 @@ import { useUserWithClaims } from "@/lib/getUser";
 export default function Page() {
     const { user } = useUserWithClaims();
     const [quizData, setQuizData] = useState<QuizDone[]>([]);
-    const recommendedQuizzes = [
-        {
-            id: "BN0QbVdUQdMmwRvtbgxx",
-            name: "Quiz de Mathématiques",
-            level: "Débutant",
-        },
-        {
-            id: "BkVp5agtGk5Aoq1zlxIg",
-            name: "Quiz de Physique",
-            level: "Intermédiaire",
-        },
-        {
-            id: "g81h7u4B1kyQoYDSIClm",
-            name: "Quiz de Chimie",
-            level: "Avancé",
-        },
-    ];
+
     const [isLoading, setIsLoading] = useState(true);
     const currentEcritNumber = 1;
 
@@ -93,7 +77,7 @@ export default function Page() {
         );
     }
 
-    if (quizData.length === 0 && recommendedQuizzes.length === 0 && !isLoading) {
+    if (quizData.length === 0 && !isLoading) {
         return (
             <EmptyState
                 icon={<HiOutlineClipboardList size="48px" />}
@@ -101,9 +85,6 @@ export default function Page() {
                 description="Commencez par faire des quiz pour voir vos résultats et obtenir des recommandations personnalisées."
             >
                 <HStack gap={4} mt={4}>
-                    <Link href={`/parcours/ecrit-${currentEcritNumber}`}>
-                        <Button colorPalette="green">Explorer les quiz (Écrit {currentEcritNumber})</Button>
-                    </Link>
                     <Link href="/parcours/oral-1">
                         <Button variant="outline">Explorer les Oral 1</Button>
                     </Link>
@@ -179,34 +160,51 @@ export default function Page() {
                 </>
             )}
 
-            {recommendedQuizzes.length > 0 && (
-                <Box maxWidth="1000px" mx="auto" py={8} mt={8}>
-                    <Heading size="lg" textAlign="center" mb={6}>
-                        <HStack justifyContent="center">
-                            <HiOutlineSparkles /> <Text>Quiz recommandés pour vous</Text>
-                        </HStack>
-                    </Heading>
-                    <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={6}>
-                        {recommendedQuizzes.map((quiz) => (
-                            <Card.Root key={quiz.id} borderWidth="1px" borderRadius="md" shadow="sm" _hover={{ shadow: "md" }}>
-                                <Card.Header>
-                                    <Heading size="md">{quiz.name}</Heading>
-                                </Card.Header>
-                                <Card.Body>
-                                    <Text>Niveau: {quiz.level}</Text>
-                                </Card.Body>
-                                <Card.Footer>
-                                    <Link href={`/parcours/ecrit-${currentEcritNumber}/${quiz.id}`} passHref>
-                                        <Button colorPalette="green" variant="solid" width="full">
-                                            Commencer le quiz
-                                        </Button>
-                                    </Link>
-                                </Card.Footer>
-                            </Card.Root>
-                        ))}
-                    </SimpleGrid>
-                </Box>
-            )}
+            <Box maxWidth="1000px" mx="auto" py={8} mt={8}>
+                <Heading size="lg" textAlign="center" mb={6}>
+                    <HStack justifyContent="center">
+                        <HiOutlineSparkles /> <Text>Bonjour {user?.displayName || ""}, que souhaites-tu réviser aujourd&apos;hui</Text>
+                    </HStack>
+                </Heading>
+                <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={6}>
+                    <Card.Root borderWidth="1px" borderRadius="md" shadow="sm" _hover={{ shadow: "md" }}>
+                        <Card.Header>
+                            <Heading size="md">Oral 1</Heading>
+                        </Card.Header>
+                        <Card.Footer>
+                            <Link href={`/parcours/oral-1`} passHref>
+                                <Button colorPalette="green" variant="solid" width="full">
+                                    Voir les fiches
+                                </Button>
+                            </Link>
+                        </Card.Footer>
+                    </Card.Root>
+                    <Card.Root borderWidth="1px" borderRadius="md" shadow="sm" _hover={{ shadow: "md" }}>
+                        <Card.Header>
+                            <Heading size="md">Oral 3</Heading>
+                        </Card.Header>
+                        <Card.Footer>
+                            <Link href={`/parcours/oral-1#fiches`} passHref>
+                                <Button colorPalette="green" variant="solid" width="full">
+                                    Voir les fiches
+                                </Button>
+                            </Link>
+                        </Card.Footer>
+                    </Card.Root>
+                    <Card.Root borderWidth="1px" borderRadius="md" shadow="sm" _hover={{ shadow: "md" }}>
+                        <Card.Header>
+                            <Heading size="md">Oral 3</Heading>
+                        </Card.Header>
+                        <Card.Footer>
+                            <Link href={`/parcours/oral-3`} passHref>
+                                <Button colorPalette="green" variant="solid" width="full">
+                                    Faire une simulation
+                                </Button>
+                            </Link>
+                        </Card.Footer>
+                    </Card.Root>
+                </SimpleGrid>
+            </Box>
         </Box>
     );
 }

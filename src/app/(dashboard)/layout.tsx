@@ -11,6 +11,8 @@ import DesktopMenu from "@/components/menu/dashboard/DesktopMenu";
 import MobileMenu from "@/components/menu/dashboard/MobileMenu";
 import { getAuthenticatedAppForUser } from "@/lib/firebase/serverApp";
 
+export const dynamic = "force-dynamic"; // Force server component to be dynamic to avoid caching issues with Firebase auth
+
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
     const { user } = await getAuthenticatedAppForUser();
 

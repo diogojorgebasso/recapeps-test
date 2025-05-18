@@ -1,17 +1,26 @@
 "use client";
 
-import { Box, Heading, Text, VStack, List } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import getTranscription from "../getTranscription";
+import { Box, Heading, Text, VStack, List, Spinner, Alert } from "@chakra-ui/react"; // Keep existing imports for now, Alert might be from a different import if it's a custom component
+import { useEffect, useState, useRef } from "react";
 import { useUserWithClaims } from "@/lib/getUser";
-import { TranscriptionData } from "@/types/Transcript";
+import { TranscriptionData, TranscriptionStatus } from "@/types/Transcript";
+import { useSearchParams } from 'next/navigation';
+import { db, storage } from "@/lib/firebase/clientApp"; // Import clientStorage
+import { doc, onSnapshot, Unsubscribe } from "firebase/firestore";
+import { ref as storageRef, getBlob } from "firebase/storage"; // For fetching from GCS
+import { toaster } from "@/components/ui/toaster";
 
 export default function Page() {
-  const [transcription, setTranscription] = useState<TranscriptionData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [transcriptionDocData, setTranscriptionDocData] = useState<TranscriptionData | null>(null);
+  const [fetchedTranscriptionText, setFetchedTranscriptionText] = useState<string | null>(null);
+  const [currentStatus, setCurrentStatus] = useState<TranscriptionStatus>("processing"); // Start with processing
   const [error, setError] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const transcriptionIdFromQuery = searchParams.get('transcriptionId'); // This should be the 'theme'
 
   const { user } = useUserWithClaims();
+  const unsubscribeRef = useRef<Unsubscribe | null>(null);
+  const [isFetchingText, setIsFetchingText] = useState(false);
 
   const formatFileSize = (bytes: number) => {
     if (bytes < 1024) return bytes + " B";
@@ -20,68 +29,137 @@ export default function Page() {
   };
 
   useEffect(() => {
-
-    if (!user) {
-      // If user is explicitly null or undefined after initial check, handle appropriately.
-      // For example, if useUserWithClaims initially returns undefined then null.
-      if (user === null) {
-        setError("Utilisateur non connecté."); // More specific error for null user
+    // Ensure user and transcriptionId (theme) are available
+    if (!user || !transcriptionIdFromQuery) {
+      if (user === null && !transcriptionIdFromQuery) {
+        setError("Utilisateur non connecté ou ID de transcription manquant.");
+      } else if (user === null) {
+        setError("Utilisateur non connecté.");
+      } else if (!transcriptionIdFromQuery) {
+        setError("ID de transcription manquant dans l'URL.");
       } else {
-        setError("User ID is missing.");
+        // User is undefined (still loading), wait for user object
       }
-      setIsLoading(false);
+      setCurrentStatus("error");
       return;
     }
 
-    const fetchTranscriptData = async () => {
-      const startTime = Date.now(); // Record start time
-      setIsLoading(true);
-      setError(null);
+    // Clean up previous listener if user or transcriptionId changes
+    if (unsubscribeRef.current) {
+      unsubscribeRef.current();
+    }
+    setFetchedTranscriptionText(null); // Reset fetched text when ID changes
+    setIsFetchingText(false);
 
-      let data = null;
-      let fetchError: any = null;
+    const transcriptDocRef = doc(db, "users", user.uid, "transcripts", transcriptionIdFromQuery);
 
-      try {
-        // Ensure getTranscription is compatible with the data it returns or cast appropriately
-        data = await getTranscription(user.uid, "addiction"); // Assuming user.uid is available
-      } catch (err: any) {
-        console.error("Failed to fetch transcription:", err);
-        fetchError = err;
-      }
+    unsubscribeRef.current = onSnapshot(transcriptDocRef, async (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data() as TranscriptionData;
+        setTranscriptionDocData(data);
+        setCurrentStatus(data.status || "processing");
+        setError(null);
 
-      const elapsedTime = Date.now() - startTime;
-      const remainingTime = 4000 - elapsedTime;
+        if (data.status === "completed" && data.transcriptionPath) {
+          if (!fetchedTranscriptionText && !isFetchingText) { // Fetch only if not already fetched or fetching
+            setIsFetchingText(true);
+            try {
+              // Assuming data.transcriptionPath is the full gs:// URI, extract the path part.
+              // Or if your backend stores just the path, adjust accordingly.
+              let pathInBucket = data.transcriptionPath;
+              if (pathInBucket.startsWith("gs://")) {
+                pathInBucket = pathInBucket.substring(pathInBucket.indexOf('/', 5) + 1); // Remove gs://bucket-name/
+              }
 
-      const updateState = () => {
-        if (fetchError) {
-          setError(fetchError.message || "Failed to load transcription.");
-          setTranscription(null);
-        } else if (data) {
-          setTranscription(data as TranscriptionData);
-        } else {
-          setTranscription(null); // Explicitly set to null if no data
-          setError("Transcription not found.");
+              const fileRef = storageRef(storage, pathInBucket);
+              // const downloadUrl = await getDownloadURL(fileRef); // Option 1: Get URL and fetch
+              // const response = await fetch(downloadUrl);
+              // const text = await response.text();
+              // setFetchedTranscriptionText(text);
+
+              // Option 2: Get Blob and read as text (more direct with Firebase SDK)
+              const blob = await getBlob(fileRef);
+              const text = await blob.text();
+              setFetchedTranscriptionText(text);
+
+            } catch (fetchError: any) {
+              console.error("Error fetching transcription text from GCS:", fetchError);
+              setError("Impossible de charger le texte de la transcription depuis le stockage.");
+              toaster.create({ title: "Erreur de chargement", description: "Le texte de la transcription n'a pas pu être récupéré.", type: "error" });
+              setFetchedTranscriptionText(data.transcription || "Erreur lors du chargement du texte."); // Fallback if direct transcription was stored
+            } finally {
+              setIsFetchingText(false);
+            }
+          }
+        } else if (data.status === "completed" && !data.transcriptionPath) {
+          // Completed, but no transcription path (e.g., empty audio or no speech detected)
+          setFetchedTranscriptionText(data.transcription || ""); // Use direct transcription if available (e.g. empty string)
+        } else if (data.status === "error" || data.status === "error_unsupported_type") {
+          setError(data.errorMessage || (data.status === "error_unsupported_type" ? "Type de fichier non supporté." : "Erreur lors du traitement."));
+          setFetchedTranscriptionText(data.transcription || null); // Display error message from transcription field if present
         }
-        setIsLoading(false);
-      };
-
-      if (remainingTime > 0) {
-        setTimeout(updateState, remainingTime);
       } else {
-        updateState();
+        setError("Document de transcription non trouvé. Il est possible qu'il soit encore en cours de création ou que l'ID soit incorrect.");
+        setCurrentStatus("error"); // Or keep 'processing' and show a specific message
+        setTranscriptionDocData(null);
+      }
+    }, (err) => {
+      console.error("Error listening to transcription document:", err);
+      setError("Erreur de connexion au suivi de la transcription.");
+      setCurrentStatus("error");
+      setTranscriptionDocData(null);
+      toaster.create({ title: "Erreur de Suivi", description: "Impossible de suivre l'état de la transcription.", type: "error" });
+    });
+
+    // Cleanup listener on component unmount
+    return () => {
+      if (unsubscribeRef.current) {
+        unsubscribeRef.current();
       }
     };
-
-    fetchTranscriptData();
-  }, [user]);
+  }, [user, transcriptionIdFromQuery, fetchedTranscriptionText, isFetchingText]); // Add dependencies
 
   return (
     <Box p={5} maxW="3/4" mx="auto" boxShadow="md">
       <VStack align="start" gap={4}>
 
-        <Heading size="lg">Transcription de l&apos;enregistrement</Heading>
-        {isLoading && <Text>Chargement de la transcription...</Text>}
-        {error && <Text color="red.500">Erreur: {error}</Text>}
+        <Heading size="lg">Transcription de l&apos;enregistrement (Thème: {transcriptionIdFromQuery || 'N/A'})</Heading>
+
+        {(currentStatus === "processing" || (currentStatus === "completed" && isFetchingText)) && (
+          <Alert.Root status="info" variant="subtle" flexDirection="column" alignItems="center" justifyContent="center" textAlign="center" height="200px">
+            <Alert.Indicator asChild>
+              <Spinner size="xl" />
+            </Alert.Indicator>
+            <Alert.Content mt={4}> {/* Added mt={4} to Alert.Content for spacing similar to previous AlertTitle */}
+              <Alert.Title mb={1} fontSize="lg">
+                {currentStatus === "completed" && isFetchingText ? "Chargement du texte..." : "Traitement en cours..."}
+              </Alert.Title>
+              <Alert.Description maxWidth="sm">
+                {currentStatus === "completed" && isFetchingText ? "Récupération du texte de la transcription." : "Votre transcription est en cours de préparation. Cela peut prendre quelques instants."}
+              </Alert.Description>
+            </Alert.Content>
+          </Alert.Root>
+        )}
+
+        {currentStatus === "error" && error && (
+          <Alert.Root status="error">
+            <Alert.Indicator /> {/* Default Chakra icon or your custom one */}
+            <Alert.Content>
+              <Alert.Title>Erreur de Transcription!</Alert.Title>
+              <Alert.Description>{error}</Alert.Description>
+            </Alert.Content>
+          </Alert.Root>
+        )}
+        {currentStatus === "error_unsupported_type" && (
+          <Alert.Root status="warning">
+            <Alert.Indicator /> {/* Default Chakra icon or your custom one */}
+            <Alert.Content>
+              <Alert.Title>Type de fichier non supporté</Alert.Title>
+              <Alert.Description>La transcription n&apos;a pas pu être effectuée pour ce fichier.</Alert.Description>
+            </Alert.Content>
+          </Alert.Root>
+        )}
+
 
         <Box
           w={{ base: "90%", md: "70%", lg: "66%" }}
@@ -102,7 +180,7 @@ export default function Page() {
           </Text>
         </Box>
 
-        {transcription ? (
+        {currentStatus === "completed" && transcriptionDocData && fetchedTranscriptionText !== null ? (
           <Box
             p={4}
             borderRadius="md"
@@ -112,16 +190,16 @@ export default function Page() {
             whiteSpace="pre-wrap"
             w="full"
           >
-            <Text fontWeight="bold">Fichier: {transcription.fileName}</Text>
+            <Text fontWeight="bold">Fichier: {transcriptionDocData.fileName}</Text>
             <Text fontSize="sm" color="gray.500">
-              Taille: {formatFileSize(transcription.fileSize)} | Type: {transcription.contentType}
+              Taille: {formatFileSize(transcriptionDocData.fileSize)} | Type: {transcriptionDocData.contentType}
             </Text>
-            <Text mt={2}>{transcription.transcription}</Text>
+            <Text mt={2}>{fetchedTranscriptionText}</Text>
           </Box>
         ) : (
-          !isLoading && !error && (
+          currentStatus !== "processing" && !(currentStatus === "completed" && isFetchingText) && currentStatus !== "error" && currentStatus !== "error_unsupported_type" && (
             <Text color="gray.500" fontStyle="italic">
-              Aucune transcription disponible pour l&apos;ID fourni ou les critères.
+              Aucune transcription disponible ou en attente de traitement.
             </Text>
           )
         )}

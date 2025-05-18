@@ -26,7 +26,6 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
     try {
         initializeAppCheck(firebaseApp, {
             provider: new ReCaptchaEnterpriseProvider('6Lco8f4qAAAAAPFNsctWY6ASBbDBnWZ50v5jF9eP'),
-            isTokenAutoRefreshEnabled: true
         });
     } catch (error) {
         console.error("Error initializing Firebase App Check:", error);
