@@ -221,6 +221,7 @@ export default function Page() {
             Comment analysez-vous cette situation et quelles solutions envisagez-vous ?
           </Text>
         </Box>
+
         {currentStatus === "completed" && fetchedTranscriptionText !== null && !isFetchingJson && transcriptionDocData ? (
           <Box
             p={4}

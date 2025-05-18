@@ -20,16 +20,23 @@ import { toaster, Toaster } from "@/components/ui/toaster";
 export default function ClientComponent({ theme }: { theme: string }) {
     const router = useRouter();
     const [title, setTitle] = useState("");
-    const { user } = useUserWithClaims();
+    const { user, pro } = useUserWithClaims();
 
     useEffect(() => {
         if (user === undefined) {
             return;
         }
+
         if (user === null) {
             router.push("/login"); // Ensure this path is correct for your app
             return;
         }
+
+        if (user && !pro) {
+            router.push("/abonnement");
+            return;
+        }
+
         if (theme) {
             getOral(theme)
                 .then((oralDoc) => {
@@ -44,7 +51,7 @@ export default function ClientComponent({ theme }: { theme: string }) {
                     console.error(`Error fetching oral document for subjectId "${theme}":`, error);
                 });
         }
-    }, [user, router, theme]);
+    }, [user, router, theme, pro]);
 
     const [isRecording, setIsRecording] = useState(false);
     const [isPaused, setIsPaused] = useState(false);

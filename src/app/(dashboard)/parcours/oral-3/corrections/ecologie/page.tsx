@@ -222,6 +222,63 @@ export default function Page() {
         <Box bg="teal.500" p="3" borderRadius="lg" w="full">
           <Heading size="md" >Définitions</Heading>
         </Box>
+
+        {currentStatus === "error" && error && (
+          <Alert.Root status="error">
+            <Alert.Indicator /> {/* Default Chakra icon or your custom one */}
+            <Alert.Content>
+              <Alert.Title>Erreur de Transcription!</Alert.Title>
+              <Alert.Description>{error}</Alert.Description>
+            </Alert.Content>
+          </Alert.Root>
+        )}
+
+        <Box
+          w={{ base: "90%", md: "70%", lg: "66%" }}
+          border="5px solid"
+          borderRadius="lg"
+          p={{ base: 4, md: 6 }}
+          boxShadow="md"
+          textAlign="center"
+          alignSelf={"center"}
+          my={"4"}
+        >
+          <Text fontWeight="bold">Sujet vie scolaire</Text>
+          <Text mt={4}>
+            Vous êtes professeur principal d&apos;une classe de 3ème, vous devez organiser l&apos;élection des délégués de classe. Personne ne propose sa candidature.
+          </Text>
+          <Text mt={2}>
+            Comment analysez-vous cette situation et quelles solutions envisagez-vous ?
+          </Text>
+        </Box>
+
+        {currentStatus === "completed" && fetchedTranscriptionText !== null && !isFetchingJson && transcriptionDocData ? (
+          <Box
+            p={4}
+            borderRadius="md"
+            borderWidth="1px"
+            borderColor="gray.200"
+            fontSize="md"
+            whiteSpace="pre-wrap"
+            w="full"
+          >
+            <Text fontWeight="bold">Fichier Audio: {transcriptionDocData.fileName}</Text>
+            <Text fontSize="sm" color="gray.500">
+              Taille: {formatFileSize(transcriptionDocData.fileSize)} | Type: {transcriptionDocData.contentType || 'N/A'}
+            </Text>
+            <Text mt={2}>{fetchedTranscriptionText}</Text>
+          </Box>
+        ) : (
+          currentStatus !== "processing" &&
+          !(currentStatus === "completed" && isFetchingJson) &&
+          currentStatus !== "error" &&
+          currentStatus !== "error_unsupported_type" &&
+          fetchedTranscriptionText === null && ( // Ensure text is null to show this message
+            <Text color="gray.500" fontStyle="italic">
+              Aucune transcription disponible ou en attente de traitement.
+            </Text>
+          )
+        )}
         <List.Root gap={2} pl={4}>
           <Text><Text fontWeight="bold" as="span">LP</Text> : élèves en fin de scolarité, qui sont en en parallèle de l’école dans la vie active. Élèves fréquemment en opposition au système scolaire et aux règles de l’école.</Text>
           <Text><Text fontWeight="bold" as="span">Dans la cour</Text> : lieu où l’ensemble des personnels peuvent intervenir. Lieu placé sous la surveillance des AED.</Text>

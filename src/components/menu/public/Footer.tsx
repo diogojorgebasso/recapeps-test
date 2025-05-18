@@ -15,28 +15,16 @@ export default function Footer() {
                     &copy; 2025 Recap&apos;eps
                 </Text>
 
-                {/* Legal links - better grouped on mobile */}
-                <Stack direction={{ base: "column", md: "row" }} gap={{ base: 2, md: 4 }} align="center">
-                    <Link color="white" href="/legal/mentions-legales">Mentions légales</Link>
-                    <Link color="white" href="/legal/conditions-generales">Conditions générales de vente</Link>
-                    <Link color="white" href="/legal/politique-confidentialite">Politique de confidentialité</Link>
-                </Stack>
+                <Link color="white" href="/legal/mentions-legales">Mentions légales</Link>
+                <Link color="white" href="/legal/conditions-generales">Conditions générales de vente</Link>
+                <Link color="white" href="/legal/politique-confidentialite">Politique de confidentialité</Link>
 
-                {/* Social media icons */}
-                <HStack gap={3}>
-                    <a href="https://linkedin.com/company/recapeps"
-                        aria-label="Recapeps sur LinkedIn"
-                        target="_blank"
-                        rel="noopener noreferrer">
-                        <FaLinkedin size="20px" />
-                    </a>
-                    <a href="https://instagram.com/recapeps"
-                        aria-label="Recapeps sur Instagram"
-                        target="_blank"
-                        rel="noopener noreferrer">
-                        <FaInstagram size="20px" />
-                    </a>
-                </HStack>
+                <a href="https://instagram.com/recapeps"
+                    aria-label="Recapeps sur Instagram"
+                    target="_blank"
+                    rel="noopener noreferrer">
+                    <FaInstagram size="20px" />
+                </a>
             </Stack>
         </Container>
     );

@@ -143,9 +143,11 @@ export const sendwelcomeemail = functions.runWith({
             html: `
           <p>Bonjour,</p>
           <p>Bienvenue sur <strong>Recap'eps</strong> !</p>
-          <p>Nous sommes ravis de vous compter parmi nos utilisateurs.</p>
-          <p>N'hésitez pas à explorer toutes les fonctionnalités de notre plateforme.</p>
-          <p>Cordialement,<br>L'équipe RecapEPS</p>
+          <p>Nous sommes ravis de te compter parmi nos utilisateurs.</p>
+          <p>N'hésite pas à explorer toutes les fonctionnalités de notre plateforme et à nous faire un petit retour sur ton expérience.</p>
+          <p>Si tu as la moindre question ou remarque, tu peux nous contacter sur support@recapeps.fr</p>
+          <p>Bon courage pour tes révisions! 
+          <br>L'équipe Recap'eps</p>
         `
         };
 

@@ -1,3 +1,4 @@
+import { getAuthenticatedAppForUser } from "@/lib/firebase/serverApp";
 import ClientComponent from "./ClientComponent";
 
 export default async function Page({ params }: { params: Promise<{ theme: string }> }) {

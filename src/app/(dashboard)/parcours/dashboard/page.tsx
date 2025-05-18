@@ -192,7 +192,7 @@ export default function Page() {
                         </Card.Header>
                         <Card.Body>
                             <Text fontSize="sm">
-                                Fais des simulations d&apos;oraux pour tester ton niveau
+                                Fais des simulations d&apos;oraux pour tester ton niveau.
                             </Text>
                         </Card.Body>
                         <Card.Footer>
@@ -209,7 +209,7 @@ export default function Page() {
                         </Card.Header>
                         <Card.Body>
                             <Text fontSize="sm">
-                                Vérifie que tu as toutes les connaissances nécessaires
+                                Vérifie que tu as toutes les connaissances nécessaires.
                             </Text>
                         </Card.Body>
                         <Card.Footer>
