@@ -76,7 +76,7 @@ export default function Page() {
     setIsFetchingJson(false);
     fetchedPathRef.current = null;
 
-    const transcriptDocRef = doc(db, "users", user.uid, "transcripts", "egalite");
+    const transcriptDocRef = doc(db, "users", user.uid, "transcripts", "securite-2");
 
     unsubscribeRef.current = onSnapshot(transcriptDocRef, async (docSnap) => {
       if (docSnap.exists()) {
