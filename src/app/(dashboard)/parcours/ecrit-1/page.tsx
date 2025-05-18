@@ -26,7 +26,6 @@ import Link from "next/link";
 export default function Page() {
     const { user, pro } = useUserWithClaims();
     const [quizNodesArray, setQuizNodesArray] = useState<QuizTrail[]>([]);
-    console.log("pro", pro);
     useEffect(() => {
         if (!user) return;
         const fetchData = async () => {
@@ -130,9 +129,9 @@ function ExamCard({
                                     <Dialog.Header>
                                         <Dialog.Title>Contenu exclusif Recap&apos;eps Pro</Dialog.Title>
                                     </Dialog.Header>
-                                    <Dialog.Body>
+                                    <Dialog.Body > {/* Ensure Dialog.Body is a div */}
                                         <Text>
-                                            Tu apprécies le contenu que nous te proposons mais tu restes sur ta faim? Tu aimerai accéder à tout le contenu que nous t&apos;avons concocté?
+                                            Tu apprécies le contenu que nous te proposons mais tu restes sur ta faim? Tu aimerais accéder à tout le contenu que nous t&apos;avons concocté?
                                             Alors n&apos;hésite plus et passe à Recap&apos;eps Pro ! 🎯
                                         </Text>
                                     </Dialog.Body>
