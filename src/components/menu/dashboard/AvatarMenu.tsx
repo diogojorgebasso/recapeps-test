@@ -15,9 +15,11 @@ import {
 } from "react-icons/lu";
 import Link from "next/link";
 import { useUserWithClaims } from "@/lib/getUser";
+import { useRouter } from "next/navigation";
 
 export default function AvatarMenu() {
     const { user, pro } = useUserWithClaims();
+    const router = useRouter();
     return (
         <Menu.Root>
             <Menu.Trigger>
@@ -51,7 +53,10 @@ export default function AvatarMenu() {
                             </Link>
                         </Menu.Item>
                         <Menu.Separator />
-                        <Menu.Item value="logout" onClick={signOut}>
+                        <Menu.Item value="logout" onClick={() => {
+                            signOut()
+                            router.push("/")
+                        }}>
                             <HStack gap={2}>
                                 <LuLogOut />
                                 <span>Déconnexion</span>
