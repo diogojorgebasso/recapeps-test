@@ -30,8 +30,9 @@ export default function Page() {
     const [quizNodesArray, setQuizNodesArray] = useState<QuizTrail[]>([]);
 
     useEffect(() => {
-        if (!user) {
+        if (user === null) {
             router.push("/login?redirect=/parcours/ecrit-1");
+            return
         };
         const fetchData = async () => {
             try {
