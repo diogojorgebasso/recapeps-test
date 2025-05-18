@@ -1,34 +1,67 @@
 import { Box, Heading, Text, VStack, List } from "@chakra-ui/react";
-import type { Metadata } from 'next' 
+import type { Metadata } from 'next'
+import { useEffect, useState } from "react";
+import getTranscription from "../getTranscription";
+
 export const metadata: Metadata = {
-  title: 'Correction oral 3 CAPEPS – Addiction',
+  title: 'Correction oral 3 CAPEPS - Addiction',
   description: "Prépare-toi efficacement à l'oral 3 du CAPEPS avec cette correction complète d’un sujet sur l’addiction : définition des mots clés, hypothèses explicatives, valeurs de la République, dilemme de l'enseignant et éléments de réponse.",
 }
 
-const Page = () => {
+export default function Page() {
+  const [transcription, setTranscription] = useState<TranscriptionData | null>(null);
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return bytes + " B";
+    else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + " KB";
+    else return (bytes / 1048576).toFixed(1) + " MB";
+  };
+
+  useEffect(async () => {
+    const fetchTranscript = await getTranscript();
+  }, []);
+
   return (
-    
-    <Box p={5} maxW="3/4" mx="auto"  boxShadow="md">
+
+    <Box p={5} maxW="3/4" mx="auto" boxShadow="md">
       <VStack align="start">
 
-      <Box
-        w={{ base: "90%", md: "70%", lg: "66%" }}
-        border="5px solid"
-        borderRadius="lg"
-        p={{ base: 4, md: 6 }}
-        boxShadow="md"
-        textAlign="center"
-        alignSelf={"center"}
-        my={"4"}
-      >
-        <Text fontWeight="bold">Sujet vie scolaire</Text>
-        <Text mt={4}>
-        Vous êtes professeur(e) d’Éducation Physique et Sportive dans un collège rural. Lors d’un CA, est constaté l’addiction des élèves aux écrans avec des conséquences sur les apprentissages.</Text>
-        <Text mt={2}>
-Comment analysez-vous cette situation et quelles solutions envisagez-vous ?
+        {transcription?.transcription ? (
+          <Box
+            p={4}
+            bg="gray.50"
+            borderRadius="md"
+            borderWidth="1px"
+            borderColor={borderColor}
+            fontSize="md"
+            whiteSpace="pre-wrap"
+          >
+            {transcription.transcription}
+          </Box>
+        ) : (
+          <Text color="gray.500" fontStyle="italic">
+            Aucune transcription disponible.
+          </Text>
+        )}
 
-        </Text>
-      </Box>
+        <Box
+          w={{ base: "90%", md: "70%", lg: "66%" }}
+          border="5px solid"
+          borderRadius="lg"
+          p={{ base: 4, md: 6 }}
+          boxShadow="md"
+          textAlign="center"
+          alignSelf={"center"}
+          my={"4"}
+        >
+          <Text fontWeight="bold">Sujet vie scolaire</Text>
+          <Text mt={4}>
+            Vous êtes professeur(e) d’Éducation Physique et Sportive dans un collège rural. Lors d’un CA, est constaté l’addiction des élèves aux écrans avec des conséquences sur les apprentissages.</Text>
+          <Text mt={2}>
+            Comment analysez-vous cette situation et quelles solutions envisagez-vous ?
+
+          </Text>
+        </Box>
 
         <Box bg="teal.500" p="3" borderRadius="lg" w="full">
           <Heading size="md" >Définitions</Heading>
@@ -86,4 +119,3 @@ Comment analysez-vous cette situation et quelles solutions envisagez-vous ?
   );
 };
 
-export default Page;

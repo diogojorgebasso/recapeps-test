@@ -15,24 +15,41 @@ import {
 } from "@chakra-ui/react";
 import { uploadRecordingAction } from "./uploadRecordingAction";
 import { getOral } from "./getOral";
+import { useUserWithClaims } from "@/lib/getUser";
 
-export default function ClientComponent({ subjectId }: { subjectId: string }) {
+export default function ClientComponent({ theme }: { theme: string }) {
     const router = useRouter();
     const [title, setTitle] = useState("");
+    const { user } = useUserWithClaims();
 
     useEffect(() => {
-        getOral(subjectId)
-            .then((oralDoc) => {
-                if (oralDoc.exists()) {
-                    setTitle(oralDoc.data().title);
-                } else {
-                    console.error("Document does not exist");
-                }
-            })
-            .catch((error) => {
-                console.error("Error fetching document:", error);
-            });
-    }, [subjectId]);
+        if (user === undefined) {
+            return; // Wait for user state to be determined
+        }
+
+        // If user is null, it means the user is not logged in after loading.
+        if (user === null) {
+            router.push("/auth/login");
+            return;
+        }
+
+        // If user is an object, the user is logged in. Proceed to fetch data.
+        // Ensure subjectId is valid before fetching
+        if (theme) {
+            getOral(theme)
+                .then((oralDoc) => {
+                    if (oralDoc.exists()) {
+                        const data = oralDoc.data();
+                        setTitle(data.title);
+                    } else {
+                        console.error(`Oral document with subjectId "${theme}" does not exist.`);
+                    }
+                })
+                .catch((error) => {
+                    console.error(`Error fetching oral document for subjectId "${theme}":`, error);
+                });
+        }
+    }, [user, router, theme]); // Added router to dependency array
 
     const [isRecording, setIsRecording] = useState(false);
     const [timeLeft, setTimeLeft] = useState(180);
@@ -190,9 +207,9 @@ export default function ClientComponent({ subjectId }: { subjectId: string }) {
             const blob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
             const formData = new FormData();
             // Use a filename that the server action can recognize
-            formData.append('audioBlob', blob, `oral_${subjectId}_${Date.now()}.webm`);
+            formData.append('audioBlob', blob, `oral_${theme}.webm`);
 
-            const result = await uploadRecordingAction(formData, subjectId);
+            const result = await uploadRecordingAction(formData, user?.uid || "", theme);
 
             if (result.filePath) {
                 router.push(result.filePath);
@@ -214,7 +231,13 @@ export default function ClientComponent({ subjectId }: { subjectId: string }) {
         <Container maxW="container.md" py={8}>
             <VStack gap={8}>
                 <Center>
-                    <Heading size="xl" textAlign="center">{title}</Heading>
+                    <Heading size="xl" textAlign="center">{theme}</Heading>
+                    <Text fontSize="lg" color="gray.500" mt={2}>
+                        {title}
+                    </Text>
+                    <Text fontSize="lg" color="gray.500" mt={2}>
+                        Comment analysez-vous cette situation et quelles solutions envisagez-vous ?
+                    </Text>
                 </Center>
 
                 <Box

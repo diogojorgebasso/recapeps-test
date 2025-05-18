@@ -1,7 +1,8 @@
 "use server";
 
 import { redirect } from 'next/navigation'
-import { Box, Text, Link } from '@chakra-ui/react' // Import Chakra UI components
+import { Box, Text, Button, Flex, VStack, Heading } from '@chakra-ui/react'
+import Link from 'next/link';
 
 import { stripe } from '@/lib/stripe';
 
@@ -28,16 +29,58 @@ export default async function Return({
 
     if (status === 'complete') {
         return (
-            <Box as="section" id="success">
-                <Text>
-                    Merci pour votre confiance {customer_details?.name}! Un email de confirmation a été ennvoyé à
-                    {customer_details?.email}. Si vous avez des questions, n&apos;hésitez pas à nous contacter à l&apos;adresse suivante :
-                </Text>
-                <Link href="mailto:support@recapeps.fr">support@recapeps.fr</Link>. {/* Use Link for anchor */}
-                <Text>
-                    Bonnes révisions et à bientôt sur Recap&apos;eps!
-                </Text>
-            </Box>
+            <Flex
+                direction="column"
+                alignItems="center"
+                justifyContent="center"
+                minH="100vh"
+                bg="gray.50"
+                p={8}
+            >
+                <Box
+                    as="section"
+                    id="success"
+                    p={8}
+                    borderWidth="1px"
+                    borderRadius="lg"
+                    boxShadow="xl"
+                    bg="white"
+                    textAlign="center"
+                    maxW="md"
+                >
+                    <VStack gap={4}>
+                        <Heading as="h1" size="lg" color="green.500">
+                            Paiement Réussi!
+                        </Heading>
+                        <Text fontSize="lg">
+                            Merci pour votre confiance, {customer_details?.name}!
+                        </Text>
+                        <Text>
+                            Un email de confirmation a été envoyé à{' '}
+                            <Text as="span" fontWeight="bold">{customer_details?.email}</Text>.
+                        </Text>
+                        <Text>
+                            Si vous avez des questions, n&apos;hésitez pas à nous contacter à l&apos;adresse suivante :{' '}
+                            <a href="mailto:support@recapeps.fr" color="blue.500">
+                                support@recapeps.fr
+                            </a>.
+                        </Text>
+                        <Text fontSize="lg" fontWeight="medium">
+                            Bonnes révisions et à bientôt sur Recap&apos;eps!
+                        </Text>
+                        <Button
+                            colorPalette="green"
+                            size="lg"
+                            mt={6}
+                            asChild
+                        >
+                            <Link href="/parcours/dashboard">
+                                Accéder à mon tableau de bord
+                            </Link>
+                        </Button>
+                    </VStack>
+                </Box>
+            </Flex>
         )
     }
 }

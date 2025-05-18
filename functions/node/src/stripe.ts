@@ -216,7 +216,6 @@ export const stripewebhooktest = onRequest({
 
       res.status(200).send("Webhook received");
     } else {
-      // Acknowledge unhandled event types
       res.status(200).send("Event type not handled");
     }
 

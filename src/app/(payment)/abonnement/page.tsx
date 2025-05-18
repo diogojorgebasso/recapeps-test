@@ -13,6 +13,7 @@ import {
 import { LuCircleCheck } from 'react-icons/lu';
 import { useState } from 'react';
 import Link from 'next/link';
+import { useUserWithClaims } from '@/lib/getUser';
 
 interface Plan {
     id: string;
@@ -65,6 +66,32 @@ const PLANS: Plan[] = [
 export default function AbonnementPage() {
     const [selectedId, setSelectedId] = useState('yearly');
     const [loadingId, setLoadingId] = useState<string | null>(null);
+
+    const { pro } = useUserWithClaims()
+
+    if (pro) {
+        return (
+            <Box>
+                <Box py={10} px={4}>
+                    <Heading as="h1" textAlign="center" mb={10}>
+                        Vous êtes déjà abonné à la formule Pro
+                    </Heading>
+                    <Text textAlign="center" fontSize="lg">
+                        Merci de votre confiance ! Vous pouvez accéder à tous les cours sans frais supplémentaires.
+                    </Text>
+                    <Link href="/parcours/dashboard">
+                        <Button
+                            colorPalette="blue"
+                            size="lg"
+                            mt={6}
+                        >
+                            Accéder à mon tableau de bord
+                        </Button>
+                    </Link>
+                </Box>
+            </Box>
+        );
+    }
 
     return (
         <Box>

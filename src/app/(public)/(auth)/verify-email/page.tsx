@@ -32,7 +32,7 @@ export default function VerifyEmail() {
             setLoading(false);
 
             if (!currentUser) {
-                router.push('/');
+                router.push('/login');
                 return;
             }
 

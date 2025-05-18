@@ -26,7 +26,7 @@ import Link from "next/link";
 export default function Page() {
     const { user, pro } = useUserWithClaims();
     const [quizNodesArray, setQuizNodesArray] = useState<QuizTrail[]>([]);
-
+    console.log("pro", pro);
     useEffect(() => {
         if (!user) return;
         const fetchData = async () => {
