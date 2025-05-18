@@ -165,7 +165,7 @@ export default function Page() {
             <Box maxWidth="1000px" mx="auto" py={8} mt={8}>
                 <Heading size="lg" textAlign="center" mb={6}>
                     <HStack justifyContent="center">
-                        <HiOutlineSparkles /> <Text>Bonjour {user?.displayName || ""}, que souhaites-tu réviser aujourd&apos;hui</Text>
+                        <HiOutlineSparkles /> <Text>Bonjour {user?.displayName || ""}, que souhaites-tu réviser aujourd&apos;hui ?</Text>
                     </HStack>
                 </Heading>
                 <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={6}>
@@ -174,8 +174,8 @@ export default function Page() {
                             <Heading size="md">Oral 1</Heading>
                         </Card.Header>
                         <Card.Body>
-                            <Text fontSize="sm" color="gray.500">
-                                Préparez-vous pour l&apos;oral 1 avec nos fiches de révision.
+                            <Text fontSize="sm" >
+                                Révise grâce à ces fiches spécifiques à chaque sport.
                             </Text>
                         </Card.Body>
                         <Card.Footer>
@@ -191,26 +191,31 @@ export default function Page() {
                             <Heading size="md">Oral 3</Heading>
                         </Card.Header>
                         <Card.Body>
-                            <Text fontSize="sm" color="gray.500">
-                                Préparez-vous pour l&apos;oral 3 avec nos fiches de révision.
+                            <Text fontSize="sm">
+                                Fais des simulations d&apos;oraux pour tester ton niveau
                             </Text>
                         </Card.Body>
                         <Card.Footer>
-                            <Link href={`/parcours/oral-3#fiches`} passHref>
+                            <Link href={`/parcours/oral-3`} passHref>
                                 <Button colorPalette="green" variant="solid" width="full">
-                                    Voir les fiches
+                                    Faire une simulation
                                 </Button>
                             </Link>
                         </Card.Footer>
                     </Card.Root>
                     <Card.Root borderWidth="1px" borderRadius="md" shadow="sm" _hover={{ shadow: "md" }}>
                         <Card.Header>
-                            <Heading size="md">Oral 3</Heading>
+                            <Heading size="md">Oral 3 - Fiches</Heading>
                         </Card.Header>
+                        <Card.Body>
+                            <Text fontSize="sm">
+                                Vérifie que tu as toutes les connaissances nécessaires
+                            </Text>
+                        </Card.Body>
                         <Card.Footer>
-                            <Link href={`/parcours/oral-3`} passHref>
+                            <Link href={`/parcours/oral-3#fiches`} passHref>
                                 <Button colorPalette="green" variant="solid" width="full">
-                                    Faire une simulation
+                                    Voir les fiches
                                 </Button>
                             </Link>
                         </Card.Footer>

@@ -7,9 +7,10 @@ import {
     CardFooter,
     Flex,
     Heading,
-    Icon,
+    Center,
     SimpleGrid,
     Text,
+    VStack
 } from "@chakra-ui/react";
 import { subjects } from "./subjects";
 import { subjects2 } from "./subjects2";
@@ -53,7 +54,7 @@ function ExamCard({
                 color={blocked ? "gray.400" : "blue.500"}
                 _groupHover={{ color: blocked ? "gray.400" : "blue.600" }}
             >
-                <IconCard />
+                <IconCard size={30} />
             </Flex>
 
             <CardBody textAlign="center" px={4} pb={blocked ? 2 : 4}>
@@ -160,18 +161,35 @@ function ExamCard2({
     );
 }
 
+function getRandomSubject() {
+    const randomIndex = Math.floor(Math.random() * subjects.length);
+    return subjects[randomIndex];
+}
 
 export default async function Page() {
     const { pro } = await getAuthenticatedAppForUser();
 
     return (
         <Box px={{ base: 4, md: 8 }} py={8}>
-            <Heading as="h1" size="xl" mb={2}>
-                Oral&nbsp;3
-            </Heading>
-            <Text mb={8} fontSize="lg" color="gray.600">
-                Choisissez un thème pour commencer votre préparation.
+            <Center>
+                <VStack gap={4} mb={8}>
+                    <Heading as="h1" size="xl" mb={2}>
+                        Faire une simulation de l&apos;oral 3
+                    </Heading>
+                    <Text fontSize="lg" color="gray.500">
+                        Entraine-toi sur un sujet aléatoire, comme le jour J !
+                    </Text>
+                    <Button shadow="md" size="xl" bg={"orange.500"} color="white" mt={4} asChild>
+                        <Link href={`/parcours/oral-3/${getRandomSubject().id}`}>
+                            Démarrer la simulation
+                        </Link>
+                    </Button>
+                </VStack>
+            </Center>
+            <Text mb={8} fontSize="lg">
+                Sinon, choisis le thème sur lequel tu souhaites t&apos;entrainer :
             </Text>
+
 
             <SimpleGrid columns={{ base: 1, sm: 2, lg: 3 }} gap={6}>
                 {subjects.map(({ id, name, icon, premium }) => (
@@ -185,7 +203,7 @@ export default async function Page() {
                     />
                 ))}
             </SimpleGrid>
-            <Heading id="fiches">Fiches de révision</Heading>
+            <Heading id="fiches" size="2xl" mt={4}>Fiches de révision</Heading>
             <SimpleGrid columns={{ base: 1, sm: 2, lg: 3 }} gap={6} mt={4}>
                 {subjects2.map(({ id, name, icon, premium }) => (
                     <ExamCard2

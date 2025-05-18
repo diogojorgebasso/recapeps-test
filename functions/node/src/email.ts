@@ -9,7 +9,7 @@ const db = getFirestore();
 MailService.setApiKey(process.env.SENDGRID_API_KEY || "");
 
 export const sendcontactemail = onDocumentCreated({
-    document: "contact/{contactID}",
+    document: "contacts/{contactID}",
     serviceAccount: "send-contact-email-run@recapeps-test.iam.gserviceaccount.com"
 },
     async (event) => {

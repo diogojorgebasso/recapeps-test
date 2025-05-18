@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  Center,
   Heading,
   Text,
   SimpleGrid,
@@ -137,105 +138,118 @@ export default function Home() {
             </Card.Root>
           </LinkBox>
         </SimpleGrid>
-
-        <Box p={4}>
-          <VStack align="stretch" mt={12} gap={12} padding={6}>
-            <Text>
-              Pour réviser efficacement les écrits, tu as accès à des fiches de révisions ainsi qu&apos;à des quiz qui te permettent de retenir toutes les connaissances dont tu auras besoin le jour J ✍️ <br /><br />
-            </Text>
-            {/* Écrit 1 */}
-            <Box id="ecrit1">
-              <Heading size="xl" mb={4}>
-                Écrit 1
-              </Heading>
-              <Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={6} alignItems="stretch" >
-                <GridItem>
+        <Box p={12}>
+          <Text>
+            Pour réviser efficacement les écrits, tu as accès à des fiches de révisions ainsi qu&apos;à des quiz qui te permettent de retenir toutes les connaissances dont tu auras besoin le jour J ✍️ <br /><br />
+          </Text>
+          <Box id="ecrit1">
+            <Heading size="xl" mb={4}>
+              Écrit 1
+            </Heading>
+            <Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={6} alignItems="stretch" >
+              <GridItem>
+                <Flex wrap="wrap" gap={4} justify="center" height="100%">
+                  <Image
+                    src="sante-p1.png"
+                    alt="Écrit 1"
+                    width={{ base: "100%", md: "300px" }}
+                    height="auto"
+                    objectFit="contain"
+                  />
+                  <Image
+                    src="/sante-p2.png"
+                    alt="Écrit 1"
+                    width={{ base: "100%", md: "300px" }}
+                    height="auto"
+                    objectFit="contain"
+                  />
+                </Flex>
+              </GridItem>
+              <GridItem>
+                <VStack align="start" >
                   <Flex wrap="wrap" gap={4} justify="center" height="100%">
-                    <Image
-                      src="sante-p1.png"
-                      alt="Écrit 1"
-                      width={{ base: "100%", md: "300px" }}
-                      height="auto"
-                      objectFit="contain"
-                    />
-                    <Image
-                      src="/sante-p2.png"
-                      alt="Écrit 1"
-                      width={{ base: "100%", md: "300px" }}
-                      height="auto"
-                      objectFit="contain"
-                    />
+                    <QuizComponent1 />
                   </Flex>
-                </GridItem>
-                <GridItem>
-                  <VStack align="start" >
-                    <Flex wrap="wrap" gap={4} justify="center" height="100%">
-                      <QuizComponent1 />
-                    </Flex>
-                  </VStack>
-                </GridItem>
-              </Grid>
-            </Box>
+                </VStack>
+              </GridItem>
+            </Grid>
+          </Box>
 
-            {/* Écrit 2 */}
-            <Box id="ecrit2">
-              <Heading size="xl" mb={4}>
-                Écrit 2
-              </Heading>
-              <Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={6}>
-                <GridItem>
+          {/* Écrit 2 */}
+          <Box id="ecrit2">
+            <Heading size="xl" mb={4}>
+              Écrit 2
+            </Heading>
+            <Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={6}>
+              <GridItem>
+                <Flex wrap="wrap" gap={4} justify="center" height="100%">
+                  <Image
+                    src="/competence-p1.png"
+                    alt="Écrit 2"
+                    height="auto"
+                    objectFit="contain"
+                    width={{ base: "100%", md: "300px" }}
+                  />
+                  <Image
+                    src="/competence-p2.png"
+                    alt="Écrit 2"
+                    height="auto"
+                    objectFit="contain"
+                    width={{ base: "100%", md: "300px" }}
+                  />
+                </Flex>
+              </GridItem>
+              <GridItem>
+                <VStack align="start">
                   <Flex wrap="wrap" gap={4} justify="center" height="100%">
-                    <Image
-                      src="/competence-p1.png"
-                      alt="Écrit 2"
-                      height="auto"
-                      objectFit="contain"
-                      width={{ base: "100%", md: "300px" }}
-                    />
-                    <Image
-                      src="/competence-p2.png"
-                      alt="Écrit 2"
-                      height="auto"
-                      objectFit="contain"
-                      width={{ base: "100%", md: "300px" }}
-                    />
+                    <QuizComponent2 />
                   </Flex>
-                </GridItem>
-                <GridItem>
-                  <VStack align="start">
-                    <Flex wrap="wrap" gap={4} justify="center" height="100%">
-                      <QuizComponent2 />
-                    </Flex>
-                  </VStack>
-                </GridItem>
-              </Grid>
-            </Box>
+                </VStack>
+              </GridItem>
+            </Grid>
+          </Box>
 
-            <Text>
-              Pour réviser efficacement les oraux, tu as accès à des fiches de révision ainsi qu&apos;à des simulations d&apos;entretien d&apos;oral 3 <br /><br />
+          <Text>
+            Pour réviser efficacement les oraux, tu as accès à des fiches de révision ainsi qu&apos;à des simulations d&apos;entretien d&apos;oral 3 <br /><br />
+          </Text>
+
+          <Box id="oral1">
+            <Heading size="xl" mb={4}>
+              Oral 1
+            </Heading>
+            <Text fontSize="lg">
+              Pour réviser l&apos;oral 1, tu as accès à un résumé synthétique des infos utiles pour chaque sport
             </Text>
-            {/* Oral 1 */}
-            <Box id="oral1">
-              <Heading size="xl" mb={4}>
-                Oral 1
-              </Heading>
-              <Text fontSize="lg">
-                Pour réviser l&apos;oral 1, tu as accès à un résumé synthétique des infos utiles pour chaque sport
-              </Text>
-            </Box>
+            <Center>
+              <Image
+                src="/oral-1.jpeg"
+                alt="Oral 1"
+                height="auto"
+                width="50%"
+              />
+            </Center>
+          </Box>
 
-            {/* Oral 3 */}
-            <Box id="oral3">
-              <Heading size="xl" mb={4}>
-                Oral 3
-              </Heading>
-              <Text fontSize="lg" mb={4}>
-                Pour réviser l&apos;oral 3, tu as non seulement accès à des synthèses de connaissances utiles, mais tu peux aussi t&apos;entrainer sur de vrais sujets comme si tu étais à l&apos;examen
-              </Text>
-            </Box>
-          </VStack>
+
+          <Box id="oral3" mt={8}>
+            <Heading size="xl" mb={4}>
+              Oral 3
+            </Heading>
+            <Text fontSize="lg" mb={4}>
+              Pour réviser l&apos;oral 3, tu as non seulement accès à des synthèses de connaissances utiles, mais tu peux aussi t&apos;entrainer sur de vrais sujets comme si tu étais à l&apos;examen
+            </Text>
+            <Center>
+              <Image
+                src="/oral-3.jpeg"
+                alt="Oral 3"
+                height="auto"
+                width="50%"
+              />
+            </Center>
+
+          </Box>
         </Box>
       </Box>
-    </Box>
+    </Box >
   );
 }

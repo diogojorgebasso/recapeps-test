@@ -107,7 +107,7 @@ export default function EmailNotificationToggle() {
             onChange={handleToggle}
             disabled={loading}
         >
-            {loading ? 'Chargement...' : (enabled ? 'Recevoir des notifications par email' : 'Ne pas recevoir de notifications par email')}
+            {loading ? 'Chargement...' : 'Recevoir des notifications par email'}
         </Checkbox>
     );
 }

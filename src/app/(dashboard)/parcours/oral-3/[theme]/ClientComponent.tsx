@@ -288,7 +288,6 @@ export default function ClientComponent({ theme }: { theme: string }) {
     return (
         <Container maxW="container.md" py={8}>
             <Toaster />
-            <Heading size="xl" textAlign="center">{theme}</Heading>
             <Text fontSize="lg" mt={2}>{title}</Text>
             <Text fontSize="lg" mt={2}>Comment analysez-vous cette situation et quelles solutions envisagez-vous ?</Text>
 
