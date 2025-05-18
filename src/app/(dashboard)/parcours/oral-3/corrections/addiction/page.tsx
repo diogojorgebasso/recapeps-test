@@ -31,7 +31,7 @@ const formatFileSize = (bytes?: number): string => {
   if (bytes === undefined || bytes === null) return 'N/A';
   if (bytes === 0) return '0 Bytes';
   const k = 1024;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  const sizes = ['Bytes', 'KB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 };
@@ -202,7 +202,6 @@ export default function Page() {
             </Alert.Content>
           </Alert.Root>
         )}
-
 
         <Box
           w={{ base: "90%", md: "70%", lg: "66%" }}
