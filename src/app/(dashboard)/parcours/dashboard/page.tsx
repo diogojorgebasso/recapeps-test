@@ -29,7 +29,7 @@ import Link from "next/link";
 import { findCompletedAttempts } from "@/repositories/quizRepo";
 import { QuizDone } from "@/types/Quiz";
 import { useUserWithClaims } from "@/lib/getUser";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
     const { user } = useUserWithClaims();
@@ -41,7 +41,6 @@ export default function Page() {
     useEffect(() => {
         const loadData = async () => {
             if (!user?.uid) {
-                setIsLoading(false);
                 router.push("/login");
                 return;
             }

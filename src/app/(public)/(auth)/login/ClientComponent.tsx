@@ -17,7 +17,7 @@ import { FaGoogle } from "react-icons/fa";
 import { PasswordInput } from "@/components/ui/password-input";
 import { signInWithGoogle, signInWithEmail } from "@/lib/firebase/auth";
 import { z } from "zod";
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation' // Import useSearchParams
 
 // Define the validation schema
 const loginSchema = z.object({
@@ -30,6 +30,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 export default function ClientComponent() {
 
     const router = useRouter();
+    const searchParams = useSearchParams(); // Get search params
     const [formData, setFormData] = useState<LoginFormData>({
         email: "",
         password: "",
@@ -38,6 +39,14 @@ export default function ClientComponent() {
     const [errors, setErrors] = useState<Partial<Record<keyof LoginFormData, string>>>({});
     const [isLoading, setIsLoading] = useState(false);
     const [generalError, setGeneralError] = useState<string | null>(null);
+
+    const getRedirectUrl = () => {
+        const redirectPath = searchParams.get('redirect');
+        if (redirectPath && redirectPath.startsWith('/')) {
+            return redirectPath;
+        }
+        return "/parcours/dashboard";
+    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -48,10 +57,19 @@ export default function ClientComponent() {
         }
     };
 
-    const handleGoogleSignIn = (event: React.FormEvent) => {
+    const handleGoogleSignIn = async (event: React.FormEvent) => { // Make async to await signIn
         event.preventDefault();
-        signInWithGoogle();
-        router.push("/parcours/dashboard");
+        setIsLoading(true); // Optional: set loading state
+        setGeneralError(null);
+        try {
+            await signInWithGoogle();
+            router.push(getRedirectUrl());
+        } catch (error) {
+            setGeneralError("Échec de connexion avec Google.");
+            console.error("Google Sign-In error:", error);
+        } finally {
+            setIsLoading(false); // Optional: reset loading state
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -64,7 +82,7 @@ export default function ClientComponent() {
             setIsLoading(true);
 
             await signInWithEmail(validatedData.email, validatedData.password);
-            router.push("/parcours/dashboard");
+            router.push(getRedirectUrl());
         } catch (error) {
             if (error instanceof z.ZodError) {
                 // Handle validation errors

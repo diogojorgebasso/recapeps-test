@@ -22,15 +22,19 @@ import { getProgressOverview } from "@/repositories/quizRepo";
 import { QuizTrail } from "@/types/TreeSkill";
 import { useUserWithClaims } from "@/lib/getUser";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
     const { user, pro } = useUserWithClaims();
+    const router = useRouter();
     const [quizNodesArray, setQuizNodesArray] = useState<QuizTrail[]>([]);
     useEffect(() => {
-        if (!user) return;
+        if (!user) {
+            router.push("/login?redirect=/parcours/ecrit-1");
+        };
         const fetchData = async () => {
             try {
-                const progressData = await getProgressOverview(user.uid, 1);
+                const progressData = await getProgressOverview(user?.uid, 1);
                 setQuizNodesArray(progressData || []);
             } catch (error) {
                 console.error("Failed to fetch progress overview:", error);
@@ -38,7 +42,7 @@ export default function Page() {
             }
         };
         fetchData();
-    }, [user]);
+    }, [user, router]);
 
     return (
         <Tabs.Root defaultValue="apprendre">
