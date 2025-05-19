@@ -176,6 +176,24 @@ export default function Page() {
       <VStack align="start">
         <Heading size="lg">Transcription de l&apos;enregistrement</Heading>
 
+        <Box
+          w={{ base: "90%", md: "70%", lg: "66%" }}
+          border="5px solid"
+          borderRadius="lg"
+          p={{ base: 4, md: 6 }}
+          boxShadow="md"
+          textAlign="center"
+          alignSelf={"center"}
+          my={"4"}
+        >
+          <Text fontWeight="bold">Sujet disciplinaire</Text>
+          <Text mt={4}>
+            Vous êtes professeur d&apos;EPS dans un collège, après avoir lu les résultats des filles et des garçons en EPS lors des dernières années, il s&apos;avère que la moyenne des garçons est supérieure à celle des filles d&apos;environ 2 points.        </Text>
+          <Text mt={2}>
+            Comment analysez-vous cette situation et quelles solutions envisagez-vous ?
+          </Text>
+        </Box>
+
         {(currentStatus === "processing" || (currentStatus === "completed" && isFetchingJson)) && (
           <Alert.Root status="info" variant="subtle" flexDirection="column" alignItems="center" justifyContent="center" textAlign="center" height="200px">
             <Alert.Indicator asChild>
@@ -201,53 +219,6 @@ export default function Page() {
             </Alert.Content>
           </Alert.Root>
         )}
-
-        <Box
-          w={{ base: "90%", md: "70%", lg: "66%" }}
-          border="5px solid"
-          borderRadius="lg"
-          p={{ base: 4, md: 6 }}
-          boxShadow="md"
-          textAlign="center"
-          alignSelf={"center"}
-          my={"4"}
-        >
-          <Text fontWeight="bold">Sujet disciplinaire</Text>
-          <Text mt={4}>
-            Vous êtes professeur d&apos;EPS dans un collège, après avoir lu les résultats des filles et des garçons en EPS lors des dernières années, il s&apos;avère que la moyenne des garçons est supérieure à celle des filles d&apos;environ 2 points.        </Text>
-          <Text mt={2}>
-            Comment analysez-vous cette situation et quelles solutions envisagez-vous ?
-          </Text>
-        </Box>
-
-        {currentStatus === "error" && error && (
-          <Alert.Root status="error">
-            <Alert.Indicator /> {/* Default Chakra icon or your custom one */}
-            <Alert.Content>
-              <Alert.Title>Erreur de Transcription!</Alert.Title>
-              <Alert.Description>{error}</Alert.Description>
-            </Alert.Content>
-          </Alert.Root>
-        )}
-
-        <Box
-          w={{ base: "90%", md: "70%", lg: "66%" }}
-          border="5px solid"
-          borderRadius="lg"
-          p={{ base: 4, md: 6 }}
-          boxShadow="md"
-          textAlign="center"
-          alignSelf={"center"}
-          my={"4"}
-        >
-          <Text fontWeight="bold">Sujet vie scolaire</Text>
-          <Text mt={4}>
-            Vous êtes professeur principal d&apos;une classe de 3ème, vous devez organiser l&apos;élection des délégués de classe. Personne ne propose sa candidature.
-          </Text>
-          <Text mt={2}>
-            Comment analysez-vous cette situation et quelles solutions envisagez-vous ?
-          </Text>
-        </Box>
 
         {currentStatus === "completed" && fetchedTranscriptionText !== null && !isFetchingJson && transcriptionDocData ? (
           <Box
@@ -276,6 +247,7 @@ export default function Page() {
             </Text>
           )
         )}
+
         <Box bg="teal.500" p="3" borderRadius="lg" w="full">
           <Heading size="md" >Définitions</Heading>
         </Box>
