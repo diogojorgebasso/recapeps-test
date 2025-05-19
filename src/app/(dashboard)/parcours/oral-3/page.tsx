@@ -19,6 +19,7 @@ import { subjects } from "./subjects";
 import { subjects2 } from "./subjects2";
 import type { IconType } from "react-icons";
 import { getAuthenticatedAppForUser } from "@/lib/firebase/serverApp";
+import { redirect } from "next/navigation";
 
 /**
  * A single exam card.
@@ -170,7 +171,11 @@ function getRandomSubject() {
 }
 
 export default async function Page() {
-    const { pro } = await getAuthenticatedAppForUser();
+    const { pro, user } = await getAuthenticatedAppForUser();
+
+    if (!user) {
+        redirect("/login?redirect=/parcours/oral-3");
+    }
 
     return (
         <Box px={{ base: 4, md: 8 }} py={8}>
