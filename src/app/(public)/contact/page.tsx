@@ -15,12 +15,13 @@ import { z } from "zod";
 import { addDoc, collection } from "firebase/firestore";
 import { db } from "@/lib/firebase/clientApp";
 import { useUserWithClaims } from '@/lib/getUser';
+import { toaster, Toaster } from "@/components/ui/toaster";
 
 // Define validation schema
 const contactSchema = z.object({
     name: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
     email: z.string().email("Adresse email invalide"),
-    message: z.string().min(10, "Le message doit contenir au moins 10 caractères")
+    message: z.string()
 });
 
 type ContactFormData = z.infer<typeof contactSchema>;
@@ -34,12 +35,7 @@ export default function Page() {
     });
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isLoading, setIsLoading] = useState(false);
-    const [submitStatus, setSubmitStatus] = useState<{
-        type: 'success' | 'error';
-        message: string;
-    } | null>(null);
 
-    // Pre-fill form with user data if available
     useEffect(() => {
         if (user) {
             setFormData(prev => ({
@@ -70,10 +66,8 @@ export default function Page() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setErrors({});
-        setSubmitStatus(null);
 
         try {
-            // Validate form data
             const validatedData = contactSchema.parse(formData);
             setIsLoading(true);
 
@@ -93,11 +87,11 @@ export default function Page() {
                 message: ''
             });
 
-            setSubmitStatus({
+            toaster.create({
                 type: 'success',
-                message: 'Votre message a été envoyé avec succès!'
-            });
-
+                title: 'Message envoyé',
+                description: 'Votre message a été envoyé avec succès!'
+            })
         } catch (error) {
             if (error instanceof z.ZodError) {
                 // Format Zod errors
@@ -107,11 +101,17 @@ export default function Page() {
                     fieldErrors[path] = err.message;
                 });
                 setErrors(fieldErrors);
+                toaster.create({
+                    type: 'warning',
+                    title: 'Erreur de validation',
+                    description: 'Veuillez corriger les erreurs indiquées dans le formulaire.'
+                });
             } else {
                 console.error("Error submitting contact form:", error);
-                setSubmitStatus({
+                toaster.create({
                     type: 'error',
-                    message: "Une erreur est survenue lors de l'envoi du message. Veuillez réessayer."
+                    title: 'Erreur',
+                    description: "Une erreur est survenue lors de l'envoi du message. Veuillez réessayer."
                 });
             }
         } finally {
@@ -121,6 +121,7 @@ export default function Page() {
 
     return (
         <>
+            <Toaster />
             <Box
                 display="flex"
                 alignItems="center"
@@ -140,69 +141,67 @@ export default function Page() {
                         Contactez-nous
                     </Text>
 
+                    <Fieldset.Root>
+                        <Fieldset.Content as={VStack} gap={4}>
+                            <Field.Root>
+                                <Field.Label mb={2}>Nom</Field.Label>
+                                <Input
+                                    type="text"
+                                    name="name"
+                                    value={formData.name}
+                                    onChange={handleChange}
+                                    placeholder="Entrez votre nom"
+                                    required
+                                />
+                                {errors.name && (
+                                    <Field.ErrorText>{errors.name}</Field.ErrorText>
+                                )}
+                            </Field.Root>
 
-                    <form onSubmit={handleSubmit}>
-                        <Fieldset.Root>
-                            <Fieldset.Content as={VStack} gap={4}>
-                                <Field.Root>
-                                    <Field.Label mb={2}>Nom</Field.Label>
-                                    <Input
-                                        type="text"
-                                        name="name"
-                                        value={formData.name}
-                                        onChange={handleChange}
-                                        placeholder="Entrez votre nom"
-                                        required
-                                    />
-                                    {errors.name && (
-                                        <Field.ErrorText>{errors.name}</Field.ErrorText>
-                                    )}
-                                </Field.Root>
+                            <Field.Root>
+                                <Field.Label mb={2}>Email</Field.Label>
+                                <Input
+                                    type="email"
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleChange}
+                                    placeholder="Entrez votre email"
+                                    required
+                                />
+                                {errors.email && (
+                                    <Field.ErrorText>{errors.email}</Field.ErrorText>
+                                )}
+                            </Field.Root>
 
-                                <Field.Root>
-                                    <Field.Label mb={2}>Email</Field.Label>
-                                    <Input
-                                        type="email"
-                                        name="email"
-                                        value={formData.email}
-                                        onChange={handleChange}
-                                        placeholder="Entrez votre email"
-                                        required
-                                    />
-                                    {errors.email && (
-                                        <Field.ErrorText>{errors.email}</Field.ErrorText>
-                                    )}
-                                </Field.Root>
+                            <Field.Root>
+                                <Field.Label mb={2}>Message</Field.Label>
+                                <Textarea
+                                    id="message"
+                                    name="message"
+                                    value={formData.message}
+                                    onChange={handleChange}
+                                    placeholder="Entrez votre message"
+                                    rows={4}
+                                    required
+                                />
+                                {errors.message && (
+                                    <Field.ErrorText>{errors.message}</Field.ErrorText>
+                                )}
+                            </Field.Root>
 
-                                <Field.Root>
-                                    <Field.Label mb={2}>Message</Field.Label>
-                                    <Textarea
-                                        id="message"
-                                        name="message"
-                                        value={formData.message}
-                                        onChange={handleChange}
-                                        placeholder="Entrez votre message"
-                                        rows={4}
-                                        required
-                                    />
-                                    {errors.message && (
-                                        <Field.ErrorText>{errors.message}</Field.ErrorText>
-                                    )}
-                                </Field.Root>
-
-                                <Button
-                                    type="submit"
-                                    colorPalette="orange"
-                                    w="full"
-                                    mt={4}
-                                    loading={isLoading}
-                                    disabled={isLoading}
-                                >
-                                    Envoyer le message
-                                </Button>
-                            </Fieldset.Content>
-                        </Fieldset.Root>
-                    </form>
+                            <Button
+                                type="submit"
+                                colorPalette="orange"
+                                w="full"
+                                mt={4}
+                                onClick={handleSubmit}
+                                loading={isLoading} // Changed from 'loading' to 'isLoading'
+                                disabled={isLoading}
+                            >
+                                Envoyer le message
+                            </Button>
+                        </Fieldset.Content>
+                    </Fieldset.Root>
                 </Box>
             </Box>
         </>

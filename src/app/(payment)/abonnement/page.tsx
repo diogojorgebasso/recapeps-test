@@ -38,7 +38,7 @@ const PLANS: Plan[] = [
         features: [
             'Accès à tous les cours',
             'Fiches de révisions écrits et oraux',
-            "Préparation aux oraux",
+            "Préparation aux oraux 1 et 3",
             'Résiliable à tout moment',
         ],
         buttonText: 'Commencer',
@@ -52,7 +52,7 @@ const PLANS: Plan[] = [
         features: [
             'Accès à tous les cours',
             'Fiches de révisions écrits et oraux',
-            "Préparation aux oraux",
+            "Préparation aux oraux 1 et 3",
             "Support premium prioritaire"
         ],
         buttonText: 'Commencer',
