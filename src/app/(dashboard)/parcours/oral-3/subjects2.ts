@@ -24,24 +24,24 @@ export const subjects2: Subject[] = [
         id: 'lexique',
         name: 'Lexique',
         icon: FaBookOpen,
-        premium: false,
+        premium: true,
     },
     {
         id: 'lois',
         name: 'Lois',
         icon: FaGavel,
-        premium: false,
+        premium: true,
     },
     {
         id: 'solutions-long-terme',
         name: 'Solutions long terme',
         icon: FaLightbulb,
-        premium: false,
+        premium: true,
     },
     {
         id: 'valeurs-de-la-republique',
         name: 'Valeurs de la République',
         icon: FaFlag,
-        premium: false,
+        premium: true,
     },
 ];

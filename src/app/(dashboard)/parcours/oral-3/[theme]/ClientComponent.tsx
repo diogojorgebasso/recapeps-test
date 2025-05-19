@@ -32,11 +32,6 @@ export default function ClientComponent({ theme }: { theme: string }) {
             return;
         }
 
-        if (user && !pro) {
-            router.push("/abonnement");
-            return;
-        }
-
         if (theme) {
             getOral(theme)
                 .then((oralDoc) => {

@@ -172,7 +172,7 @@ export default function Page() {
   }, [user]); // Effect only depends on user
 
   return (
-    <Box p={5} maxW="3/4" mx="auto" boxShadow="md">
+    <Box p={5} mx="auto" boxShadow="md">
       <VStack align="start" gap={4}>
 
         <Heading size="lg">Transcription de l&apos;enregistrement</Heading>

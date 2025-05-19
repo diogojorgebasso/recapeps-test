@@ -172,10 +172,29 @@ export default function Page() {
   }, [user]); // Effect only depends on user
 
   return (
-    <Box p={5} maxW="3/4" mx="auto" boxShadow="md">
+    <Box p={5} mx="auto" boxShadow="md">
       <VStack align="start">
 
         <Heading size="lg">Transcription de l&apos;enregistrement</Heading>
+
+        <Box
+          w={{ base: "90%", md: "70%", lg: "66%" }}
+          border="5px solid"
+          borderRadius="lg"
+          p={{ base: 4, md: 6 }}
+          boxShadow="md"
+          textAlign="center"
+          alignSelf={"center"}
+          my={"4"}
+        >
+          <Text fontWeight="bold">Sujet vie scolaire</Text>
+          <Text mt={4}>
+            Vous êtes professeur principal d&apos;une classe de 3ème, vous devez organiser l&apos;élection des délégués de classe. Personne ne propose sa candidature.
+          </Text>
+          <Text mt={2}>
+            Comment analysez-vous cette situation et quelles solutions envisagez-vous ?
+          </Text>
+        </Box>
 
         {(currentStatus === "processing" || (currentStatus === "completed" && isFetchingJson)) && (
           <Alert.Root status="info" variant="subtle" flexDirection="column" alignItems="center" justifyContent="center" textAlign="center" height="200px">
@@ -202,53 +221,6 @@ export default function Page() {
             </Alert.Content>
           </Alert.Root>
         )}
-
-        <Box
-          w={{ base: "90%", md: "70%", lg: "66%" }}
-          border="5px solid"
-          borderRadius="lg"
-          p={{ base: 4, md: 6 }}
-          boxShadow="md"
-          textAlign="center"
-          alignSelf={"center"}
-          my={"4"}
-        >
-          <Text fontWeight="bold">Sujet disciplinaire</Text>
-          <Text mt={4}>
-            Vous êtes professeur d’EPS dans un collège rural. Vous constatez qu’un élève de 6ème est l’objet de moqueries régulières et qu’il ne va pas dans les vestiaires. En l’interrogeant, il vous dit qu’on l’y bouscule et qu’on lui cache ou vole ses affaires.        </Text>
-          <Text mt={2}>
-            Comment analysez-vous cette situation et quelles solutions envisagez-vous ?
-          </Text>
-        </Box>
-
-        {currentStatus === "error" && error && (
-          <Alert.Root status="error">
-            <Alert.Indicator /> {/* Default Chakra icon or your custom one */}
-            <Alert.Content>
-              <Alert.Title>Erreur de Transcription!</Alert.Title>
-              <Alert.Description>{error}</Alert.Description>
-            </Alert.Content>
-          </Alert.Root>
-        )}
-
-        <Box
-          w={{ base: "90%", md: "70%", lg: "66%" }}
-          border="5px solid"
-          borderRadius="lg"
-          p={{ base: 4, md: 6 }}
-          boxShadow="md"
-          textAlign="center"
-          alignSelf={"center"}
-          my={"4"}
-        >
-          <Text fontWeight="bold">Sujet vie scolaire</Text>
-          <Text mt={4}>
-            Vous êtes professeur principal d&apos;une classe de 3ème, vous devez organiser l&apos;élection des délégués de classe. Personne ne propose sa candidature.
-          </Text>
-          <Text mt={2}>
-            Comment analysez-vous cette situation et quelles solutions envisagez-vous ?
-          </Text>
-        </Box>
 
         {currentStatus === "completed" && fetchedTranscriptionText !== null && !isFetchingJson && transcriptionDocData ? (
           <Box
