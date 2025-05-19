@@ -11,9 +11,10 @@ import {
     Button,
 } from '@chakra-ui/react';
 import { LuCircleCheck } from 'react-icons/lu';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useUserWithClaims } from '@/lib/getUser';
+import { useRouter } from 'next/navigation';
 
 interface Plan {
     id: string;
@@ -31,13 +32,11 @@ const PLANS: Plan[] = [
     {
         id: 'monthly',
         name: 'Abonnement Mensuel',
-        price: '5,99 €',
-        priceId: 'price_1QqcQ4Ij1lxZjyG3usxxSmZZ',
+        price: '4,99 €',
+        priceId: 'price_1QrIBREfLSFXfvk1pguf3yl6',
         period: 'par mois',
         features: [
             'Accès à tous les cours',
-            'Flashcards thématiques',
-            'Quiz illimités',
             'Fiches de révisions écrits et oraux',
             "Préparation aux oraux",
             'Résiliable à tout moment',
@@ -47,13 +46,11 @@ const PLANS: Plan[] = [
     {
         id: 'yearly',
         name: 'Abonnement Annuel',
-        price: '50€',
-        priceId: 'price_1RPgqEIj1lxZjyG32oGC7hXI',
+        price: '49,99€',
+        priceId: 'price_1RQI0iEfLSFXfvk1K53fjPtQ',
         period: 'par an',
         features: [
             'Accès à tous les cours',
-            'Flashcards thématiques',
-            'Quiz illimités',
             'Fiches de révisions écrits et oraux',
             "Préparation aux oraux",
             "Support premium prioritaire"
@@ -66,8 +63,19 @@ const PLANS: Plan[] = [
 export default function AbonnementPage() {
     const [selectedId, setSelectedId] = useState('yearly');
     const [loadingId, setLoadingId] = useState<string | null>(null);
+    const router = useRouter();
+    const { pro, user } = useUserWithClaims()
 
-    const { pro } = useUserWithClaims()
+    useEffect(() => {
+        if (user === undefined) {
+            return;
+        }
+
+        if (user === null) {
+            router.push("/login?redirect=/abonnement");
+            return;
+        }
+    }, [user, router]);
 
     if (pro) {
         return (

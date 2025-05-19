@@ -76,8 +76,6 @@ export default function Page() {
 
         loadData();
     }, [user, router]); // Dependencies are correct
-    console.log("Quiz Data:", quizData);
-
 
     const chartData = quizData.map((quiz) => {
         return {
