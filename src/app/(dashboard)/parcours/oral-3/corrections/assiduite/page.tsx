@@ -214,10 +214,10 @@ export default function Page() {
         >
           <Text fontWeight="bold">Sujet vie scolaire</Text>
           <Text mt={4}>
-            Vous êtes professeur(e) d’Éducation Physique et Sportive dans un collège rural. Lors d’un CA, est constaté l’addiction des élèves aux écrans avec des conséquences sur les apprentissages.</Text>
+            Vous êtes professeur d&apos;EPS en lycée, le jour de l&apos;évaluation d&apos;un cycle de danse, une élève de seconde refuse catégoriquement de présenter sa chorégraphie avec son groupe devant toute la classe.
+          </Text>
           <Text mt={2}>
             Comment analysez-vous cette situation et quelles solutions envisagez-vous ?
-
           </Text>
         </Box>
 
