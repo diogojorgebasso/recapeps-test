@@ -16,6 +16,7 @@ export default async function Return({
     if (!session_id)
         throw new Error('Please provide a valid session_id (`cs_test_...`)')
 
+    console.log('session_id', session_id)
     const {
         status,
         customer_details,
