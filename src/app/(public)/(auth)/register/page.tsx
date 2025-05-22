@@ -13,25 +13,24 @@ import {
     Button,
     HStack,
     Separator,
-    Checkbox
+    Checkbox,
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { FaGoogle } from "react-icons/fa";
-import { useColorModeValue } from "@/components/ui/color-mode";
 import { PasswordInput } from "@/components/ui/password-input";
 import { registerWithEmailAndPassword, signUpWithGoogle } from "@/lib/firebase/auth";
-import { z } from "zod";
+import { z, ZodError } from "zod/v4";
 import { useRouter } from 'next/navigation'
 
 // Schéma de validation
 const registerSchema = z.object({
-    name: z.string().nullable().optional(),
-    email: z.string().email("Adresse email invalide"),
+    name: z.string().optional(),
+    email: z.email({ error: "L'email doit être valide" }).toLowerCase(),
     password: z.string()
-        .min(8, "Le mot de passe doit contenir au moins 8 caractères")
-        .regex(/[A-Z]/, "Le mot de passe doit contenir au moins une lettre majuscule")
-        .regex(/[a-z]/, "Le mot de passe doit contenir au moins une lettre minuscule")
-        .regex(/[0-9]/, "Le mot de passe doit contenir au moins un chiffre"),
+        .min(6, { error: "Le mot de passe doit contenir au moins 6 caractères" })
+        .regex(/[A-Z]/, { error: "Le mot de passe doit contenir au moins une lettre majuscule" })
+        .regex(/[0-9]/, { error: "Le mot de passe doit contenir au moins un chiffre" }),
+    acceptTerms: z.boolean()
 });
 
 type RegisterFormData = z.infer<typeof registerSchema>;
@@ -42,27 +41,18 @@ export default function Register() {
         name: "",
         email: "",
         password: "",
+        acceptTerms: false,
     });
-    const [errors, setErrors] = useState<Record<string, string[]>>({});
     const [isLoading, setIsLoading] = useState(false);
-    const [generalError, setGeneralError] = useState<string | null>(null);
+    const [errors, setErrors] = useState<string>();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value, type, checked } = e.target;
-        const newValue = type === 'checkbox' ? checked : value;
+        const { name, value } = e.target;
 
         setFormData(prev => ({
             ...prev,
-            [name]: newValue,
+            [name]: value,
         }));
-
-        if (errors[name]) {
-            setErrors(prev => {
-                const cp = { ...prev };
-                delete cp[name];
-                return cp;
-            });
-        }
     };
 
     const hangleSignUpWithGoogle = async (event: React.FormEvent) => {
@@ -73,26 +63,17 @@ export default function Register() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setGeneralError(null);
-        setErrors({});
-
         try {
             const validated = registerSchema.parse(formData);
             setIsLoading(true);
             await registerWithEmailAndPassword(validated.email, validated.password, validated.name ?? undefined);
-            console.log("Redirecting to verify email");
             router.push("/verify-email");
         } catch (err) {
-            if (err instanceof z.ZodError) {
-                const fieldErrs: Record<string, string[]> = {};
-                err.errors.forEach(issue => {
-                    const key = issue.path[0] as string;
-                    (fieldErrs[key] ||= []).push(issue.message);
-                });
-                setErrors(fieldErrs);
-            } else {
-                setGeneralError("Échec de l'inscription. Veuillez réessayer.");
-                console.error(err);
+            if (err instanceof ZodError) {
+                console.error("ZodError", err);
+                const pretty = z.prettifyError(err);
+                setErrors(pretty)
+                return;
             }
         } finally {
             setIsLoading(false);
@@ -101,10 +82,8 @@ export default function Register() {
 
     return (
         <Flex
-            height="100vh"
             alignItems="center"
             justifyContent="center"
-            bg={useColorModeValue("gray.50", "gray.800")}
             p={4}
         >
             <Card.Root width="sm" shadow="md">
@@ -128,13 +107,12 @@ export default function Register() {
                                         onChange={handleChange}
                                         autoComplete='name'
                                     />
-                                    {errors.name?.map((e, i) => (
-                                        <Field.ErrorText key={i}>{e}</Field.ErrorText>
-                                    ))}
                                 </Field.Root>
 
                                 <Field.Root required>
-                                    <Field.Label>Email</Field.Label>
+                                    <Field.Label>Email
+                                        <Field.RequiredIndicator />
+                                    </Field.Label>
                                     <Input
                                         type="email"
                                         name="email"
@@ -143,43 +121,44 @@ export default function Register() {
                                         placeholder="exemple@email.com"
                                         autoComplete='email'
                                     />
-                                    {errors.email?.map((e, i) => (
-                                        <Field.ErrorText key={i}>{e}</Field.ErrorText>
-                                    ))}
                                 </Field.Root>
 
                                 {/* Mot de passe */}
                                 <Field.Root required>
-                                    <Field.Label>Mot de passe</Field.Label>
+                                    <Field.Label>Mot de passe
+                                        <Field.RequiredIndicator />
+                                    </Field.Label>
                                     <PasswordInput
                                         name="password"
                                         value={formData.password}
                                         onChange={handleChange}
                                         placeholder="Entrez votre mot de passe"
-                                        autoCapitalize="new-password"
+                                        autoComplete="new-password"
                                     />
-                                    {errors.password?.map((e, i) => (
-                                        <Field.ErrorText key={i}>{e}</Field.ErrorText>
-                                    ))}
                                 </Field.Root>
                                 <Field.Root required>
                                     <Checkbox.Root
-                                        name="acceptTerms">
+                                        name="acceptTerms"
+                                        onCheckedChange={(checked) =>
+                                            setFormData(prev => ({
+                                                ...prev,
+                                                acceptTerms: typeof checked === 'boolean' ? checked : false
+                                            }))
+                                        }
+                                    >
                                         <Checkbox.HiddenInput />
                                         <Checkbox.Control />
                                         <Checkbox.Label>J&apos;ai lu et j&apos;accepte la <Link href="/legal/politique-confidentialite">Politique de Confidentialité</Link></Checkbox.Label>
                                     </Checkbox.Root>
-                                    {errors.acceptTerms?.map((e, i) => (
-                                        <Field.ErrorText key={i}>{e}</Field.ErrorText>
-                                    ))}
                                 </Field.Root>
                             </Fieldset.Root>
-
-                            {generalError && (
-                                <Text color="red.500" fontSize="sm">{generalError}</Text>
+                            {errors && (
+                                <Text color="red.500" fontSize="sm">
+                                    {errors}
+                                </Text>
                             )}
-
-                            <Button type="submit"
+                            <Button
+                                type="submit"
                                 colorPalette="blue"
                                 w="full"
                                 loading={isLoading}
