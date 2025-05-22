@@ -21,6 +21,7 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { registerWithEmailAndPassword, signUpWithGoogle } from "@/lib/firebase/auth";
 import { z, ZodError } from "zod/v4";
 import { useRouter } from 'next/navigation'
+import { FirebaseError } from 'firebase/app';
 
 // Schéma de validation
 const registerSchema = z.object({
@@ -70,10 +71,22 @@ export default function Register() {
             router.push("/verify-email");
         } catch (err) {
             if (err instanceof ZodError) {
-                console.error("ZodError", err);
                 const pretty = z.prettifyError(err);
                 setErrors(pretty)
                 return;
+            }
+            if (err instanceof FirebaseError) {
+                switch (err.code) {
+                    case "auth/email-already-in-use":
+                        setErrors("Adresse déjà utilisée");
+                        break;
+                    case "auth/weak-password":
+                        setErrors("Mot de passe trop faible");
+                        break;
+                    default:
+                        setErrors("Internal server error.");
+                        break;
+                }
             }
         } finally {
             setIsLoading(false);
