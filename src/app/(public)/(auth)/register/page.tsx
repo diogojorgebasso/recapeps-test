@@ -67,9 +67,16 @@ export default function Register() {
         try {
             const validated = registerSchema.parse(formData);
             setIsLoading(true);
-            await registerWithEmailAndPassword(validated.email, validated.password, validated.name ?? undefined);
-            router.push("/verify-email");
+            await registerWithEmailAndPassword(
+                validated.email,
+                validated.password,
+                validated.name ?? undefined);
+            console.log("IM GOING TO redirect the user");
+            setIsLoading(false);
+            router.replace("/verify-email");
+            console.log("in theory I redirected the user");
         } catch (err) {
+            setIsLoading(false);
             if (err instanceof ZodError) {
                 const pretty = z.prettifyError(err);
                 setErrors(pretty)
@@ -88,8 +95,6 @@ export default function Register() {
                         break;
                 }
             }
-        } finally {
-            setIsLoading(false);
         }
     };
 

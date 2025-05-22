@@ -28,9 +28,10 @@ export default function VerifyEmail() {
     const router = useRouter();
 
     useEffect(() => {
+        console.log('Verifying email...');
         const unsubscribe = auth.onAuthStateChanged((currentUser) => {
             setLoading(false);
-
+            console.log('Current user verify email:', currentUser);
             if (!currentUser) {
                 router.push('/login');
                 return;

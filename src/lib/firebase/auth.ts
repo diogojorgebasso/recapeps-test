@@ -115,14 +115,15 @@ export async function registerWithEmailAndPassword(
 ) {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    console.log("User registered:", userCredential.user);
-    await updateProfile(userCredential.user, {
-      displayName: displayName,
-    });
-    console.log(userCredential)
     const user = userCredential.user;
     console.log("User registered:", user);
-    return user;
+    await updateProfile(user, {
+      displayName: displayName,
+    });
+    await sendVerificationEmail(user);
+
+    console.log("User registered:", user);
+    return;
   } catch (error) {
     throw error; // Re-throw the error to be handled by the caller
   }
