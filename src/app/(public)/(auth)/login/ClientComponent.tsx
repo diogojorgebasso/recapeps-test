@@ -59,7 +59,7 @@ export default function ClientComponent() {
 
     const handleGoogleSignIn = async (event: React.FormEvent) => { // Make async to await signIn
         event.preventDefault();
-        setIsLoading(true); // Optional: set loading state
+        setIsLoading(true);
         setGeneralError(null);
         try {
             await signInWithGoogle();
@@ -68,7 +68,7 @@ export default function ClientComponent() {
             setGeneralError("Échec de connexion avec Google.");
             console.error("Google Sign-In error:", error);
         } finally {
-            setIsLoading(false); // Optional: reset loading state
+            setIsLoading(false);
         }
     };
 

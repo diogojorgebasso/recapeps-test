@@ -37,7 +37,7 @@ export default function SubscriptionSection({ pro }: { pro: boolean }) {
                 Passer à Recap’eps Pro
             </Heading>
             <Button asChild>
-                <Link href="/checkout">S’abonner</Link>
+                <Link href="/abonnement">S’abonner</Link>
             </Button>
         </>
     );
