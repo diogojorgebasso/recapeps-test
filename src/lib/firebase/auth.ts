@@ -1,6 +1,5 @@
 import {
   GoogleAuthProvider,
-  signInWithPopup,
   onAuthStateChanged as _onAuthStateChanged,
   onIdTokenChanged as _onIdTokenChanged,
   sendEmailVerification,
@@ -9,12 +8,12 @@ import {
   updateProfile,
   sendPasswordResetEmail as firebaseSendPasswordResetEmail,
   NextOrObserver,
-  User
+  User,
+  signInWithRedirect,
+  getRedirectResult
 } from "firebase/auth";
 
 import { auth } from "@/lib/firebase/clientApp";
-
-let popupInProgress = false;
 
 export function onAuthStateChanged(cb: NextOrObserver<User>) {
   return _onAuthStateChanged(auth, cb);
@@ -25,47 +24,14 @@ export function onIdTokenChanged(cb: NextOrObserver<User>) {
 }
 
 export async function signInWithGoogle() {
-  if (popupInProgress) return;
-  popupInProgress = true;
+
   const provider = new GoogleAuthProvider();
 
   try {
-    const result = await signInWithPopup(auth, provider);
-    const user = result.user;
-
-    // If the user's email is not verified, send a verification email
-    if (user && !user.emailVerified) {
-      await sendEmailVerification(user);
-      console.log("Verification email sent to", user.email);
-    }
+    await signInWithRedirect(auth, provider);
   } catch (error) {
     console.error("Error signing in with Google", error);
     throw error;
-  } finally {
-    popupInProgress = false;
-  }
-}
-
-export async function signUpWithGoogle() {
-  if (popupInProgress) return;
-
-  popupInProgress = true;
-
-  const provider = new GoogleAuthProvider();
-
-  try {
-    const result = await signInWithPopup(auth, provider);
-    const user = result.user;
-
-    if (!user.emailVerified) {
-      await sendEmailVerification(user);
-      console.log("Verification email sent to", user.email); // TODO : Better error handling.
-    }
-  } catch (error) {
-    console.error("Error signing up with Google", error);
-    throw error;
-  } finally {
-    popupInProgress = false;
   }
 }
 

@@ -193,6 +193,7 @@ export default function Page() {
                                 type="submit"
                                 colorPalette="orange"
                                 w="full"
+                                color="white"
                                 mt={4}
                                 onClick={handleSubmit}
                                 loading={isLoading} // Changed from 'loading' to 'isLoading'

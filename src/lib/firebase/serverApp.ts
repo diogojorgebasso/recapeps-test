@@ -8,7 +8,7 @@ import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
     apiKey: "AIzaSyCQL9kH3r-y4Q4PtzQ_t9lBJl5J3zuty7k",
-    authDomain: "recapeps-test.firebaseapp.com",
+    authDomain: "recapeps.fr",
     projectId: "recapeps-test",
     storageBucket: "recapeps-test.firebasestorage.app",
     messagingSenderId: "298375526115",

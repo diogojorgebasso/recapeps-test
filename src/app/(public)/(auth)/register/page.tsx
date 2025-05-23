@@ -18,7 +18,7 @@ import {
 import Link from "next/link";
 import { FaGoogle } from "react-icons/fa";
 import { PasswordInput } from "@/components/ui/password-input";
-import { registerWithEmailAndPassword, signUpWithGoogle } from "@/lib/firebase/auth";
+import { registerWithEmailAndPassword, signInWithGoogle } from "@/lib/firebase/auth";
 import { z, ZodError } from "zod/v4";
 import { useRouter } from 'next/navigation'
 import { FirebaseError } from 'firebase/app';
@@ -58,7 +58,7 @@ export default function Register() {
 
     const hangleSignUpWithGoogle = async (event: React.FormEvent) => {
         event.preventDefault();
-        signUpWithGoogle();
+        signInWithGoogle();
         router.push("/parcours/dashboard"); // we assume the email is verified.
     }
 

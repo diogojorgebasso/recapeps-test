@@ -1,7 +1,9 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation' // Import useSearchParams
+
 import {
     Flex,
     Card,
@@ -15,11 +17,12 @@ import {
 } from "@chakra-ui/react";
 import { FaGoogle } from "react-icons/fa";
 import { PasswordInput } from "@/components/ui/password-input";
-import { signInWithGoogle, signInWithEmail } from "@/lib/firebase/auth";
-import { z } from "zod";
-import { useRouter, useSearchParams } from 'next/navigation' // Import useSearchParams
 
-// Define the validation schema
+import { signInWithEmail } from "@/lib/firebase/auth";
+import { z } from "zod";
+import { getRedirectResult, signInWithRedirect, GoogleAuthProvider } from 'firebase/auth';
+import { auth } from "@/lib/firebase/clientApp";
+
 const loginSchema = z.object({
     email: z.string().email("Adresse email invalide"),
     password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères"),
@@ -30,7 +33,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 export default function ClientComponent() {
 
     const router = useRouter();
-    const searchParams = useSearchParams(); // Get search params
+    const searchParams = useSearchParams();
     const [formData, setFormData] = useState<LoginFormData>({
         email: "",
         password: "",
@@ -57,19 +60,20 @@ export default function ClientComponent() {
         }
     };
 
-    const handleGoogleSignIn = async (event: React.FormEvent) => { // Make async to await signIn
+    const handleGoogleSignIn = async (event: React.FormEvent) => {
         event.preventDefault();
-        setIsLoading(true); // Optional: set loading state
+        setIsLoading(true);
         setGeneralError(null);
         try {
-            await signInWithGoogle();
-            router.push(getRedirectUrl());
+            const provider = new GoogleAuthProvider();
+            console.log("Redirecting to Google sign-in");
+            await signInWithRedirect(auth, provider);
+            console.log("I WILL NOT SEE THIS to Google sign-in");
         } catch (error) {
-            setGeneralError("Échec de connexion avec Google.");
-            console.error("Google Sign-In error:", error);
-        } finally {
-            setIsLoading(false); // Optional: reset loading state
+            console.error("Error signing in with Google", error);
+            throw error;
         }
+        setIsLoading(false);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -102,6 +106,25 @@ export default function ClientComponent() {
             setIsLoading(false);
         }
     };
+
+    useEffect(() => {
+        console.log("I entered in the useEffect")
+        const checkRedirectResult = async () => {
+            try {
+                const result = await getRedirectResult(auth);
+                const user = result?.user;
+                console.log("User from redirect result:", user);
+                if (user) {
+                    console.log("User signed in via redirect", user);
+                    router.push(getRedirectUrl());
+                }
+            } catch (error) {
+                console.error("Error handling redirect auth", error);
+            }
+        };
+
+        checkRedirectResult();
+    }, [router]);
 
     return (
         <Flex

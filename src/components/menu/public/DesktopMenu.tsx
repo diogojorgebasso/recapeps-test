@@ -51,7 +51,6 @@ function useUserSession(initialUser: any) {
 export default function DesktopMenu({ initialUser }: { initialUser: any }) {
     const user = useUserSession(initialUser);
     const [isNotification, setIsNotification] = useState(false);
-    console.log("user", user);
 
     useEffect(() => {
         if (user) {
