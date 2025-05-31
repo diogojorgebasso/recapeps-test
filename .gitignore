@@ -57,3 +57,4 @@ apphosting.local.yaml
 *.tfstate.backup
 *.tfvars.secret
 *.tfvars.local
+storybook-static
