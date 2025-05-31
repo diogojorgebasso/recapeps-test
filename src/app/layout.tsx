@@ -20,13 +20,13 @@ export default async function RootLayout({
   return (
     <html suppressHydrationWarning lang="fr">
       <body>
-        <PushNotificationsProvider>
+        <Provider>
           <TrackingConsentProvider>
-            <Provider>
+            <PushNotificationsProvider>
               {children}
-            </Provider>
+            </PushNotificationsProvider>
           </TrackingConsentProvider>
-        </PushNotificationsProvider>
+        </Provider>
       </body>
     </html>
   );

@@ -2,7 +2,7 @@
 
 import { ReactNode, createContext, useState, useEffect, useContext } from 'react';
 import { firebaseApp } from '@/lib/firebase/clientApp';
-
+import { ConsentBanner } from './ConsentBanner';
 type TrackingConsentCtx = { consentGiven: boolean | null; setConsent: (v: boolean) => void };
 
 export const TrackingConsentContext = createContext<TrackingConsentCtx | undefined>(undefined);
@@ -36,6 +36,7 @@ export function TrackingConsentProvider({ children }: { children: ReactNode }) {
     return (
         <TrackingConsentContext.Provider value={{ consentGiven, setConsent }}>
             {children}
+            <ConsentBanner />
         </TrackingConsentContext.Provider>
     );
 };
