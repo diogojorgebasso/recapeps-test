@@ -10,75 +10,55 @@ import {
     Heading,
 } from '@chakra-ui/react';
 import React, { useState } from 'react';
+import quizData from '@/data/quizData.json';
 
-const questions = [
-    {
-        question: "L’OMS définit la santé comme un bien-être :",
-        options: [
-            "Physique, mental, social",
-            "Physique, psychologique, familial",
-            "Familial, amical, personnel",
-            "Psychologique, moteur, social",
-        ],
-        correctAnswer: "Physique, mental, social",
-    },
-    {
-        question: "Jusqu’aux années 60, la santé est principalement considérée comme :",
-        options: ["Physique", "Mentale", "Sociale", "Psychologique"],
-        correctAnswer: "Physique",
-    },
-    {
-        question: "Les groupes d’élèves établis avec les IO de 1945 prennent en compte la santé :",
-        options: ["Motrice", "Physiologique", "Psychologique", "Sociale"],
-        correctAnswer: "Physiologique",
-    },
-    {
-        question: "Les Lendits, relancés dans les années 1930, étaient :",
-        options: [
-            "Des compétitions sportives scolaires",
-            "Des activités centrées sur les sports de combat",
-            "Des rassemblements collectifs de plein air",
-            "Des épreuves exclusivement médicales",
-        ],
-        correctAnswer: "Des rassemblements collectifs de plein air",
-    },
-    {
-        question: "Le rapport d’Helsinki (1999) souligne que l’activité physique :",
-        options: [
-            "Doit être réservée à l’élite sportive",
-            "A une importance pour la santé, l’éducation et la culture",
-            "Doit être centrée sur les capacités physiques individuelles",
-            "Est uniquement une pratique compétitive",
-        ],
-        correctAnswer: "A une importance pour la santé, l’éducation et la culture",
-    },
-];
+interface Question {
+    question: string;
+    options: string[];
+    correctAnswer: number;
+}
 
-export default function QuizComponent1() {
+interface QuizData {
+    title: string;
+    level: number;
+    questions: Question[];
+}
+
+interface QuizDataCollection {
+    quiz1: QuizData;
+    quiz2: QuizData;
+}
+
+interface QuizProps {
+    quizId: 'quiz1' | 'quiz2';
+}
+
+export default function Quiz({ quizId }: QuizProps) {
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [selectedOption, setSelectedOption] = useState<string | null>(null);
     const [score, setScore] = useState(0);
     const [showAnswer, setShowAnswer] = useState(false);
     const [isFinished, setIsFinished] = useState(false);
 
-    const question = questions[currentQuestion];
-    const progress = (currentQuestion / questions.length) * 100;
+    const typedQuizData = quizData as QuizDataCollection;
+    const quiz = typedQuizData[quizId];
+    const question = quiz.questions[currentQuestion];
+    const progress = (currentQuestion / quiz.questions.length) * 100;
 
     const handleOptionClick = (option: string) => {
         if (!showAnswer) {
             setSelectedOption(option);
         }
-    };
-
-    const handleValidation = () => {
-        if (selectedOption === question.correctAnswer) {
+    }; const handleValidation = () => {
+        const selectedIndex = question.options.indexOf(selectedOption!);
+        if (selectedIndex === question.correctAnswer) {
             setScore((prev) => prev + 1);
         }
         setShowAnswer(true);
     };
 
     const handleNext = () => {
-        if (currentQuestion + 1 < questions.length) {
+        if (currentQuestion + 1 < quiz.questions.length) {
             setCurrentQuestion((prev) => prev + 1);
             setSelectedOption(null);
             setShowAnswer(false);
@@ -92,7 +72,6 @@ export default function QuizComponent1() {
             <Box
                 textAlign="center"
                 p={6}
-
                 rounded="xl"
                 shadow="md"
                 w={{ base: "90%", md: "600px" }}
@@ -100,7 +79,7 @@ export default function QuizComponent1() {
             >
                 <Heading size="lg" mb={4}>Quiz terminé !</Heading>
                 <Text fontSize="xl" fontWeight="semibold" mb={4}>
-                    Votre score : <Text as="span" fontWeight="bold">{score} / {questions.length}</Text>
+                    Votre score : <Text as="span" fontWeight="bold">{score} / {quiz.questions.length}</Text>
                 </Text>
                 <Text mb={8}>
                     Si tu souhaites accéder à plus de contenu et suivre ta progression, tu peux créer ton compte juste ici 😎
@@ -119,7 +98,7 @@ export default function QuizComponent1() {
             overflow="hidden">
             <Flex justify="space-between" mb={2}>
                 <Text fontSize="sm" color="gray.500">
-                    Niveau : {1}
+                    Niveau : {quiz.level}
                 </Text>
             </Flex>
 
@@ -132,13 +111,11 @@ export default function QuizComponent1() {
                         {question.question}
                     </Text>
                 </Box>
-            </Heading>
-
-            <VStack gap={3} align="stretch">
-                {question.options.map((option) => {
+            </Heading>            <VStack gap={3} align="stretch">
+                {question.options.map((option: string, index: number) => {
                     let bg = 'gray.800';
                     if (showAnswer) {
-                        if (option === question.correctAnswer) {
+                        if (index === question.correctAnswer) {
                             bg = 'green.500';
                         } else if (option === selectedOption) {
                             bg = 'red.500';
@@ -160,7 +137,11 @@ export default function QuizComponent1() {
                             fontSize="md"
                             fontWeight="medium"
                         >
-                            {option}
+                            <Text whiteSpace="normal"
+                                wordBreak="break-word"
+                                overflowWrap="break-word">
+                                {option}
+                            </Text>
                         </Button>
                     );
                 })}
@@ -188,4 +169,4 @@ export default function QuizComponent1() {
             </Button>
         </Box>
     );
-};
+}

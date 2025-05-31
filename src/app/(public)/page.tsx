@@ -21,8 +21,7 @@ import Link from "next/link";
 import { LuNotebookPen, LuListTodo } from "react-icons/lu";
 import { FiBookOpen } from "react-icons/fi"
 import Logo from "@/components/ui/logo-recapeps";
-import QuizComponent1 from "./quiz1";
-import QuizComponent2 from "./quiz2";
+import Quiz from "./Quiz";
 
 export default function Home() {
   return (
@@ -164,11 +163,10 @@ export default function Home() {
                     objectFit="contain"
                   />
                 </Flex>
-              </GridItem>
-              <GridItem>
+              </GridItem>              <GridItem>
                 <VStack align="start" >
                   <Flex wrap="wrap" gap={4} justify="center" height="100%">
-                    <QuizComponent1 />
+                    <Quiz quizId="quiz1" />
                   </Flex>
                 </VStack>
               </GridItem>
@@ -202,7 +200,7 @@ export default function Home() {
               <GridItem>
                 <VStack align="start">
                   <Flex wrap="wrap" gap={4} justify="center" height="100%">
-                    <QuizComponent2 />
+                    <Quiz quizId="quiz2" />
                   </Flex>
                 </VStack>
               </GridItem>
@@ -225,7 +223,7 @@ export default function Home() {
                 src="/oral-1.jpeg"
                 alt="Oral 1"
                 height="auto"
-                width="50%"
+                width={{ base: "90%", md: "70%", lg: "50%" }}
               />
             </Center>
           </Box>
@@ -243,7 +241,8 @@ export default function Home() {
                 src="/oral-3.jpeg"
                 alt="Oral 3"
                 height="auto"
-                width="50%"
+                width={{ base: "90%", md: "70%", lg: "50%" }}
+                maxWidth="600px"
               />
             </Center>
 

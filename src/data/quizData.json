@@ -1,0 +1,99 @@
+{
+  "quiz1": {
+    "title": "Écrit 1 - Santé",
+    "level": 1,
+    "questions": [
+      {
+        "question": "L'OMS définit la santé comme un bien-être :",
+        "options": [
+          "Physique, mental, social",
+          "Physique, psychologique, familial",
+          "Familial, amical, personnel",
+          "Psychologique, moteur, social"
+        ],
+        "correctAnswer": 0
+      },
+      {
+        "question": "Jusqu'aux années 60, la santé est principalement considérée comme :",
+        "options": ["Physique", "Mentale", "Sociale", "Psychologique"],
+        "correctAnswer": 0
+      },
+      {
+        "question": "Les groupes d'élèves établis avec les IO de 1945 prennent en compte la santé :",
+        "options": ["Motrice", "Physiologique", "Psychologique", "Sociale"],
+        "correctAnswer": 1
+      },
+      {
+        "question": "Les Lendits, relancés dans les années 1930, étaient :",
+        "options": [
+          "Des compétitions sportives scolaires",
+          "Des activités centrées sur les sports de combat",
+          "Des rassemblements collectifs de plein air",
+          "Des épreuves exclusivement médicales"
+        ],
+        "correctAnswer": 2
+      },
+      {
+        "question": "Le rapport d'Helsinki (1999) souligne que l'activité physique :",
+        "options": [
+          "Doit être réservée à l'élite sportive",
+          "A une importance pour la santé, l'éducation et la culture",
+          "Doit être centrée sur les capacités physiques individuelles",
+          "Est uniquement une pratique compétitive"
+        ],
+        "correctAnswer": 1
+      }
+    ]
+  },
+  "quiz2": {
+    "title": "Écrit 2 - Compétences",
+    "level": 1,
+    "questions": [
+      {
+        "question": "En EPS on retrouve … compétences travaillées en continuité sur les différents cycles ",
+        "options": ["3", "5", "7", "9"],
+        "correctAnswer": 1
+      },
+      {
+        "question": "Comment le S4C (2015) définit-il une compétence ?",
+        "options": [
+          "L'aptitude à mobiliser ses ressources pour accomplir une tâche ou faire face à une situation complexe ou inédite",
+          "Une action reproductible dans toutes les situations ",
+          "Une capacité spécifique à une discipline donnée",
+          "Une qualité qui ne se développe que par la répétition "
+        ],
+        "correctAnswer": 0
+      },
+      {
+        "question": "En quoi consiste une compétence sociale en EPS?",
+        "options": [
+          "Jouer individuellement et interagir avec les autres",
+          "Exécuter les consignes sans réfléchir",
+          "Partager des règles, assumer des rôles et des responsabilités ",
+          "Se concentrer sur sa propre performance"
+        ],
+        "correctAnswer": 2
+      },
+      {
+        "question": "Quels sont les trois types de compétences abordées en EPS ?",
+        "options": [
+          "Physiques, techniques et théoriques",
+          "Personnelles, scolaires et sportives ",
+          "Rapides, lentes et moyennes",
+          "Motrices, méthodologiques et sociales"
+        ],
+        "correctAnswer": 3
+      },
+      {
+        "question": "Quelle est la première compétence travaillée en EPS selon le BO 2015 ?",
+        "options": [
+          "Développer sa motricité et construire un langage du corps",
+          "Apprendre les règles de tous les sports",
+          "Se spécialiser dans une discipline",
+          "Développer uniquement l'endurance"
+        ],
+        "correctAnswer": 0
+      }
+    ]
+  }
+}
